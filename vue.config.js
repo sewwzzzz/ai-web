@@ -14,5 +14,9 @@ module.exports = defineConfig({
         resolvers: [ElementPlusResolver()],
       }),
     ],
-  }
+    module: {
+      rules: [
+      ]
+    },
+  },
 })
