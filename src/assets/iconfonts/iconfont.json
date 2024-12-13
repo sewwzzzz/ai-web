@@ -1,0 +1,51 @@
+{
+  "id": "4692039",
+  "name": "iconfont",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "3382096",
+      "name": "深度学习",
+      "font_class": "shenduxuexi",
+      "unicode": "e698",
+      "unicode_decimal": 59032
+    },
+    {
+      "icon_id": "6570228",
+      "name": "知识",
+      "font_class": "zhishi",
+      "unicode": "e61a",
+      "unicode_decimal": 58906
+    },
+    {
+      "icon_id": "13299880",
+      "name": "计算机视觉",
+      "font_class": "jisuanjishijue",
+      "unicode": "e848",
+      "unicode_decimal": 59464
+    },
+    {
+      "icon_id": "18368435",
+      "name": "机器人",
+      "font_class": "jiqiren",
+      "unicode": "e68c",
+      "unicode_decimal": 59020
+    },
+    {
+      "icon_id": "21053827",
+      "name": "软件",
+      "font_class": "ruanjian",
+      "unicode": "e689",
+      "unicode_decimal": 59017
+    },
+    {
+      "icon_id": "21445807",
+      "name": "自然语言处理",
+      "font_class": "ziranyuyanchuli",
+      "unicode": "e68f",
+      "unicode_decimal": 59023
+    }
+  ]
+}
