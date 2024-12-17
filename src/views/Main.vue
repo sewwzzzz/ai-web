@@ -10,7 +10,28 @@
         </div>
       </aside>
       <article id="main-article">
-
+        <div class="main-box">
+          <div class="box-title">
+            基础知识
+          </div>
+          <div class="box-content">
+            <el-menu
+              ellipsis
+              class="el-menu-popper-demo"
+              mode="horizontal"
+              :popper-offset="0"
+              style="width: 600px"
+            >
+              <el-menu-item index="1">Processing Center</el-menu-item>
+              <el-sub-menu index="2">
+                <template #title>Workspace</template>
+                <el-menu-item index="2-1">item one</el-menu-item>
+                <el-menu-item index="2-2">item two</el-menu-item>
+                <el-menu-item index="2-3">item three</el-menu-item>
+              </el-sub-menu>
+            </el-menu>
+          </div>
+        </div>
       </article>
     </div>
 </template>
@@ -18,6 +39,7 @@
 <style lang="css" scoped>
 #main-header{
   width:100%;
+  min-width: 950px;
   height:64px;
   /* x偏移量 | y偏移量 | 阴影模糊半径 | 阴影扩散半径 | 阴影颜色 */
   box-shadow: 0 5px 10px -5px rgb(108, 108, 108);
@@ -33,6 +55,7 @@
   width:150px;
   height:100%;
   background-color:rgb(249, 249, 249);
+  flex-shrink:0; /*使得不被flex:1的div压缩 */
 }
 
 .main-title{
@@ -57,10 +80,33 @@
 .title{
   margin-left:5px;
 }
+
 #main-article{
   flex:1;
   height:100%;
   background-color:rgb(231, 238, 244);
+}
+
+.main-box{
+  margin-top:10px;
+  box-sizing: border-box;
+  height:380px;
+  width:100%;
+  min-width: 800px;
+  padding: 10px 20px;
+}
+
+.box-title{
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 20px;
+  color:#555555;
+}
+
+.box-content{
+  margin-top:5px;
+  width:100%;
+  height:calc(100% - 10px - 10px - 20px - 5px);
+  background-color: #ffffff;
 }
 </style>
 
