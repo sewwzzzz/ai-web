@@ -1,68 +1,72 @@
 <template>
-    <header id="main-header">
-
-    </header>
-    <div id="main-div">
-      <aside id="main-aside">
-        <div v-for="(item,index) in menu" :key="index" class="main-title">
-          <div :class="item.icon"></div>
-          <div class="title">{{item.title}}</div>
-        </div>
-      </aside>
-      <article id="main-article">
-        <div class="main-box">
-          <div class="box-title">
-            基础知识
-          </div>
-          <div class="box-content">
-            <el-menu
-              ellipsis
-              class="el-menu-popper-demo"
-              mode="horizontal"
-              :popper-offset="0"
-              style="width: 600px"
-            >
-              <el-menu-item index="1">Processing Center</el-menu-item>
-              <el-sub-menu index="2">
-                <template #title>Workspace</template>
-                <el-menu-item index="2-1">item one</el-menu-item>
-                <el-menu-item index="2-2">item two</el-menu-item>
-                <el-menu-item index="2-3">item three</el-menu-item>
-              </el-sub-menu>
-            </el-menu>
-          </div>
-        </div>
-      </article>
+  <aside id="main-aside">
+      <div id="aside-sign">
+        <svg-icon id="sign-icon" name="aiweb"></svg-icon>
+        <div id="sign-title">AI资讯</div>
+      </div>
+      <div v-for="(item,index) in menu" :key="index" class="aside-title">
+        <div :class="item.icon"></div>
+        <div class="title">{{item.title}}</div>
+      </div>
+  </aside>
+  <article id="main-article">
+    <div id="article-header">
+      <SelectInput id="header-input" :menuItem="menuItem"></SelectInput>
     </div>
+    <div class="article-box" v-for="(item,index) in menu" :key="index">
+      <div class="box-title">
+        {{ item.title }}
+      </div>
+      <div ref="boxContentRef" class="box-content">
+        <Menu :menuWidth="menuWidth" :menuTitle="item.menuTitle" :menuItem="item.menuItem"></Menu>
+      </div>
+    </div>
+  </article>
 </template>
 
 <style lang="css" scoped>
-#main-header{
+#article-header{
   width:100%;
-  min-width: 950px;
   height:64px;
   /* x偏移量 | y偏移量 | 阴影模糊半径 | 阴影扩散半径 | 阴影颜色 */
-  box-shadow: 0 5px 10px -5px rgb(108, 108, 108);
-}
-
-#main-div{
-  height: calc(100% - 64px - 5px);
-  display:flex;
-  margin-top:5px;
+  box-shadow: 0 3px 10px -5px rgb(173, 172, 172);
 }
 
 #main-aside{
+  position: fixed;
   width:150px;
   height:100%;
   background-color:rgb(249, 249, 249);
-  flex-shrink:0; /*使得不被flex:1的div压缩 */
 }
 
-.main-title{
+#aside-sign{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  width:100%;
+  height:64px;
+  border-bottom: 1px #e0dbdb solid;
+  background-color: #ffffff;
+}
+
+#sign-icon{
+  width:35px;
+  height:35px;
+}
+
+#sign-title{
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 30px;
+  font-weight:600;
+}
+
+.aside-title{
+  box-sizing: border-box;
   height: 60px;
   width:100%;
   /* 位置 */
   display: flex;
+  padding-left: 10px;
   align-items:center;
   /* 字体 */
   font-weight:400;
@@ -71,7 +75,7 @@
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
 }
 
-.main-title:hover{
+.aside-title:hover{
   background-color: rgb(224, 224, 224);
   color:rgb(89, 97, 249);
   cursor:pointer;
@@ -82,17 +86,17 @@
 }
 
 #main-article{
-  flex:1;
-  height:100%;
+  margin-left: 150px;
+  width:calc(100% - 150px);
   background-color:rgb(231, 238, 244);
+  overflow: auto;
 }
 
-.main-box{
+.article-box{
   margin-top:10px;
   box-sizing: border-box;
   height:380px;
   width:100%;
-  min-width: 800px;
   padding: 10px 20px;
 }
 
@@ -111,30 +115,72 @@
 </style>
 
 <script setup>
+import SelectInput from '@/components/SelectInput.vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+
+const menuItem = ['Bilibili', '微信公众号', 'Github','huggingface']
 const menu = {
   baseKnowledge: {
     title: '基础知识',
     icon: 'iconfont icon-zhishi',
+    menuTitle: ['Python', '数学基础'],
+    menuItem: ['Bilibili', '微信公众号', 'Github','huggingface']
   },
   tool: {
     title: '工具与软件',
-    icon:'iconfont icon-ruanjian',
+    icon: 'iconfont icon-ruanjian',
+    menuTitle: ['Numpy', 'Pandas', '数据分析与实战','Pytorch','TenserFlow'],
+    menuItem: ['Bilibili', '微信公众号', 'Github','huggingface']
   },
   machineLearning: {
     title: '机器学习',
-    icon:'iconfont icon-jiqiren',
+    icon: 'iconfont icon-jiqiren',
+    menuTitle: ['机器学习理论', '机器学习实战'],
+    menuItem: ['Bilibili', '微信公众号', 'Github','huggingface']
   },
   deepLearning: {
     title: '深度学习',
     icon: 'iconfont icon-shenduxuexi',
+    menuTitle: ['深度学习理论', '深度学习实战'],
+    menuItem: ['Bilibili', '微信公众号', 'Github','huggingface']
   },
   computerVision: {
     title: '计算机视觉',
-    icon:'iconfont icon-jisuanjishijue',
+    icon: 'iconfont icon-jisuanjishijue',
+    menuTitle: ['图像分类', '目标检测','图像分割','目标跟踪','图像生成'],
+    menuItem: ['Bilibili', '微信公众号', 'Github','huggingface']
   },
   naturalLanguageProcessing: {
     title: '自然语言处理',
-    icon:'iconfont icon-ziranyuyanchuli',
+    icon: 'iconfont icon-ziranyuyanchuli',
+    menuTitle: ['文本分配', '文本匹配','文本生成','序列标注'],
+    menuItem: ['Bilibili', '微信公众号', 'Github','huggingface']
   }
 }
+
+const boxContentRef = ref(null)
+const menuWidth = ref(1076)
+// 计算box-content的宽度
+function debounce(fn,delay) {
+  let timer = null
+  return function () {
+    const context = this
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => {
+      fn.apply(context,arguments)
+    }, delay)
+  }
+}
+
+const updateMenuWidth = debounce(() => {
+  menuWidth.value = boxContentRef.value.offsetWidth*0.8
+}, 100)
+
+onMounted(()=>{
+  window.addEventListener('resize', updateMenuWidth)
+})
+
+onBeforeUnmount(()=>{
+  window.removeEventListener('resize',updateMenuWidth)
+})
 </script>
