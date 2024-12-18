@@ -12,6 +12,11 @@
   <article id="main-article">
     <div id="article-header">
       <SelectInput id="header-input" :menuItem="menuItem"></SelectInput>
+      <div id="header-right">
+        <div id="right-avator"></div>
+        <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title">
+        </ToolIcon>
+      </div>
     </div>
     <div class="article-box" v-for="(item,index) in menu" :key="index">
       <div class="box-title">
@@ -26,10 +31,46 @@
 
 <style lang="css" scoped>
 #article-header{
+  position:relative;
   width:100%;
   height:64px;
+  background: linear-gradient(to right, #1E88F5, #FFC107); /* 初始渐变 */
+  animation: blink 3s infinite alternate;
+  opacity: 1; /* 初始透明度 */
   /* x偏移量 | y偏移量 | 阴影模糊半径 | 阴影扩散半径 | 阴影颜色 */
-  box-shadow: 0 3px 10px -5px rgb(173, 172, 172);
+  box-shadow: 0 3px 10px -5px rgb(14, 4, 78);
+}
+
+@keyframes blink {
+  0% { opacity: 1; } /* 完全不透明 */
+  100% { opacity: 0.7; } /* 半透明 */
+}
+
+#header-input{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%)
+}
+
+#header-right{
+  float:right;
+  margin-right: 10px;
+  height:100%;
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+
+#right-avator{
+  background-color: #1E88F5;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+#right-avator:hover{
+  cursor: pointer;
 }
 
 #main-aside{
@@ -158,8 +199,27 @@ const menu = {
   }
 }
 
+const tools = [
+  {
+    name: 'notices',
+    title: '消息'
+  },
+  {
+    name: 'dynamics',
+    title:'动态'
+  },
+  {
+    name: 'collections',
+    title:'收藏'
+  },
+  {
+    name: 'histories',
+    title:'历史'
+  }
+]
+
 const boxContentRef = ref(null)
-const menuWidth = ref(1076)
+let menuWidth = 1076
 // 计算box-content的宽度
 function debounce(fn,delay) {
   let timer = null
@@ -173,7 +233,7 @@ function debounce(fn,delay) {
 }
 
 const updateMenuWidth = debounce(() => {
-  menuWidth.value = boxContentRef.value.offsetWidth*0.8
+  menuWidth = boxContentRef.value.Width*0.8
 }, 100)
 
 onMounted(()=>{

@@ -4,7 +4,7 @@
     class="el-menu-popper-demo"
     mode="horizontal"
     :popper-offset="0"
-    :style="{width: props.menuWidth}"
+    :style="`width: ${props.menuWidth}px`"
   >
     <el-sub-menu v-for="(TitleItem,TitleIndex) in props.menuTitle" :key="TitleIndex" :index = "TitleIndex.toString()"> 
         <template #title>{{ TitleItem }}</template>
