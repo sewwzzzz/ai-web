@@ -13,7 +13,7 @@
   <article id="main-article">
     <el-backtop :right="100" :bottom="100" />
     <div id="article-header">
-      <SelectInput id="header-input" :menuItem="menuItem"></SelectInput>
+      <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
       <div id="header-right">
         <div id="right-avator"></div>
         <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title">
@@ -26,7 +26,7 @@
       </div>
       <div ref="boxContentRef" class="box-content">
         <div class="content-header">
-          <Menu :menuWidth="menuWidth" :menuTitle="item.menuTitle" :menuItem="item.menuItem"></Menu>
+          <Menu ref="menuRef" :menuTitle="item.menuTitle" :menuItem="item.menuItem"></Menu>
           <el-button class="header-more">
             查看更多<el-icon><i-ep-arrow-right></i-ep-arrow-right></el-icon>
           </el-button>
@@ -168,7 +168,8 @@
 
 .header-more{
   position:absolute;
-  right:0%;
+  top:5px;
+  right:5px;
 }
 </style>
 
@@ -241,8 +242,6 @@ const tools = [
   }
 ]
 
-const boxContentRef = ref(null)
-let menuWidth = 1076
 // 计算box-content的宽度
 function debounce(fn,delay) {
   let timer = null
@@ -255,9 +254,17 @@ function debounce(fn,delay) {
   }
 }
 
+const menuRef = ref(null)
+const boxContentRef = ref(null)
+let menuWidth = 1076
+const inputRef = ref(null)
 // 设定每个板块menu的宽度
-const updateMenuWidth = debounce(() => {
-  menuWidth = boxContentRef.value.Width*0.8
+const updateWidth = debounce(() => {
+  menuWidth = boxContentRef.value[0].offsetWidth * 0.8
+  inputRef.value.setInputWidth(boxContentRef.value[0].offsetWidth*0.4)
+  menuRef.value.forEach((item) => {
+    item.setMenuWidth(menuWidth)
+  })
 }, 100)
 
 // 获取一下scrollTop高度
@@ -265,13 +272,14 @@ const handleScroll = function () {
   console.log('当前的滚动条高度', document.documentElement.scrollTop)
 }
 
-onMounted( () =>{
-  window.addEventListener('resize', updateMenuWidth)
+onMounted(() => {
+  updateWidth()
+  window.addEventListener('resize', updateWidth)
   // window.addEventListener('scroll',handleScroll)
 })
 
 onBeforeUnmount(()=>{
-  window.removeEventListener('resize', updateMenuWidth)
+  window.removeEventListener('resize', updateWidth)
   // window.removeEventListener('scroll',handleScroll)
 })
 

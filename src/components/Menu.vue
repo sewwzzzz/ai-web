@@ -4,7 +4,7 @@
     class="el-menu-popper-demo"
     mode="horizontal"
     :popper-offset="0"
-    :style="`width: ${props.menuWidth}px`"
+    :style="{width:realWidth + 'px'}"
   >
     <el-sub-menu v-for="(TitleItem,TitleIndex) in props.menuTitle" :key="TitleIndex" :index = "TitleIndex.toString()"> 
         <template #title>{{ TitleItem }}</template>
@@ -18,12 +18,8 @@
 </style>
 
 <script setup>
-import { defineProps } from 'vue'
+import { defineProps,defineExpose,ref } from 'vue'
 const props = defineProps({
-  menuWidth: {
-    type: Number,
-    default: 1076
-  },
   menuTitle: {
     type: Array,
   },
@@ -31,4 +27,9 @@ const props = defineProps({
     type: Array,
   }
 })
+let realWidth = ref(0)
+function setMenuWidth(menuWidth) {
+  realWidth.value = menuWidth
+}
+defineExpose({setMenuWidth})
 </script>

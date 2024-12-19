@@ -4,9 +4,10 @@
       v-model="input"
       placeholder="Please input"
       class="input-with-select"
+      :style="{ width:realWidth+'px'}"
     >
       <template #prepend>
-        <el-select v-model="select" placeholder="Select" style="width: 140px">
+        <el-select v-model="select" placeholder="Select" style="width:130px">
           <el-option v-for="(item,index) in props.menuItem" :key="index" :label="item" :value="index.toString()" />
         </el-select>
       </template>
@@ -26,14 +27,11 @@
   background-color: var(--el-fill-color-blank);
 }
 
-.el-input{
-  width: 400px;
-}
 
 </style>
 
 <script setup>
-import { ref,defineProps } from 'vue'
+import { ref,defineProps, defineExpose} from 'vue'
 
 const input = ref('')
 const select = ref('')
@@ -42,4 +40,9 @@ const props = defineProps({
     type:Array,
   }
 })
+const realWidth = ref(0)
+function setInputWidth(inputWidth) {
+  realWidth.value = inputWidth
+}
+defineExpose({setInputWidth})
 </script>
