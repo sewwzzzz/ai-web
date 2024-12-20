@@ -1,5 +1,6 @@
 <template>
-  <Main></Main>
+  <!-- <Main></Main> -->
+  <Poster></Poster>
 </template>
 
 <style scoped>
@@ -8,4 +9,5 @@
 
 <script setup>
 import Main from './views/Main.vue'
+import Poster from './views/Poster.vue';
 </script>
