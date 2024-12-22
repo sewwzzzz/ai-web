@@ -1,6 +1,6 @@
 <template>
   <div id="badge-content" @click="updateState()">
-    <SvgIcon name="goods" :class="[isA?'content-icon-sure':'content-icon']"></SvgIcon>
+    <SvgIcon name="stores" :class="[isA?'content-icon-sure':'content-icon']"></SvgIcon>
     <div :class="[isA?'content-number-sure':'content-number']">{{ num }}</div>
   </div>
 </template>
@@ -9,8 +9,8 @@
 #badge-content{
   position:relative;
   background-color: rgb(255, 255, 255);
-  height:50px;
-  width:50px;
+  height:48px;
+  width:48px;
   border-radius: 50%;
   cursor:pointer;
 }
@@ -34,7 +34,7 @@
   top:50%;
   left:50%;
   transform: translate(-50%,-50%);
-  color:rgb(30, 128, 255);
+  color:rgb(255, 206, 30);
   transition: color 0.5s linear; 
 }
 .content-number{
@@ -63,19 +63,16 @@
 
 <script setup>
 import { defineProps,ref } from 'vue'
-import SvgIcon from './SvgIcon.vue'
+import SvgIcon from '../SvgIcon.vue';
 const props = defineProps({
   number: {
     type: Number,
     default:0,
   },
-  name: {
-    type:String,
-  },
   isActive: {
     type: Boolean,
     default:false
-  }
+  },
 })
 let num = ref(props.number)
 let isA = ref(props.isActive)

@@ -79,10 +79,14 @@ const debounce = function(fn,delay) {
   }
 }
 
+const show = [
+  '贡献','获赞','订阅量'
+]
 export{
   menuItem,
   menu,
   tools,
   scrollData,
-  debounce
+  debounce,
+  show
 }
