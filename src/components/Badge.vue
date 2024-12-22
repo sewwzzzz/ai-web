@@ -25,6 +25,7 @@
   left:50%;
   transform: translate(-50%,-50%);
   color:rgb(194, 200, 209);
+  transition: color 0.5s linear; 
 }
 .content-icon-sure{
   position:absolute;
@@ -34,6 +35,7 @@
   left:50%;
   transform: translate(-50%,-50%);
   color:rgb(30, 128, 255);
+  transition: color 0.5s linear; 
 }
 .content-number{
   position:absolute;
