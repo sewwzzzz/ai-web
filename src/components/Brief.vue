@@ -63,6 +63,7 @@
   width:50px;
   height:50px;
   border-radius: 50%;
+  cursor:pointer;
 }
 #header-name{
   width:calc(100% - 70px);
@@ -74,7 +75,7 @@
   height:40px;
   width:80%;
   margin:auto;
-  font-size: 20px;
+  font-size: 15px;
 }
 .footer-text{
   margin-left: 5px;

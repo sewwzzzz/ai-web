@@ -77,7 +77,7 @@ const props = defineProps({
 let num = ref(props.number)
 let isA = ref(props.isActive)
 const updateState = function () {
-  if (num.value === props.number) {
+  if (!isA.value) {
     num.value += 1
     isA.value = true
   }
