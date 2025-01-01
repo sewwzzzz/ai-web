@@ -354,3 +354,8 @@ template {
 [hidden] {
   display: none;
 }
+
+ul{
+  margin:0px margin;
+  list-style-type:none; /* 去掉每项前的小圆点 */
+}

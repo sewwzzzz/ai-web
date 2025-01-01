@@ -82,11 +82,14 @@ const debounce = function(fn,delay) {
 const show = [
   '贡献','获赞','订阅量'
 ]
+
+const messageMenu = ['回复我的','@我的','收到的赞','系统通知']
 export{
   menuItem,
   menu,
   tools,
   scrollData,
   debounce,
-  show
+  show,
+  messageMenu
 }

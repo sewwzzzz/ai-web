@@ -1,6 +1,7 @@
 <template>
   <!-- <Main></Main> -->
-  <Poster></Poster>
+  <!-- <Poster></Poster> -->
+  <Message></Message>
 </template>
 
 <style scoped>
@@ -9,5 +10,6 @@
 
 <script setup>
 import Main from './views/Main.vue'
-import Poster from './views/Poster.vue';
+import Message from './views/Message.vue'
+import Poster from './views/Poster.vue'
 </script>

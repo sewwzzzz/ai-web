@@ -1,61 +1,61 @@
 <template>
-  <div id="poster-header">
-    <Header></Header>
+  <div id="poster">
+    <div id="poster-header">
+      <Header></Header>
+    </div>
+    <div id="poster-content">
+      <div id="content-left">
+        <BadgeGoods>
+        </BadgeGoods>
+        <BadgeComments>
+        </BadgeComments>
+        <BadgeStores>
+        </BadgeStores>
+      </div>
+      <div id="content-right">
+        <Brief></Brief>
+      </div>
+    </div>
+    <div id="poster-comments">
+      <div id="comments-title">评论 {{commentNum}}</div>
+      <div id="comments-input">
+        <img id="input-avator"/>
+        <el-input
+            v-model="textarea"
+            type="textarea"
+            :autosize="{ minRows: 5, maxRows:5 }"
+            placeholder="Please input"
+            maxlength="1000"
+            show-word-limit
+          >
+        </el-input>
+        <el-button id="input-button" type="primary" :disabled="textarea === ''?true:false">发送</el-button>
+      </div>
+      <div id="comments-sort">
+        <div :class="[select?'sort-sure':'sort']" @click="updateHotSelect()">最热</div>
+        <div id="sort-divider">|</div>
+        <div :class="[select?'sort':'sort-sure']" @click="updateNewSelect()">最新</div>
+      </div>
+      <div id="comments">
+        <Comment></Comment>
+      </div>
+    </div>
+    <div id="poster-bottom"></div>
   </div>
-  <div id="view-content">
-    <div id="view-left">
-      <BadgeGoods>
-      </BadgeGoods>
-      <BadgeComments>
-      </BadgeComments>
-      <BadgeStores>
-      </BadgeStores>
-    </div>
-    <div id="view-right">
-      <Brief></Brief>
-    </div>
-  </div>
-  <div id="content-comments">
-    <div id="comments-title">评论 {{commentNum}}</div>
-    <div id="comments-input">
-      <img id="input-avator"/>
-      <el-input
-          v-model="textarea"
-          type="textarea"
-          :autosize="{ minRows: 5, maxRows:5 }"
-          placeholder="Please input"
-          maxlength="1000"
-          show-word-limit
-        >
-      </el-input>
-      <el-button id="input-button" type="primary" :disabled="textarea === ''?true:false">发送</el-button>
-    </div>
-    <div id="comments-sort">
-      <div :class="[select?'sort-sure':'sort']" @click="updateHotSelect()">最热</div>
-      <div id="sort-divider">|</div>
-      <div :class="[select?'sort':'sort-sure']" @click="updateNewSelect()">最新</div>
-    </div>
-    <div id="comments">
-      <Comment></Comment>
-    </div>
-  </div>
-  <div id="content-bottom"></div>
 </template>
 
-<style>
-html body{
-  background-color: rgb(242, 243, 245);
-}
-</style>
-
 <style scoped>
+#poster{
+  background-color: rgb(242, 243, 245);
+  overflow:hidden;/* 父子之间margin重叠问题 */
+}
 #poster-header{
   position:fixed;
   width:100%;
   top:0;
   z-index:1;
 }
-#view-left{
+#content-left{
   position: fixed;
   top:160px;
   margin-left:-85px;
@@ -63,20 +63,20 @@ html body{
   flex-direction: column;
   gap:28px;
 }
-#view-right{
+#content-right{
   position:fixed;
   top:100px;
   left:68%;
   transform: translateX(35px);
 }
-#view-content{
+#poster-content{
   margin-top:100px;
   margin-left:18%;
   width:50%;
   height:800px;
   background-color:white;
 }
-#content-comments{
+#poster-comments{
   box-sizing: border-box;
   margin-top: 30px;
   margin-left: 18%;
@@ -144,7 +144,7 @@ html body{
   width:100%;
   margin-top:20px;
 }
-#content-bottom{
+#poster-bottom{
   margin-left:18%;
   width:50%;
   height: 180px;
