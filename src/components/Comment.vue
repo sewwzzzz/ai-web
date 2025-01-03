@@ -91,10 +91,13 @@
 
 <script setup>
 import { ref } from 'vue'
-import FooterGoods from './Footer/FooterGoods.vue';
-import FooterReply from './Footer/FooterReply.vue';
+import FooterGoods from './Footer/FooterGoods.vue'
+import FooterReply from './Footer/FooterReply.vue'
+
 let showReply = ref(false)
 let textarea = ref('')
+
+// 控制评论的'评论拉起/关闭'状态 子组件: ./Footer/FooterReply.vue
 const updateReplyState = function (state) {
   showReply.value = state
   console.log(state)

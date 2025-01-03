@@ -105,7 +105,8 @@
 </style>
 
 <script setup>
-import { defineProps,ref } from 'vue'
+import { defineProps, ref } from 'vue'
+
 const props = defineProps({
   avator: {
     type:String,
@@ -125,6 +126,8 @@ const props = defineProps({
   }
 })
 let state = props.isSubscribe ? ref('') : ref('primary')
+
+// 更新作者简介的'订阅'状态
 const updateState = function () {
   state.value = state.value === '' ? 'primary' : ''
 }

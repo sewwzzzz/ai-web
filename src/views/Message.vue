@@ -10,12 +10,12 @@
           <span>消息中心</span>
         </div>
         <ul id="left-box">
-          <li :class="['box-item']" v-for="(item,index) in messageMenu" :key="index">{{ item }}</li>
+          <li :class="[item.EMenu === currentMenu ? 'box-item-active' : 'box-item']" v-for="(item,index) in messageMenu" :key="index">{{ item.CMenu }}</li>
         </ul>
       </div>
       <div id="content-right">
-        <div id="right-title">回复我的</div>
-        <div id="right-content"></div>
+        <div id="right-title">{{ currentMenu }}</div>
+        <RouterView class="right-content"></RouterView> 
       </div>
     </div>
   </div>
@@ -86,7 +86,20 @@
 
 }
 .box-item-active{
+  height:40px;
+  width:100%;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
   color:rgb(47, 174, 227);
+}
+.box-item-active::before{
+  content:'●';
+  width:10px;
+  height:20px;
+  margin-right: 10px;
+  text-align:center;
+
 }
 .box-item:hover{
   color:rgb(47, 174, 227);
@@ -107,16 +120,52 @@
   padding: 15px 16px;
   color:rgb(102, 102, 102);
 }
-#right-content{
+.right-content{
   width:100%;
   margin-top:10px;
   height:calc(100% - 62px);
-  background-color:white;
-  box-shadow: 0 0px 10px -5px rgb(134, 134, 137);
 }
 </style>
 
 <script setup>
 import SvgIcon from '@/components/SvgIcon.vue'
 import { messageMenu } from '@/datas/config'
+import { watch, ref, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+let ul = ref(null)
+let currentMenu = ref('')
+
+// 元素挂载后需要执行的操作
+onMounted(() => {
+  ul.value = document.getElementById('left-box')
+  ul.value.addEventListener('click',jump)
+})
+
+// 元素销毁前需要执行的操作
+onUnmounted(() => {
+  ul.value.removeEventListener('click',jump)
+})
+
+// 更新路由以及页面主题
+const setMenu = (messageCode) => {
+  currentMenu.value = messageCode
+}
+watch(
+  route,
+  (newVal) => {
+    setMenu(newVal.meta.messageCode)
+  },
+  {immediate:true,deep:true}
+)
+
+// 点击菜单，跳转路由
+const jump = (event) => {
+  // console.log(messageMenu[event.target.innerText])
+  if (messageMenu[event.target.innerText].EMenu !== currentMenu.value) {
+    router.push(messageMenu[event.target.innerText].path)
+  }
+}
 </script>

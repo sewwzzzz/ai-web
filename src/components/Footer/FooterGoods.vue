@@ -46,7 +46,8 @@
 </style>
 
 <script setup>
-import { defineProps,ref } from 'vue'
+import { defineProps, ref } from 'vue'
+
 const props = defineProps({
   number: {
     type: Number,
@@ -59,6 +60,8 @@ const props = defineProps({
 })
 const num = ref(props.number)
 const isA = ref(props.isActive)
+
+// 点击更新评论'点赞'状态
 const updateState = function(){
   if (isA.value) {
     num.value -= 1

@@ -161,13 +161,18 @@ import Comment from '@/components/Comment.vue';
 import Header from '@/components/Header.vue'
 import { show } from '@/datas/config'
 import { ref } from 'vue'
+
 let commentNum = ref(5)
 let textarea = ref('')
 let select = ref(true)
+
+// 点击显示最热评论
 const updateHotSelect = function () {
   if(select.value) return
   select.value = !select.value
 }
+
+// 点击显示最新评论
 const updateNewSelect = function () {
   if (!select.value) return
   select.value = !select.value

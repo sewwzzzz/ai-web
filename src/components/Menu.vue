@@ -18,7 +18,8 @@
 </style>
 
 <script setup>
-import { defineProps,defineExpose,ref } from 'vue'
+import { defineProps, defineExpose, ref } from 'vue'
+
 const props = defineProps({
   menuTitle: {
     type: Array,
@@ -28,8 +29,11 @@ const props = defineProps({
   }
 })
 let realWidth = ref(0)
+
+// 设置每个板块的菜单栏宽度
 function setMenuWidth(menuWidth) {
   realWidth.value = menuWidth
 }
+
 defineExpose({setMenuWidth})
 </script>

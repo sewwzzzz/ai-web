@@ -63,7 +63,8 @@
 
 <script setup>
 import { defineProps,ref } from 'vue'
-import SvgIcon from '../SvgIcon.vue';
+import SvgIcon from '../SvgIcon.vue'
+
 const props = defineProps({
   number: {
     type: Number,
@@ -76,6 +77,8 @@ const props = defineProps({
 })
 let num = ref(props.number)
 let isA = ref(props.isActive)
+
+// 点赞后更新'收藏'徽章状态
 const updateState = function () {
   if (num.value === props.number) {
     num.value += 1

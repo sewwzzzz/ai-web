@@ -41,8 +41,11 @@ const props = defineProps({
   }
 })
 const realWidth = ref(0)
+
+// 设置搜索框的宽度
 function setInputWidth(inputWidth) {
   realWidth.value = inputWidth
 }
+
 defineExpose({setInputWidth})
 </script>

@@ -46,7 +46,8 @@
 </style>
 
 <script setup>
-import { defineProps,ref,defineEmits } from 'vue'
+import { defineProps, ref, defineEmits } from 'vue'
+
 const props = defineProps({
   number: {
     type: Number,
@@ -56,6 +57,8 @@ const props = defineProps({
 const emit = defineEmits(['reply'])
 let num = ref(props.number)
 let isComment = ref(false)
+
+// 控制评论的'评论拉起/关闭'状态
 const updateState = function(){
   if (isComment.value) {
     isComment.value = false

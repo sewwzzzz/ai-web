@@ -8,7 +8,7 @@
       <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
       <div id="header-right">
         <div id="right-avator"></div>
-        <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title">
+        <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title" @click="jumpTools(item)">
         </ToolIcon>
       </div>
     </div>
@@ -89,21 +89,34 @@
 import SelectInput from './SelectInput.vue'
 import ToolIcon from './ToolIcon.vue'
 import { menuItem,tools,debounce } from '@/datas/config'
-import { ref,onMounted,onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 
-// 设定搜索框的宽度
+const router = useRouter()
 const inputRef = ref(null)
 const headerRef = ref(null)
-const updateWidth = debounce(() => {
-  inputRef.value.setInputWidth(headerRef.value.offsetWidth*0.4)
-})
 
+// 元素挂载后需要执行的操作
 onMounted(() => {
   updateWidth()
   window.addEventListener('resize',updateWidth)
 })
 
+// 元素销毁前需要执行的操作
 onBeforeUnmount(() => {
   window.removeEventListener('resize',updateWidth)
 })
+
+// 设定搜索框的宽度
+const updateWidth = debounce(() => {
+  inputRef.value.setInputWidth(headerRef.value.offsetWidth*0.4)
+})
+
+// 点击 消息/动态/收藏/历史/ 后跳转路由
+const jumpTools = (item) => {
+  let routeData = router.resolve({
+    path: item.path, // 这里填写的是路由配置中定义的路由路径path或者name
+  });
+  window.open(routeData.href, '_blank');
+}
 </script>

@@ -47,7 +47,8 @@ const menu = {
 const tools = [
   {
     name: 'notices',
-    title: '消息'
+    title: '消息',
+    path:'/message'
   },
   {
     name: 'dynamics',
@@ -83,7 +84,28 @@ const show = [
   '贡献','获赞','订阅量'
 ]
 
-const messageMenu = ['回复我的','@我的','收到的赞','系统通知']
+const messageMenu = {
+  '回复我的':{
+    EMenu: 'reply',
+    CMenu: '回复我的' ,
+    path: '/message/reply'
+  },
+  '@我的':{
+    EMenu: 'at',
+    CMenu: '@我的',
+    path:'/message/at'
+  },
+  '收到的赞':{
+    EMenu: 'love',
+    CMenu: '收到的赞',
+    path:'/message/love',
+  },
+  '系统通知':{
+    EMenu: 'system',
+    CMenu: '系统通知',
+    path:'/message/system'
+  }
+}
 export{
   menuItem,
   menu,

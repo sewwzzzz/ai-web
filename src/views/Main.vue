@@ -16,7 +16,7 @@
       <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
       <div id="header-right">
         <div id="right-avator"></div>
-        <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title">
+        <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title" @click="jumpTools(item)">
         </ToolIcon>
       </div>
     </div>
@@ -178,12 +178,14 @@ import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { menuItem,menu,tools,scrollData,debounce } from '@/datas/config'
-
+import { useRouter } from 'vue-router'
 
 const menuRef = ref(null)
 const boxContentRef = ref(null)
 let menuWidth = 1076
 const inputRef = ref(null)
+const router = useRouter()
+
 // 设定每个板块menu和搜索框的宽度
 const updateWidth = debounce(() => {
   menuWidth = boxContentRef.value[0].offsetWidth * 0.8
@@ -198,19 +200,20 @@ const handleScroll = function () {
   console.log('当前的滚动条高度', document.documentElement.scrollTop)
 }
 
+// 元素挂载后需要执行的操作
 onMounted(() => {
   updateWidth()
   window.addEventListener('resize', updateWidth)
   // window.addEventListener('scroll',handleScroll)
 })
 
+// 元素销毁前需要执行的操作
 onBeforeUnmount(()=>{
   window.removeEventListener('resize', updateWidth)
   // window.removeEventListener('scroll',handleScroll)
 })
 
 // 锚点滚动
-
 const locateHeight = function (targetHeight) {
   let nowHeight = document.documentElement.scrollTop
   const direction = nowHeight < targetHeight ? 1 : -1 
@@ -227,4 +230,11 @@ const locateHeight = function (targetHeight) {
   }, scrollData.metaScrollTime)
 }
 
+// 点击 消息/动态/收藏/历史/ 后跳转路由
+const jumpTools = (item) => {
+  let routeData = router.resolve({
+    path: item.path, // 这里填写的是路由配置中定义的路由路径path或者name
+  });
+  window.open(routeData.href, '_blank');
+}
 </script>
