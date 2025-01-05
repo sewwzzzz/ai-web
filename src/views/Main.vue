@@ -1,5 +1,9 @@
 <template>
-
+  <div id="main-login" v-show="showLogin">
+    <Enter @exit-login="showLoginCmpt"></Enter>
+  </div>
+  <div id="main-mask" v-show="showLogin">
+  </div>
   <aside id="main-aside">
       <div id="aside-sign" @click="stayMain()">
         <svg-icon id="sign-icon" name="aiweb"></svg-icon>
@@ -15,7 +19,7 @@
     <div id="article-header">
       <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
       <div id="header-right">
-        <div id="right-avator"></div>
+        <div id="right-avator" @click="touchAvator()">登录</div>
         <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title" @click="jumpTools(item)">
         </ToolIcon>
       </div>
@@ -37,6 +41,25 @@
 </template>
 
 <style lang="css" scoped>
+#main-login{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:900px;
+  height:450px;
+  z-index:3;
+}
+
+#main-mask{
+  position:fixed;
+  height:100%;
+  width:100%;
+  background-color: #555555;
+  z-index:2;
+  opacity: 0.6;
+}
+
 #article-header{
   position:relative;
   width:100%;
@@ -74,6 +97,11 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color:#e0dbdb;
+  font-size:14px;
 }
 
 #right-avator:hover{
@@ -165,6 +193,7 @@
 .content-header{
   display:flex;
   position:relative;
+  z-index:1;
 }
 
 .header-more{
@@ -178,14 +207,16 @@
 import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { menuItem,menu,tools,scrollData,debounce } from '@/datas/config'
+import { menuItem,menu,tools,scrollData,debounce, show } from '@/datas/config'
 import { useRouter } from 'vue-router'
+import Enter from './enter/Enter.vue'
 
 const menuRef = ref(null)
 const boxContentRef = ref(null)
 let menuWidth = 1076
 const inputRef = ref(null)
 const router = useRouter()
+const showLogin = ref(0)
 
 // 设定每个板块menu和搜索框的宽度
 const updateWidth = debounce(() => {
@@ -242,5 +273,16 @@ const jumpTools = (item) => {
 // 停留在首页
 const stayMain = () => {
   router.go(0)
+}
+
+
+// 点击头像
+const touchAvator = () => {
+  showLogin.value = 1
+}
+
+// 关闭登录界面
+const showLoginCmpt = () => {
+  showLogin.value = 0
 }
 </script>
