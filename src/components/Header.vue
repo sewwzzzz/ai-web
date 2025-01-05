@@ -1,6 +1,6 @@
 <template>
   <div id="header">
-    <div id="aside-sign">
+    <div id="aside-sign" @click="backMain()">
       <svg-icon id="sign-icon" name="aiweb"></svg-icon>
       <div id="sign-title">AI资讯</div>
     </div>
@@ -28,6 +28,7 @@
   height:64px;
   border-bottom: 1px #e0dbdb solid;
   background-color: #ffffff;
+  cursor:pointer;
 }
 
 #sign-icon{
@@ -46,6 +47,7 @@
   width:calc(100% - 150px);
   height:64px;
   background: linear-gradient(to right, #4b9ff3, #f6c533); /* 初始渐变 */
+  /* 动画名称 | 持续时间 | 循环次数 | 动画方向 */
   animation: blink 3s infinite alternate;
   opacity: 1; /* 初始透明度 */
   /* x偏移量 | y偏移量 | 阴影模糊半径 | 阴影扩散半径 | 阴影颜色 */
@@ -118,5 +120,10 @@ const jumpTools = (item) => {
     path: item.path, // 这里填写的是路由配置中定义的路由路径path或者name
   });
   window.open(routeData.href, '_blank');
+}
+
+// 刷新首页
+const backMain = () => {
+  router.push('/')
 }
 </script>

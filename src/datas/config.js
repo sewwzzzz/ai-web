@@ -52,7 +52,7 @@ const tools = [
   },
   {
     name: 'dynamics',
-    title:'动态'
+    title: '动态',
   },
   {
     name: 'collections',
@@ -60,7 +60,8 @@ const tools = [
   },
   {
     name: 'histories',
-    title:'历史'
+    title: '历史',
+    path:'/history'
   }
 ]
 

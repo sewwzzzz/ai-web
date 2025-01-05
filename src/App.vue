@@ -1,6 +1,6 @@
 <template>
-  <!-- <RouterView></RouterView> -->
-  <History></History>
+  <RouterView></RouterView>
+  <!-- <History></History> -->
 </template>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
 
   <aside id="main-aside">
-      <div id="aside-sign">
+      <div id="aside-sign" @click="stayMain()">
         <svg-icon id="sign-icon" name="aiweb"></svg-icon>
         <div id="sign-title">AI资讯</div>
       </div>
@@ -95,6 +95,7 @@
   height:64px;
   border-bottom: 1px #e0dbdb solid;
   background-color: #ffffff;
+  cursor:pointer;
 }
 
 #sign-icon{
@@ -236,5 +237,10 @@ const jumpTools = (item) => {
     path: item.path, // 这里填写的是路由配置中定义的路由路径path或者name
   });
   window.open(routeData.href, '_blank');
+}
+
+// 停留在首页
+const stayMain = () => {
+  router.go(0)
 }
 </script>

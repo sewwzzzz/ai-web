@@ -10,6 +10,7 @@ const router = createRouter({
     },
     {
       path: '/message',
+      name: 'message',
       component: ()=>import(`../views/Message.vue`),
       children: [
         {
@@ -49,6 +50,11 @@ const router = createRouter({
           component:()=>import(`../views/messages/System.vue`)
         }
       ]
+    },
+    {
+      path: '/history',
+      name: 'history',
+      component:()=>import(`../views/History.vue`)
     }
   ]
 

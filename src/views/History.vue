@@ -9,7 +9,7 @@
         历史记录
       </div>
       <div id="content-record">
-          <div v-show="!deleteState" class="record-select" v-for="(item,index) in menuItem" :key="index">
+          <div v-show="!deleteState" :class="[currentMenu === item ? 'record-select-sure' : 'record-select']" v-for="(item,index) in menuItem" :key="index" @click="changeMenu(item)">
             {{ item }}
           </div>
           <div v-show="!deleteState" id="record-right">
@@ -119,6 +119,22 @@
   background-color: rgb(241, 242, 243);
 }
 
+.record-select-sure{
+  display:flex;
+  justify-content:center;
+  align-items: center;
+  background-color: rgb(223, 246, 253);
+  box-sizing:border-box;
+  width:fit-content;
+  height:34px;
+  padding:0 15px;
+  font-size: 14px;
+  border-radius: 6px;
+  font-weight: 400;
+  cursor: pointer;
+  color:rgb(0, 174, 236);
+  margin-right:15px;
+}
 #record-right{
   position:absolute;
   display:flex;
@@ -170,9 +186,15 @@ import { menuItem } from '@/datas/config'
 import { ref } from 'vue'
 
 let deleteState = ref(0)
+let currentMenu = ref('Bilibili')
 
 // 改变是否允许删除的状态
 const changeDelState = () => {
   deleteState.value = !deleteState.value
+}
+
+// 点击选中菜单
+const changeMenu = (newMenu) => {
+  currentMenu.value = newMenu
 }
 </script>
