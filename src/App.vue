@@ -1,6 +1,7 @@
 <template>
   <RouterView></RouterView>
-  <!-- <History></History> -->
+  <!-- <User></User> -->
+  <!-- <Poster></Poster> -->
 </template>
 
 <style scoped>
@@ -9,6 +10,7 @@
 
 <script setup>
 import History from './views/History.vue'
-
+import Poster from './views/Poster.vue';
+import User from './views/User.vue'
 
 </script>

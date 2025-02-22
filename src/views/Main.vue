@@ -207,7 +207,7 @@
 import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { menuItem,menu,tools,scrollData,debounce, show } from '@/datas/config'
+import { menuItem,menu,tools,scrollData,debounce } from '@/datas/config'
 import { useRouter } from 'vue-router'
 import Enter from './enter/Enter.vue'
 

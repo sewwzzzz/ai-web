@@ -38,7 +38,7 @@ const menu = {
   naturalLanguageProcessing: {
     title: '自然语言处理',
     icon: 'iconfont icon-ziranyuyanchuli',
-    menuTitle: ['文本分配', '文本匹配','文本生成','序列标注'],
+    menuTitle: ['文本分类', '文本匹配','文本生成','序列标注'],
     menuItem: ['Bilibili', '微信公众号', 'Github', 'huggingface'],
     scrollHeight:1893,
   }
@@ -107,6 +107,21 @@ const messageMenu = {
     path:'/message/system'
   }
 }
+
+const headerOption = [
+  {
+    'icon':'foot',
+    'name':'足迹',
+  },
+  {
+    'icon':'collectable',
+    'name':'收藏集',
+  },
+  {
+    'icon':'follow',
+    'name':'关注'
+  }
+]
 export{
   menuItem,
   menu,
@@ -114,5 +129,6 @@ export{
   scrollData,
   debounce,
   show,
-  messageMenu
+  messageMenu,
+  headerOption
 }

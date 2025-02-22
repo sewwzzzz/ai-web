@@ -20,7 +20,7 @@
           114
         </div>
         <div class="data-name">
-          贡献
+          获赞
         </div>
       </div>
       <div class="article-data">
@@ -28,7 +28,7 @@
           114
         </div>
         <div class="data-name">
-          贡献
+          订阅量
         </div>
       </div>
     </div>
