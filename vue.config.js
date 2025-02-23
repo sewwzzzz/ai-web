@@ -9,15 +9,15 @@ const path = require('path')
 module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,//关闭eslint检验
-  devServer: {
-    proxy: {
-      '/api': {
-        target: '',
-        changeOrigin: true,
-        pathRewrite:{'^/api':''}
-      }
-    }
-  },
+  // devServer: {
+  //   proxy: {
+  //     '/api': {
+  //       target: '',
+  //       changeOrigin: true,
+  //       pathRewrite:{'^/api':''}
+  //     }
+  //   }
+  // },
   configureWebpack: {
     plugins: [
       AutoImport({

@@ -1,21 +1,27 @@
 <template>
   <div id="box-input">
-    <div id="input-account">
-      <div>账号</div>
-      <input class="account-input" placeholder="请输入账号" type="text"/> 
-    </div>
-    <div id="input-password">
-      <PasswordInput title="密码" default-des="请输入密码" :input-width="inputWidth"></PasswordInput>
-      <div id="password-forget">忘记密码?</div>
-    </div>
-  </div>
-  <div id="box-button">
-    <div id="button-left" @click="enter()">
-      注册
-    </div>
-    <div id="button-right">
-      登录
-    </div>
+    <el-form
+      ref="loginFormRef"
+      :model="loginForm"
+      status-icon
+      :rules="rules"
+      label-width="50px"
+      id="login-form"
+      label-position="left"
+    >
+      <el-form-item label="账号" prop="account">
+        <el-input v-model="loginForm.account" type="text" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="密码" prop="pass">
+        <el-input v-model="loginForm.pass" type="password" autocomplete="off" />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="login"
+          >登录</el-button
+        >
+        <el-button @click="enter">返回注册</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -27,101 +33,59 @@
   border-width: 1px;
   border-color:rgb(227, 229, 231);
 }
-#input-account{
-  height:60px;
-  width:100%;
-  border-bottom: rgb(227, 229, 231) 1px solid;
-  display:flex;
-  align-items: center;
-  box-sizing:border-box;
-  padding-left:40px;
-}
-
-.account-input{
-  margin-left:20px;
-  width:350px;
-}
-
-#input-password{
-  height:60px;
-  width:100%;
-  display:flex;
-  align-items: center;
-  box-sizing:border-box;
-  padding-left:40px;
-}
-#password-forget{
+#login-form{
+  margin-top:10px;
   margin-left:10px;
-  color:rgb(48, 179, 222);
-  cursor:pointer;
-}
-
-#box-button{
-  position:relative;
-  margin-top:30px;
-  width:100%;
-  height:40px;
-}
-
-#button-left{
-  position:absolute;
-  left:0;
-  height:100%;
-  border-radius:10px;
-  border-style:solid;
-  border-width: 1px;
-  border-color:rgb(227, 229, 231);
-  width:200px;
-  cursor:pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#button-right{
-  position:absolute;
-  right:0;
-  height:100%;
-  border-radius:10px;
-  border-style:solid;
-  border-width: 1px;
-  border-color:rgb(127, 214, 245);
-  background-color: rgb(127, 214, 245);
-  width:200px;
-  cursor:pointer;
-  color:white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#button-right-active{
-  position:absolute;
-  right:0;
-  height:100%;
-  border-radius:10px;
-  border-style:solid;
-  border-width: 1px;
-  border-color:rgb(0, 174, 236);
-  background-color: rgb(0, 174, 236);
-  width:200px;
-  cursor:pointer;
-  color:white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin-right:10px;
 }
 </style>
 
 <script setup>
-import PasswordInput from '@/components/PasswordInput.vue';
-import { ref,defineEmits } from 'vue'
+import { ref,defineEmits,reactive } from 'vue'
 
 const emit = defineEmits(['enterRegister'])
-const inputWidth = ref(250)
+const loginFormRef = ref()
+const loginForm = reactive({
+  account:'',
+  pass: ''
+})
+
+const validateAccount = (rule, value, callback)=>{
+  if (!value) {
+    callback('账户不可为空')
+  }
+  callback()
+}
+
+const validatePass = (rule, value, callback)=>{
+  if (!value) {
+    callback('密码不可为空')
+  }
+  callback()
+}
+
+const rules = reactive({
+  account: [
+    {trigger:'blur',validator:validateAccount}
+  ],
+  pass: [
+    {trigger:'blur',validator:validatePass}
+  ],
+})
 
 // 进入注册组件
 const enter = () => {
   emit('enterRegister')
+  loginForm.account = loginForm.pass = ''
+}
+
+const login = () => {
+  if (!loginFormRef.value) return
+  loginFormRef.value.validate((valid) => {
+    if (valid) {
+      console.log(loginForm)
+      
+    } 
+  })
 }
 </script>

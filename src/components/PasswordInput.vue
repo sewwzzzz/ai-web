@@ -34,7 +34,7 @@ const props = defineProps({
   },
   inputWidth: {
     type:Number,
-  }
+  },
 })
 let passwordState = ref("password")
 

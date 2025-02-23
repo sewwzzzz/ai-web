@@ -1,23 +1,34 @@
 <template>
   <div id="box-input">
-    <div id="input-account">
-      <div>账号</div>
-      <input class="account-input" placeholder="请输入账号" type="text"/> 
-    </div>
-    <div id="input-password">
-      <PasswordInput title="密码" default-des="请输入密码" :input-width="inputWidth"></PasswordInput>
-    </div>
-    <div id="input-check">
-      <PasswordInput title="确认" default-des="请确认密码" :input-width="inputWidth"></PasswordInput>
-    </div>
-  </div>
-  <div id="box-button">
-    <div id="button-left" @click="exit()">
-      返回登陆
-    </div>
-    <div id="button-right">
-      注册
-    </div>
+    <el-form
+      ref="registerFormRef"
+      :model="registerForm"
+      status-icon
+      :rules="rules"
+      label-width="80px"
+      id="register-form"
+      label-position="left"
+    >
+      <el-form-item label="账号" prop="account">
+        <el-input v-model="registerForm.account" type="text" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="密码" prop="pass">
+        <el-input v-model="registerForm.pass" type="password" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="确认密码" prop="checkPass">
+        <el-input
+          v-model="registerForm.checkPass"
+          type="password"
+          autocomplete="off"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="register"
+          >注册</el-button
+        >
+        <el-button @click="exit">返回登录</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -29,107 +40,73 @@
   border-width: 1px;
   border-color:rgb(227, 229, 231);
 }
-#input-account{
-  height:60px;
-  width:100%;
-  border-bottom: rgb(227, 229, 231) 1px solid;
-  display:flex;
-  align-items: center;
-  box-sizing:border-box;
-  padding-left:40px;
-}
-
-.account-input{
-  margin-left:20px;
-  width:350px;
-}
-
-#input-password{
-  height:60px;
-  width:100%;
-  display:flex;
-  align-items: center;
-  border-bottom: rgb(227, 229, 231) 1px solid;
-  box-sizing:border-box;
-  padding-left:40px;
-}
-
-#input-check{
-  height:60px;
-  width:100%;
-  display:flex;
-  align-items: center;
-  box-sizing:border-box;
-  padding-left:40px;
-}
-
-
-#box-button{
-  position:relative;
-  margin-top:30px;
-  width:100%;
-  height:40px;
-}
-
-#button-left{
-  position:absolute;
-  left:0;
-  height:100%;
-  border-radius:10px;
-  border-style:solid;
-  border-width: 1px;
-  border-color:rgb(227, 229, 231);
-  width:200px;
-  cursor:pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#button-right{
-  position:absolute;
-  right:0;
-  height:100%;
-  border-radius:10px;
-  border-style:solid;
-  border-width: 1px;
-  border-color:rgb(127, 214, 245);
-  background-color: rgb(127, 214, 245);
-  width:200px;
-  cursor:pointer;
-  color:white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#button-right-active{
-  position:absolute;
-  right:0;
-  height:100%;
-  border-radius:10px;
-  border-style:solid;
-  border-width: 1px;
-  border-color:rgb(0, 174, 236);
-  background-color: rgb(0, 174, 236);
-  width:200px;
-  cursor:pointer;
-  color:white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+#register-form{
+  margin-top:10px;
+  margin-left:10px;
+  margin-right:10px;
 }
 </style>
 
 <script setup>
-import PasswordInput from '@/components/PasswordInput.vue'
-import { ref, defineEmits } from 'vue'
+import { ref,reactive, defineEmits } from 'vue'
 
 const emit = defineEmits(["exitRegister"])
-const inputWidth = ref(330)
 
 // 退出注册模式
 const exit = () => {
   emit('exitRegister')
+  registerForm.account = registerForm.pass = registerForm.checkPass = ''
+}
+
+const registerFormRef = ref()
+const registerForm = reactive({
+  account:'',
+  pass: '',
+  checkPass:''
+})
+
+const validatePass = (rule, value, callback) => {
+  if (value.length < 6 || value.length > 15) {
+    callback(('长度请控制在 6 到 15 个字符'))
+  }
+  if (registerForm.checkPass !== '') {
+    if (!registerFormRef.value) return
+    registerFormRef.value.validateField('checkPass', () => null)
+  }
+  callback()
+}
+
+const validateCheckPass = (rule, value, callback) => {
+  if (value !== registerForm.pass) {
+    callback(('两次输入密码不一致'))
+  } else {
+    callback()
+  }
+}
+
+const rules = reactive({
+  account: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    {min:3,max:15,message:'长度请控制在 3 到 15 个字符', trigger:'blur'}
+  ],
+  pass: [
+    { required: true, message: '请输入登录密码', trigger: 'blur' },
+    {trigger:'blur',validator:validatePass}
+  ],
+  checkPass: [
+    { required: true,message: '请再次输入密码', trigger: 'blur' },
+    { validator:validateCheckPass,trigger:'blur'}
+  ]
+})
+
+const register = () => {
+  if (!registerFormRef.value) return
+  registerFormRef.value.validate((valid) => {
+    if (valid) {
+      // console.log(registerForm)
+
+    } 
+  })
 }
 </script>
+

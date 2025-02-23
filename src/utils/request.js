@@ -28,7 +28,7 @@ const request = async (config) => {
     req['params']=params
   }
   if (Object.keys(data).length != 0) {
-    req['params']=data
+    req['data']=data
   }
   return instance(req).catch((error)=> {
     console.log(error)
