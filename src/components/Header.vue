@@ -7,7 +7,7 @@
     <div ref="headerRef" id="article-header">
       <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
       <div id="header-right">
-        <div id="right-avator"></div>
+        <div id="right-avatar"></div>
         <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title" @click="jumpTools(item)">
         </ToolIcon>
       </div>
@@ -75,14 +75,14 @@
   column-gap: 20px;
 }
 
-#right-avator{
+#right-avatar{
   background-color: #1E88F5;
   width: 40px;
   height: 40px;
   border-radius: 50%;
 }
 
-#right-avator:hover{
+#right-avatar:hover{
   cursor: pointer;
 }
 </style>

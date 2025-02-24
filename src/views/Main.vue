@@ -2,7 +2,24 @@
   <div id="main-login" v-show="showLogin">
     <Enter @exit-login="showLoginCmpt"></Enter>
   </div>
-  <div id="main-mask" v-show="showLogin">
+  <div id="main-reset" v-show="showReset">
+    <Dialog title="修改个人信息" @exit="exitReset" @act="updateInfo">
+      <template v-slot:dialog-content>
+        <div id="dialog-name">
+          <el-tag type="primary" size="large">昵称</el-tag>
+          <el-input class="dialog-input" v-model="nickName" :placeholder="infoStore.nickName" />
+        </div>
+        <div id="dialog-avatar">
+          <el-tag type="primary" size="large">头像</el-tag>
+          <img class="dialog-image" :src="imageUrl" alt="">
+          <!-- <input class="dialog_input" type="file"> -->
+          <el-button @click="handleImgUpload">上传文件</el-button>
+          <input type="file" id="chooseImg" style="display:none;" @change="handleFileChange">
+        </div>
+      </template>
+    </Dialog>
+  </div>
+  <div id="main-mask" v-show="showLogin || showReset">
   </div>
   <aside id="main-aside">
       <div id="aside-sign" @click="stayMain()">
@@ -19,7 +36,8 @@
     <div id="article-header">
       <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
       <div id="header-right">
-        <div id="right-avator" @click="touchAvator()">登录</div>
+        <img v-if="infoStore.id" id="right-avatar" @click="touchAvatar" :src="infoStore.avatarUrl">
+        <div  v-else id="right-avatar" @click="touchLogin">登录</div>
         <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title" @click="jumpTools(item)">
         </ToolIcon>
       </div>
@@ -49,6 +67,51 @@
   width:900px;
   height:450px;
   z-index:3;
+}
+
+#main-reset{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:500px;
+  z-index:3;
+  background-color: #ffffff;
+  border-radius: 5px;
+}
+
+#login-reset:hover{
+  color:rgb(0, 174, 236);
+}
+
+#dialog-name{
+  padding-left:20px;
+  margin:20px 0;
+  display:flex;
+  font-family: "Noto Sans SC";
+  color:rgb(81, 85, 84);
+  gap:10px;
+  overflow: hidden;
+}
+
+.dialog-input{
+  width:150px;
+}
+
+#dialog-avatar{
+  padding-left:20px;
+  margin:20px 0;
+  display:flex;
+  overflow: hidden;
+  font-family: "Noto Sans SC";
+  color:rgb(81, 85, 84);
+  gap:10px;
+}
+
+.dialog-image{
+  height:150px;
+  width:150px;
+  border:2px dotted #8fcef29e;
 }
 
 #main-mask{
@@ -92,19 +155,19 @@
   column-gap: 20px;
 }
 
-#right-avator{
-  background-color: #1E88F5;
+#right-avatar{
+  border:1px solid #ffffff;
   width: 40px;
   height: 40px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  color:#e0dbdb;
+  color: aliceblue;
   font-size:14px;
 }
 
-#right-avator:hover{
+#right-avatar:hover{
   cursor: pointer;
 }
 
@@ -210,6 +273,8 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { menuItem,menu,tools,scrollData,debounce } from '@/datas/config'
 import { useRouter } from 'vue-router'
 import Enter from './enter/Enter.vue'
+import Dialog from '@/components/Dialog.vue'
+import useInfoStore from '@/store/info'
 
 const menuRef = ref(null)
 const boxContentRef = ref(null)
@@ -217,6 +282,36 @@ let menuWidth = 1076
 const inputRef = ref(null)
 const router = useRouter()
 const showLogin = ref(0)
+const showReset = ref(0)                           
+const infoStore = useInfoStore()
+const imageUrl = ref('')
+const nickName = ref('')
+
+
+// 修改头像
+const handleImgUpload = () => {
+  const fileInput = document.getElementById('chooseImg')
+  if (fileInput) {
+    fileInput.click()
+  }
+}
+const handleFileChange = (event) => {
+  const file = event.target.files[0]
+  event.target.value = ''
+  imageUrl.value = URL.createObjectURL(file)
+  console.log(file)
+}
+
+// 退出重置信息界面
+const exitReset = () => {
+  showReset.value = 0
+}
+
+// 上传文件/图像
+
+
+// 上传用户信息
+
 
 // 设定每个板块menu和搜索框的宽度
 const updateWidth = debounce(() => {
@@ -277,7 +372,14 @@ const stayMain = () => {
 
 
 // 点击头像
-const touchAvator = () => {
+const touchAvatar = () => {
+  showReset.value = 1
+  nickName.value = infoStore.nickName
+  imageUrl.value = infoStore.avatarUrl
+}
+
+// 点击登录
+const touchLogin = () => {
   showLogin.value = 1
 }
 
@@ -285,4 +387,5 @@ const touchAvator = () => {
 const showLoginCmpt = () => {
   showLogin.value = 0
 }
+
 </script>

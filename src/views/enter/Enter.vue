@@ -9,7 +9,7 @@
         <Register @exit-register="changeLoginState"></Register>
       </div>
       <div v-show="loginState===0">
-        <Login @enter-register="changeLoginState"></Login>
+        <Login @enter-register="changeLoginState" @exit="commitLogin()"></Login>
       </div>
     </div>
   </div>
@@ -36,7 +36,7 @@
 }
 
 #login-exit:hover{
-  color:rgb(0, 174, 236);
+  color:#79bbff;;
 }
 
 #login-img{

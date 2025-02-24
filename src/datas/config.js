@@ -122,6 +122,14 @@ const headerOption = [
     'name':'关注'
   }
 ]
+
+const commitMessage = (type, msg) => {
+  ElMessage({
+    message: msg,
+    type: type,
+  })
+}
+
 export{
   menuItem,
   menu,
@@ -130,5 +138,6 @@ export{
   debounce,
   show,
   messageMenu,
-  headerOption
+  headerOption,
+  commitMessage,
 }

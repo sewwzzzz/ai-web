@@ -23,7 +23,7 @@
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="register"
+        <el-button type="primary" @click="submit"
           >注册</el-button
         >
         <el-button @click="exit">返回登录</el-button>
@@ -48,14 +48,16 @@
 </style>
 
 <script setup>
-import { ref,reactive, defineEmits } from 'vue'
+import { ref, reactive, defineEmits } from 'vue'
+import { register } from '@/utils/preRequest'
 
 const emit = defineEmits(["exitRegister"])
 
 // 退出注册模式
 const exit = () => {
   emit('exitRegister')
-  registerForm.account = registerForm.pass = registerForm.checkPass = ''
+  if (!registerFormRef.value) return
+  registerFormRef.value.resetFields()
 }
 
 const registerFormRef = ref()
@@ -99,13 +101,13 @@ const rules = reactive({
   ]
 })
 
-const register = () => {
+const submit = () => {
   if (!registerFormRef.value) return
-  registerFormRef.value.validate((valid) => {
+  registerFormRef.value.validate(async (valid) => {
     if (valid) {
       // console.log(registerForm)
-
-    } 
+      register(registerForm.account, registerForm.pass)
+    }
   })
 }
 </script>

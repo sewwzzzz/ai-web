@@ -16,7 +16,7 @@
         <el-input v-model="loginForm.pass" type="password" autocomplete="off" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="login"
+        <el-button type="primary" @click="submit"
           >登录</el-button
         >
         <el-button @click="enter">返回注册</el-button>
@@ -41,9 +41,10 @@
 </style>
 
 <script setup>
-import { ref,defineEmits,reactive } from 'vue'
+import { ref, defineEmits, reactive } from 'vue'
+import { login } from '@/utils/preRequest'
 
-const emit = defineEmits(['enterRegister'])
+const emit = defineEmits(['enterRegister','exit'])
 const loginFormRef = ref()
 const loginForm = reactive({
   account:'',
@@ -76,15 +77,20 @@ const rules = reactive({
 // 进入注册组件
 const enter = () => {
   emit('enterRegister')
-  loginForm.account = loginForm.pass = ''
+  if (!loginFormRef.value) return
+  loginFormRef.value.resetFields()
 }
 
-const login = () => {
+const submit = () => {
   if (!loginFormRef.value) return
   loginFormRef.value.validate((valid) => {
     if (valid) {
       console.log(loginForm)
-      
+      login(loginForm.account, loginForm.pass).then((code) => {
+        if (code) {
+          emit('exit')
+        }
+      })
     } 
   })
 }

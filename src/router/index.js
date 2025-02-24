@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router"
+import useInfoStore from "@/store/info"
+import { commitMessage } from "@/datas/config"
 
 const router = createRouter({
   history: createWebHistory(), //history模式
@@ -58,6 +60,21 @@ const router = createRouter({
     }
   ]
 
+})
+
+router.beforeEach((to, from, next) => {
+  const infoStore = useInfoStore()
+  if (to.path === '/') {
+    next()
+  }
+  else {
+    if (infoStore.token != '') {
+      next()
+    } else {
+      commitMessage('error','登陆超时')
+      setTimeout(()=>next('/'),1000)
+    }
+  }
 })
 
 export default router
