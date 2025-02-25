@@ -6,7 +6,7 @@ const useInfoStore = defineStore('info', {
       nickName: '',
       avatarUrl: '',
       token: '',
-      id:0,
+      id: 0,
     }
   },
   getters: {

@@ -26,14 +26,14 @@
         <svg-icon id="sign-icon" name="aiweb"></svg-icon>
         <div id="sign-title">AI资讯</div>
       </div>
-      <div v-for="(item,index) in menu" :key="index" class="aside-title" @click="locateHeight(item.scrollHeight)">
+      <div v-for="(item,index) in menu" :key="item.blockId" class="aside-title" @click="locateHeight(item.scrollHeight)">
         <div :class="item.icon"></div>
         <div class="title">{{item.title}}</div>
       </div>
   </aside>
   <article id="main-article">
     <el-backtop :right="100" :bottom="100" />
-    <div id="article-header">
+    <div id="article-header" ref="headerRef">
       <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
       <div id="header-right">
         <img v-if="infoStore.id" id="right-avatar" @click="touchAvatar" :src="infoStore.avatarUrl">
@@ -42,13 +42,13 @@
         </ToolIcon>
       </div>
     </div>
-    <div class="article-box" v-for="(item,index) in menu" :key="index">
+    <div class="article-box" v-for="(item,index) in menu" :key="item.blockId">
       <div class="box-title">
         {{ item.title }}
       </div>
       <div ref="boxContentRef" class="box-content">
         <div class="content-header">
-          <Menu ref="menuRef" :menuTitle="item.menuTitle" :menuItem="item.menuItem"></Menu>
+          <Menu ref="menuRef" :menuTitle="systemStore.menuTitle.filter((keyword)=>keyword.blockId == item.blockId)" :menuItem="menuItem" @click="console.log(infoStore.menuTitle)"></Menu>
           <el-button class="header-more">
             查看更多<el-icon><i-ep-arrow-right></i-ep-arrow-right></el-icon>
           </el-button>
@@ -269,24 +269,36 @@
 <script setup>
 import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { menuItem,menu,tools,scrollData,debounce } from '@/datas/config'
+import { onBeforeUnmount, onMounted, ref} from 'vue'
+import { menuItem,menu,tools,scrollData,debounce} from '@/datas/config'
 import { useRouter } from 'vue-router'
 import Enter from './enter/Enter.vue'
 import Dialog from '@/components/Dialog.vue'
 import useInfoStore from '@/store/info'
-
+import useSystemStore from '@/store/system'
+import {  updateUserInfo, uploadFile } from '@/utils/preRequest'
 const menuRef = ref(null)
 const boxContentRef = ref(null)
+const headerRef = ref(null)
 let menuWidth = 1076
 const inputRef = ref(null)
 const router = useRouter()
 const showLogin = ref(0)
 const showReset = ref(0)                           
 const infoStore = useInfoStore()
+const systemStore = useSystemStore()
 const imageUrl = ref('')
 const nickName = ref('')
+let imgFile
+// let isShowMenu = ref(0)
 
+//
+// async function loadMenu(){
+//   await getBlockList()
+//   await getKeyWord()
+//   isShowMenu.value = 1
+// }
+// loadMenu()
 
 // 修改头像
 const handleImgUpload = () => {
@@ -296,10 +308,10 @@ const handleImgUpload = () => {
   }
 }
 const handleFileChange = (event) => {
-  const file = event.target.files[0]
+  imgFile = event.target.files[0]
   event.target.value = ''
-  imageUrl.value = URL.createObjectURL(file)
-  console.log(file)
+  imageUrl.value = URL.createObjectURL(imgFile)
+  console.log(imgFile)
 }
 
 // 退出重置信息界面
@@ -307,16 +319,41 @@ const exitReset = () => {
   showReset.value = 0
 }
 
-// 上传文件/图像
-
+// 转换文件/图像
+const transformFile = (file) => new Promise((resolve,reject) => {
+  const fileReader = new FileReader()
+  fileReader.onload = (e) => {
+    resolve(String.fromCharCode.apply(null, new Uint8Array(e.target.result)))
+    
+  }
+  fileReader.onerror = (error) => {
+    reject(error)
+  }
+  fileReader.readAsArrayBuffer(file)
+})
 
 // 上传用户信息
-
+const updateInfo = async () => {
+  let file = ''
+  if (imgFile) {
+    file = await transformFile(imgFile)
+    // console.log("转换后的二进制文件:",file)
+    uploadFile(file).then((url) => {
+      updateUserInfo(nickName.value, url)
+    })
+  } else {
+    if (nickName.value != infoStore.nickName) {
+      updateUserInfo(nickName.value, infoStore.avatarUrl)
+    }
+  }
+  imgFile = null
+  exitReset()
+}
 
 // 设定每个板块menu和搜索框的宽度
 const updateWidth = debounce(() => {
+  inputRef.value.setInputWidth((headerRef.value.offsetWidth+30)*0.3)
   menuWidth = boxContentRef.value[0].offsetWidth * 0.8
-  inputRef.value.setInputWidth((boxContentRef.value[0].offsetWidth+40)*0.4)
   menuRef.value.forEach((item) => {
     item.setMenuWidth(menuWidth)
   })

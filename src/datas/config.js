@@ -1,45 +1,39 @@
-const menuItem = ['Bilibili', '微信公众号', 'Github','huggingface']
+const menuItem = ['Bilibili', '微信公众号', 'Github', 'huggingface']
 const menu = {
-  baseKnowledge: {
+  '基础知识': {
     title: '基础知识',
+    blockId:1,
     icon: 'iconfont icon-zhishi',
-    menuTitle: ['Python', '数学基础'],
-    menuItem: ['Bilibili', '微信公众号', 'Github', 'huggingface'],
     scrollHeight: 0,
   },
-  tool: {
+  '工具与软件': {
     title: '工具与软件',
+    blockId:2,
     icon: 'iconfont icon-ruanjian',
-    menuTitle: ['Numpy', 'Pandas', '数据分析与实战','Pytorch','TenserFlow'],
-    menuItem: ['Bilibili', '微信公众号', 'Github', 'huggingface'],
     scrollHeight:390,
   },
-  machineLearning: {
+  '机器学习': {
     title: '机器学习',
+    blockId:3,
     icon: 'iconfont icon-jiqiren',
-    menuTitle: ['机器学习理论', '机器学习实战'],
-    menuItem: ['Bilibili', '微信公众号', 'Github', 'huggingface'],
     scrollHeight:780,
   },
-  deepLearning: {
+  '深度学习': {
     title: '深度学习',
+    blockId:4,
     icon: 'iconfont icon-shenduxuexi',
-    menuTitle: ['深度学习理论', '深度学习实战'],
-    menuItem: ['Bilibili', '微信公众号', 'Github', 'huggingface'],
     scrollHeight:1170,
   },
-  computerVision: {
+  '计算机视觉': {
     title: '计算机视觉',
+    blockId:5,
     icon: 'iconfont icon-jisuanjishijue',
-    menuTitle: ['图像分类', '目标检测','图像分割','目标跟踪','图像生成'],
-    menuItem: ['Bilibili', '微信公众号', 'Github', 'huggingface'],
     scrollHeight:1560,
   },
-  naturalLanguageProcessing: {
+  '自然语言处理': {
     title: '自然语言处理',
+    blockId:6,
     icon: 'iconfont icon-ziranyuyanchuli',
-    menuTitle: ['文本分类', '文本匹配','文本生成','序列标注'],
-    menuItem: ['Bilibili', '微信公众号', 'Github', 'huggingface'],
     scrollHeight:1893,
   }
 }

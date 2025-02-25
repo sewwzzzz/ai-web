@@ -6,9 +6,9 @@
     :popper-offset="0"
     :style="{width:realWidth + 'px'}"
   >
-    <el-sub-menu v-for="(TitleItem,TitleIndex) in props.menuTitle" :key="TitleIndex" :index = "TitleIndex.toString()"> 
-        <template #title>{{ TitleItem }}</template>
-        <el-menu-item v-for="(item,index) in props.menuItem" :key="index" :index="TitleIndex + '-' + index">{{ item }}</el-menu-item>
+    <el-sub-menu v-for="(TitleItem,TitleIndex) in props.menuTitle" :key="TitleItem.id" :index = "TitleItem.id.toString()" @click="console.log(TitleItem.id)"> 
+        <template #title>{{ TitleItem.name }}</template>
+        <el-menu-item v-for="(item,index) in props.menuItem" :key="index" :index="TitleItem.id + '-' + index">{{ item }}</el-menu-item>
     </el-sub-menu>
   </el-menu>
 </template>
