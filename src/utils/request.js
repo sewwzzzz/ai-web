@@ -26,7 +26,7 @@ instance.interceptors.response.use(function (response) {
     setTimeout(()=>router.push('/'),3000)
     return Promise.reject('登录超时')
   }
-  return Promise.reject(responseData.message)
+  return Promise.reject(responseData)
 }, function () {
   return Promise.reject('网络错误')
 })

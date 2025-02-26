@@ -9,8 +9,8 @@
         历史记录
       </div>
       <div id="content-record">
-          <div v-show="!deleteState" :class="[currentMenu === item ? 'record-select-sure' : 'record-select']" v-for="(item,index) in menuItem" :key="index" @click="changeMenu(item)">
-            {{ item }}
+          <div v-show="!deleteState" :class="[currentMenu === item.name ? 'record-select-sure' : 'record-select']" v-for="(item,index) in systemStore.platform" :key="item.id" @click="changeMenu(item.name)">
+            {{ item.name }}
           </div>
           <div v-show="!deleteState" id="record-right">
             <el-input
@@ -182,11 +182,12 @@
 <script setup>
 import CheckBox from '@/components/CheckBox.vue';
 import ToolButton from '@/components/ToolButton.vue'
-import { menuItem } from '@/datas/config'
+import useSystemStore from '@/store/system'
 import { ref } from 'vue'
 
 let deleteState = ref(0)
 let currentMenu = ref('Bilibili')
+const systemStore = useSystemStore()
 
 // 改变是否允许删除的状态
 const changeDelState = () => {

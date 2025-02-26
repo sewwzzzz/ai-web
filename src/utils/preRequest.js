@@ -44,9 +44,10 @@ async function login(userName, password) {
     infoStore.setToken(result.data)
     localStorage.setItem('token', result.data)
     getUserInfo()
+    commitMessage('success', result.message)
     getBlockList()
     getKeyWord()
-    commitMessage('success', result.message)
+    getPlatform()
     return true
   }
   return false
@@ -123,7 +124,6 @@ async function getBlockList() {
     data.forEach((item) => {
       menu[item.name].blockId = item.id
     })
-    console.log("Block栏->",menu)
   }
 }
 
@@ -136,11 +136,44 @@ async function getKeyWord() {
   }
   const result = await request(config)
   if (result) {
-    const data = result.data
-    systemStore.setMenuTitle(data)
+    systemStore.setMenuTitle(result.data)
   }
 }
 
+// 获取所有平台信息
+async function getPlatform() {
+  const config = {
+    url: '/source/list',
+    method: 'GET',
+    token : infoStore.token
+  }
+  const result = await request(config)
+  if (result) {
+    systemStore.setPlatform(result.data)
+  }
+}
+
+// 根据分页条件获取资源
+async function getList(current, size, sourceId, keyword) {
+  const params = {
+    current: current,
+    size:size
+  }
+  const data = {
+    sourceId: sourceId,
+    keyword: keyword
+  }
+  const config = {
+    url: '/resource/list',
+    method: 'POST',
+    token: infoStore.token,
+    params: params,
+    data:data
+  }
+  const result = await request(config)
+  console.log("getList响应结果:",result)
+  if (result) return result.data
+}
 
 export{
   register,
@@ -150,4 +183,7 @@ export{
   updateUserInfo,
   getBlockList,
   getKeyWord,
+  getPlatform,
+  getList,
+
 }

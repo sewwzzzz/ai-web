@@ -1,4 +1,3 @@
-const menuItem = ['Bilibili', '微信公众号', 'Github', 'huggingface']
 const menu = {
   '基础知识': {
     title: '基础知识',
@@ -125,7 +124,6 @@ const commitMessage = (type, msg) => {
 }
 
 export{
-  menuItem,
   menu,
   tools,
   scrollData,

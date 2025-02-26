@@ -4,11 +4,12 @@
     class="el-menu-popper-demo"
     mode="horizontal"
     :popper-offset="0"
-    :style="{width:realWidth + 'px'}"
+    :style="{width:props.fixedWidth?props.fixedWidth:(realWidth + 'px')}"
+    :default-active="props.menuIndex+'-'+props.subIndex"
   >
     <el-sub-menu v-for="(TitleItem,TitleIndex) in props.menuTitle" :key="TitleItem.id" :index = "TitleItem.id.toString()" @click="console.log(TitleItem.id)"> 
         <template #title>{{ TitleItem.name }}</template>
-        <el-menu-item v-for="(item,index) in props.menuItem" :key="index" :index="TitleItem.id + '-' + index">{{ item }}</el-menu-item>
+        <el-menu-item v-for="(item,index) in props.platform" :key="item.id" :index="TitleItem.id + '-' + item.id" @click="sendCurrentId(TitleItem.name, TitleItem.id, item.id, TitleItem.blockId)">{{ item.name }}</el-menu-item>
     </el-sub-menu>
   </el-menu>
 </template>
@@ -18,14 +19,25 @@
 </style>
 
 <script setup>
-import { defineProps, defineExpose, ref } from 'vue'
+import { defineProps, defineExpose, ref,defineEmits } from 'vue'
 
 const props = defineProps({
   menuTitle: {
     type: Array,
   },
-  menuItem: {
+  platform: {
     type: Array,
+  },
+  fixedWidth: {
+    type: String
+  },
+  menuIndex: {
+    type: String,
+    default:"1",
+  },
+  subIndex: {
+    type: String,
+    default:"1"
   }
 })
 let realWidth = ref(0)
@@ -35,5 +47,10 @@ function setMenuWidth(menuWidth) {
   realWidth.value = menuWidth
 }
 
-defineExpose({setMenuWidth})
+defineExpose({ setMenuWidth })
+
+const emits = defineEmits(['sendId'])
+const sendCurrentId = (keyName, keyId, sourceId, blockId) => {
+  emits('sendId',keyName, keyId, sourceId, blockId)
+}
 </script>

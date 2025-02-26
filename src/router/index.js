@@ -11,6 +11,11 @@ const router = createRouter({
       component:()=>import(`../views/Main.vue`)
     },
     {
+      path: '/Block/:blockId/:keyId/:sourceId',
+      name: 'block',
+      component:()=>import(`../views/Block.vue`)
+    },
+    {
       path: '/message',
       name: 'message',
       component: ()=>import(`../views/Message.vue`),
@@ -62,19 +67,19 @@ const router = createRouter({
 
 })
 
-router.beforeEach((to, from, next) => {
-  const infoStore = useInfoStore()
-  if (to.path === '/') {
-    next()
-  }
-  else {
-    if (infoStore.token != '') {
-      next()
-    } else {
-      commitMessage('error','登陆超时')
-      setTimeout(()=>next('/'),1000)
-    }
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   const infoStore = useInfoStore()
+//   if (to.path === '/') {
+//     next()
+//   }
+//   else {
+//     if (infoStore.token != '') {
+//       next()
+//     } else {
+//       commitMessage('error','登陆超时')
+//       setTimeout(()=>next('/'),1000)
+//     }
+//   }
+// })
 
 export default router

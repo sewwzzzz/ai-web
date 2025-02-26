@@ -5,9 +5,9 @@
       <div id="sign-title">AI资讯</div>
     </div>
     <div ref="headerRef" id="article-header">
-      <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
+      <SelectInput ref="inputRef" id="header-input" :platform="systemStore.platform"></SelectInput>
       <div id="header-right">
-        <div id="right-avatar"></div>
+        <img id="right-avatar" :src="infoStore.avatarUrl">
         <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title" @click="jumpTools(item)">
         </ToolIcon>
       </div>
@@ -62,7 +62,7 @@
 #header-input{
   position:absolute;
   top:50%;
-  left:35%;
+  left:50%;
   transform:translate(-50%,-50%)
 }
 
@@ -76,10 +76,15 @@
 }
 
 #right-avatar{
-  background-color: #1E88F5;
+  border:1px solid #ffffff;
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: aliceblue;
+  font-size:14px;
 }
 
 #right-avatar:hover{
@@ -90,13 +95,17 @@
 <script setup>
 import SelectInput from './SelectInput.vue'
 import ToolIcon from './ToolIcon.vue'
-import { menuItem,tools,debounce } from '@/datas/config'
+import { tools,debounce } from '@/datas/config'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import useSystemStore from '@/store/system'
+import useInfoStore from '@/store/info'
 
 const router = useRouter()
 const inputRef = ref(null)
 const headerRef = ref(null)
+const systemStore = useSystemStore()
+const infoStore = useInfoStore()
 
 // 元素挂载后需要执行的操作
 onMounted(() => {
@@ -111,7 +120,7 @@ onBeforeUnmount(() => {
 
 // 设定搜索框的宽度
 const updateWidth = debounce(() => {
-  inputRef.value.setInputWidth(headerRef.value.offsetWidth*0.4)
+  inputRef.value.setInputWidth(headerRef.value.offsetWidth*0.3)
 })
 
 // 点击 消息/动态/收藏/历史/ 后跳转路由

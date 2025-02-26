@@ -34,7 +34,7 @@
   <article id="main-article">
     <el-backtop :right="100" :bottom="100" />
     <div id="article-header" ref="headerRef">
-      <SelectInput ref="inputRef" id="header-input" :menuItem="menuItem"></SelectInput>
+      <SelectInput ref="inputRef" id="header-input" :platform="systemStore.platform"></SelectInput>
       <div id="header-right">
         <img v-if="infoStore.id" id="right-avatar" @click="touchAvatar" :src="infoStore.avatarUrl">
         <div  v-else id="right-avatar" @click="touchLogin">登录</div>
@@ -48,8 +48,8 @@
       </div>
       <div ref="boxContentRef" class="box-content">
         <div class="content-header">
-          <Menu ref="menuRef" :menuTitle="systemStore.menuTitle.filter((keyword)=>keyword.blockId == item.blockId)" :menuItem="menuItem" @click="console.log(infoStore.menuTitle)"></Menu>
-          <el-button class="header-more">
+          <Menu ref="menuRef" :menuTitle="systemStore.menuTitle.filter((keyword)=>keyword.blockId == item.blockId)" :platform="systemStore.platform" @send-id="setCurrent"></Menu>
+          <el-button class="header-more" @click="goBlock(item.blockId)">
             查看更多<el-icon><i-ep-arrow-right></i-ep-arrow-right></el-icon>
           </el-button>
         </div>
@@ -270,13 +270,13 @@
 import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref} from 'vue'
-import { menuItem,menu,tools,scrollData,debounce} from '@/datas/config'
+import { menu,tools,scrollData,debounce} from '@/datas/config'
 import { useRouter } from 'vue-router'
 import Enter from './enter/Enter.vue'
 import Dialog from '@/components/Dialog.vue'
 import useInfoStore from '@/store/info'
 import useSystemStore from '@/store/system'
-import {  updateUserInfo, uploadFile } from '@/utils/preRequest'
+import {  getList, updateUserInfo, uploadFile } from '@/utils/preRequest'
 const menuRef = ref(null)
 const boxContentRef = ref(null)
 const headerRef = ref(null)
@@ -290,15 +290,34 @@ const systemStore = useSystemStore()
 const imageUrl = ref('')
 const nickName = ref('')
 let imgFile
-// let isShowMenu = ref(0)
+let hashmap = new Map()
 
-//
-// async function loadMenu(){
-//   await getBlockList()
-//   await getKeyWord()
-//   isShowMenu.value = 1
-// }
-// loadMenu()
+// 根据信息获取对应数据列表
+const getDataList = (secondId, firstName, current = 1, size = 5) => {
+  getList(current,size,secondId,firstName)
+}
+// 根据不同的blockID记录展示的关键词和平台的内容
+for (let key in menu) {
+  const temp = menu[key]
+  // console.log(systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0])
+  const titleItem = systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0]
+  hashmap.set(temp.blockId, [titleItem.name, titleItem.id, 1])
+  getDataList(1,titleItem.name)
+}
+
+// 设置当前点击的平台及关键词
+const setCurrent = (firstName, firstId, secondId, blockId) => {
+  hashmap.set(blockId, [firstName, firstId, secondId])
+  // console.log("存储的Map:",hashmap)
+  getDataList(secondId,firstName)
+}
+
+
+// 查看更多
+const goBlock = (blockId) => {
+  const [keyName,keyId,sourceId] = hashmap.get(blockId)
+  router.push(`/block/${blockId}/${keyId}/${sourceId}`)
+}
 
 // 修改头像
 const handleImgUpload = () => {

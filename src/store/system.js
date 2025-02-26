@@ -123,6 +123,20 @@ const useSystemStore = defineStore('system', {
           id: 4,
           blockId:6
         },
+      ],
+      platform: [
+        {
+          name: 'Bilibili',
+          id: 1
+        },
+        {
+          name: '微信公众号',
+          id:2
+        },
+        {
+          name: 'Github',
+          id:3
+        }
       ]
     }
   },
@@ -132,6 +146,9 @@ const useSystemStore = defineStore('system', {
     setMenuTitle(menuTitle) {
       this.menuTitle = menuTitle
     },
+    setPlatform(platform) {
+      this.platform = platform
+    }
   }
 })
 

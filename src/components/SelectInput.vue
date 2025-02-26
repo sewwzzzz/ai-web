@@ -8,7 +8,7 @@
     >
       <template #prepend>
         <el-select v-model="select" placeholder="Select" style="width:130px">
-          <el-option v-for="(item,index) in props.menuItem" :key="index" :label="item" :value="index.toString()" />
+          <el-option v-for="(item,index) in props.platform" :key="item.id" :label="item.name" :value="item.id.toString()" />
         </el-select>
       </template>
       <template #append>
@@ -36,7 +36,7 @@ import { ref,defineProps, defineExpose} from 'vue'
 const input = ref('')
 const select = ref('')
 const props = defineProps({
-  menuItem: {
+  platform: {
     type:Array,
   }
 })
