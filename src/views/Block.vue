@@ -7,7 +7,7 @@
     <Menu id="navigation-menu" :menu-index="route.params.keyId" :sub-index="route.params.sourceId" @send-id="setCurrent" fixed-width="calc(100% - 160px)" :menuTitle="systemStore.menuTitle.filter((keyword)=>keyword.blockId == route.params.blockId)" :platform="systemStore.platform" ></Menu>
   </div>
   <div id="block-content">
-    <Bilibili></Bilibili>
+    <Bilibili id="content-box" v-for="(item,index) in dataList" :key="item.id" :records="item"></Bilibili>
   </div>
   <div id="block-footer">
     <Pagination id="footer-pagination" :paging = paging @sizeChange="sizeChange" @currentChange="currentChange"></Pagination>
@@ -25,12 +25,30 @@
 }
 
 #block-content{
-  height:800px;
+  display:flex;
+  flex-direction: row;
+  flex-wrap:wrap;
+  flex-direction: space-between;
+  margin-top:30px;
+  padding:0 64px;
+  box-sizing: border-box;
+}
+
+#content-box{
+  flex-basis:20%;
+  flex-shrink: 0;
+  flex-grow: 0;
+  overflow: hidden;
+  cursor:pointer;
+  box-sizing: border-box;
+  padding:0 8px;
+  margin-bottom: 40px;
 }
 
 #block-footer{
   display:flex;
   justify-content: center;
+  padding-bottom: 40px;
 }
 
 #footer-pagination{
@@ -48,6 +66,7 @@ import Bilibili from '@/components/Picture/Bilibili.vue'
 const systemStore = useSystemStore()
 const route = useRoute()
 const router = useRouter()
+let dataList = reactive([])
 
 // 当前展示的关键词和平台
 let sourceId = route.params.sourceId
@@ -59,7 +78,7 @@ const getDataList = (secondId, firstName, current = 1, size = 30) => {
     paging.pageSize = data.size
     paging.totalCount = data.total
     paging.currentPage = data.current
-    
+    dataList = data.records
   })
   
 }

@@ -3,6 +3,7 @@ import useInfoStore from "@/store/info"
 import { menu } from "@/datas/config"
 import { commitMessage } from "@/datas/config"
 import useSystemStore from "@/store/system"
+import { sendBlockMessage, sendInfoMessage, sendKeywordMessage, sendPlatformMessage } from "./broadcast"
 const infoStore = useInfoStore()
 const systemStore = useSystemStore()
 
@@ -68,6 +69,7 @@ async function getUserInfo() {
     infoStore.setAvatarUrl(data.avatarUrl)
     infoStore.setNickName(data.nickname)
     infoStore.setId(data.id)
+    sendInfoMessage()
   }
 }
 
@@ -107,6 +109,7 @@ async function updateUserInfo(nickName , avatarUrl) {
     commitMessage('success', '信息更新成功')
     infoStore.nickName = nickName
     infoStore.avatarUrl = avatarUrl
+    sendInfoMessage()
   }
 }
 
@@ -115,7 +118,6 @@ async function getBlockList() {
   const config = {
     url: '/block/list',
     method: 'GET',
-    token: infoStore.token,
   }
   const result = await request(config)
   if (result) {
@@ -132,7 +134,6 @@ async function getKeyWord() {
   const config = {
     url: '/keyword/list',
     method: 'GET',
-    token : infoStore.token
   }
   const result = await request(config)
   if (result) {
@@ -145,7 +146,6 @@ async function getPlatform() {
   const config = {
     url: '/source/list',
     method: 'GET',
-    token : infoStore.token
   }
   const result = await request(config)
   if (result) {
@@ -166,7 +166,6 @@ async function getList(current, size, sourceId, keyword) {
   const config = {
     url: '/resource/list',
     method: 'POST',
-    token: infoStore.token,
     params: params,
     data:data
   }

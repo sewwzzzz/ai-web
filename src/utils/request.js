@@ -23,8 +23,7 @@ instance.interceptors.response.use(function (response) {
   else if (responseData.code == 601 || responseData.code == 602) {
     const infoStore = useInfoStore()
     infoStore.clearInfo()
-    setTimeout(()=>router.push('/'),3000)
-    return Promise.reject('登录超时')
+    return Promise.reject('您还未登录，请先登录')
   }
   return Promise.reject(responseData)
 }, function () {

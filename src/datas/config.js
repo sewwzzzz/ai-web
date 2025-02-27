@@ -123,6 +123,14 @@ const commitMessage = (type, msg) => {
   })
 }
 
+const limitTitle = (title) => {
+  if (title.length > 20) {
+    title = title.slice(0, 21)
+    title += '...'
+  }
+  return title
+}
+
 export{
   menu,
   tools,
@@ -132,4 +140,5 @@ export{
   messageMenu,
   headerOption,
   commitMessage,
+  limitTitle,
 }

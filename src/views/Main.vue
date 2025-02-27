@@ -48,7 +48,7 @@
       </div>
       <div ref="boxContentRef" class="box-content">
         <div class="content-header">
-          <Menu ref="menuRef" :menuTitle="systemStore.menuTitle.filter((keyword)=>keyword.blockId == item.blockId)" :platform="systemStore.platform" @send-id="setCurrent"></Menu>
+          <Menu ref="menuRef" :menuTitle="systemStore.menuTitle.filter((x) => x.blockId == item.blockId)" :platform="systemStore.platform" @send-id="setCurrent"></Menu>
           <el-button class="header-more" @click="goBlock(item.blockId)">
             查看更多<el-icon><i-ep-arrow-right></i-ep-arrow-right></el-icon>
           </el-button>
@@ -122,7 +122,6 @@
   z-index:2;
   opacity: 0.6;
 }
-
 #article-header{
   position:relative;
   width:100%;
@@ -271,22 +270,23 @@ import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref} from 'vue'
 import { menu,tools,scrollData,debounce} from '@/datas/config'
+import {uploadFile, updateUserInfo} from '@/utils/preRequest'
 import { useRouter } from 'vue-router'
-import Enter from './enter/Enter.vue'
-import Dialog from '@/components/Dialog.vue'
 import useInfoStore from '@/store/info'
 import useSystemStore from '@/store/system'
-import {  getList, updateUserInfo, uploadFile } from '@/utils/preRequest'
+import {  getList } from '@/utils/preRequest'
+import Enter from './enter/Enter.vue';
+import { sendInfoMessage } from '@/utils/broadcast';
 const menuRef = ref(null)
 const boxContentRef = ref(null)
 const headerRef = ref(null)
 let menuWidth = 1076
 const inputRef = ref(null)
-const router = useRouter()
-const showLogin = ref(0)
-const showReset = ref(0)                           
+const router = useRouter()                        
 const infoStore = useInfoStore()
 const systemStore = useSystemStore()
+const showLogin = ref(0)
+const showReset = ref(0)   
 const imageUrl = ref('')
 const nickName = ref('')
 let imgFile
@@ -333,11 +333,6 @@ const handleFileChange = (event) => {
   console.log(imgFile)
 }
 
-// 退出重置信息界面
-const exitReset = () => {
-  showReset.value = 0
-}
-
 // 转换文件/图像
 const transformFile = (file) => new Promise((resolve,reject) => {
   const fileReader = new FileReader()
@@ -367,6 +362,28 @@ const updateInfo = async () => {
   }
   imgFile = null
   exitReset()
+}
+
+// 点击头像
+const touchAvatar = () => {
+  showReset.value = 1
+  nickName.value = infoStore.nickName
+  imageUrl.value = infoStore.avatarUrl
+}
+
+// 退出重置信息界面
+const exitReset = () => {
+  showReset.value = 0
+}
+
+// 点击登录
+const touchLogin = () => {
+  showLogin.value = 1
+}
+
+// 关闭登录界面
+const showLoginCmpt = () => {
+  showLogin.value = 0
 }
 
 // 设定每个板块menu和搜索框的宽度
@@ -413,35 +430,39 @@ const locateHeight = function (targetHeight) {
   }, scrollData.metaScrollTime)
 }
 
+// 监控window是否加载完成
+function openWindowWithPromise(url) {
+  return new Promise((resolve, reject) => {
+    const newWindow = window.open(url, '_blank');
+
+    if (!newWindow) {
+      reject(new Error('Failed to open new window'));
+    } else {
+      newWindow.addEventListener('load', () => {
+        resolve();
+      }, false);
+      newWindow.addEventListener('error', () => {
+        reject(new Error('Window load error'));
+      }, false);
+    }
+  });
+}
 // 点击 消息/动态/收藏/历史/ 后跳转路由
 const jumpTools = (item) => {
+  // router.push(item.path)
   let routeData = router.resolve({
     path: item.path, // 这里填写的是路由配置中定义的路由路径path或者name
   });
-  window.open(routeData.href, '_blank');
+  openWindowWithPromise(routeData.href).then(() => {
+    sendInfoMessage()
+  })
 }
+
 
 // 停留在首页
 const stayMain = () => {
   router.go(0)
 }
 
-
-// 点击头像
-const touchAvatar = () => {
-  showReset.value = 1
-  nickName.value = infoStore.nickName
-  imageUrl.value = infoStore.avatarUrl
-}
-
-// 点击登录
-const touchLogin = () => {
-  showLogin.value = 1
-}
-
-// 关闭登录界面
-const showLoginCmpt = () => {
-  showLogin.value = 0
-}
 
 </script>

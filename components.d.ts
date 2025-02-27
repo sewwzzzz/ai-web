@@ -35,7 +35,6 @@ declare module '@vue/runtime-core' {
     Header: typeof import('./src/components/Header.vue')['default']
     IEpArrowLeft: typeof import('~icons/ep/arrow-left')['default']
     IEpArrowRight: typeof import('~icons/ep/arrow-right')['default']
-    IEpCheck: typeof import('~icons/ep/check')['default']
     IEpSearch: typeof import('~icons/ep/search')['default']
     Menu: typeof import('./src/components/Menu.vue')['default']
     Pagination: typeof import('./src/components/Pagination.vue')['default']

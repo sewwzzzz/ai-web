@@ -183,11 +183,18 @@
 import CheckBox from '@/components/CheckBox.vue';
 import ToolButton from '@/components/ToolButton.vue'
 import useSystemStore from '@/store/system'
+import { getPlatform } from '@/utils/preRequest';
 import { ref } from 'vue'
 
 let deleteState = ref(0)
 let currentMenu = ref('Bilibili')
 const systemStore = useSystemStore()
+
+
+
+// 获取最新平台信息
+getPlatform()
+
 
 // 改变是否允许删除的状态
 const changeDelState = () => {
