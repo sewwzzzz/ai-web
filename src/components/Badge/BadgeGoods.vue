@@ -1,7 +1,7 @@
 <template>
   <div id="badge-content" @click="updateState()">
     <SvgIcon name="goods" :class="[isA?'content-icon-sure':'content-icon']"></SvgIcon>
-    <div :class="[isA?'content-number-sure':'content-number']">{{ num }}</div>
+    <div :class="[isA?'content-number-sure':'content-number']">{{ props.number }}</div>
   </div>
 </template>
 
@@ -62,7 +62,7 @@
 </style>
 
 <script setup>
-import { defineProps,ref } from 'vue'
+import { defineProps, defineEmits} from 'vue'
 import SvgIcon from '../SvgIcon.vue';
 
 const props = defineProps({
@@ -75,18 +75,14 @@ const props = defineProps({
     default:false
   },
 })
-let num = ref(props.number)
-let isA = ref(props.isActive)
 
+let isA = props.isActive
+
+const emits = defineEmits(['update:number'])
 // 点击后更新'点赞'徽章状态
 const updateState = function () {
-  if (!isA.value) {
-    num.value += 1
-    isA.value = true
-  }
-  else {
-    num.value -= 1
-    isA.value = false
-  }
+  isA = !isA
+  let num = props.number + (isA?1:-1)
+  emits('update:number',num)
 }
 </script>

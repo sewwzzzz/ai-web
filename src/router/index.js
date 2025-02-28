@@ -16,6 +16,11 @@ const router = createRouter({
       component:()=>import(`../views/Block.vue`)
     },
     {
+      path: '/Poster/:id',
+      name: 'poster',
+      component:()=>import(`../views/Poster.vue`)
+    },
+    {
       path: '/message',
       name: 'message',
       component: ()=>import(`../views/Message.vue`),
@@ -63,7 +68,13 @@ const router = createRouter({
       name: 'history',
       component:()=>import(`../views/History.vue`)
     }
-  ]
+  ],
+  // scrollBehavior:(to, from, savedPosition) => {
+  //   if (savedPosition && to.meta.keepAlive) {
+  //     return savedPosition;
+  //   }
+  //   return { x: 0, y:0 };
+  // }
 
 })
 

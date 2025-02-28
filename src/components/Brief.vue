@@ -1,9 +1,9 @@
 <template>
   <div id="brief-content">
     <div id="content-header">
-      <img id="header-avator" />
+      <img id="header-avatar"/>
       <div id="header-name">
-        周建辉zjh
+        {{ props.name }}
       </div>
     </div>
     <div id="content-article">
@@ -59,7 +59,7 @@
   height: 50px;
   display:flex;
 }
-#header-avator{
+#header-avatar{
   width:50px;
   height:50px;
   border-radius: 50%;
@@ -108,11 +108,11 @@
 import { defineProps, ref } from 'vue'
 
 const props = defineProps({
-  avator: {
+  avatar: {
     type:String,
   },
   name: {
-    type:String,
+    type: String,
   },
   number: {
     type:Array

@@ -5,21 +5,32 @@
     </div>
     <div id="poster-content">
       <div id="content-left">
-        <BadgeGoods>
+        <BadgeGoods v-model:number="goodNum">
         </BadgeGoods>
-        <BadgeComments>
+        <BadgeComments :number="commentNum" @go-comment="goComment">
         </BadgeComments>
         <BadgeStores>
         </BadgeStores>
       </div>
       <div id="content-right">
-        <Brief></Brief>
+        <Brief :name="authorName"></Brief>
       </div>
+      <div id="content-title">
+        {{ limitTitle(title,100)}}
+      </div>
+      <div id="content-tips">
+        <div>{{ publishTime }}</div>
+        <div>
+          <SvgIcon id="tips-icon" name="look"></SvgIcon>
+          <div>{{ viewNum }}</div>
+        </div>
+      </div>
+      <img :src="coverUrl" id="content-img" @click="jump">
     </div>
-    <div id="poster-comments">
+    <div id="poster-comments" ref="commentRef">
       <div id="comments-title">评论 {{commentNum}}</div>
       <div id="comments-input">
-        <img id="input-avator"/>
+        <img id="input-avatar" :src="infoStore.avatarUrl">
         <el-input
             v-model="textarea"
             type="textarea"
@@ -45,9 +56,44 @@
 </template>
 
 <style scoped>
+#content-title{
+  font-family: -apple-system, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial ;
+  width:100%;
+  font-size: 25px;
+  font-weight:550;
+  padding:10px 0;
+}
+
+#content-tips{
+  display:flex;
+  width:100%;
+  color:#8A919F;
+  gap:20px;
+  align-items: center;
+  padding:10px 0;
+}
+
+#content-tips div:nth-child(2){
+  display:flex;
+  align-items: center;
+  gap:8px;
+}
+
+#tips-icon{
+  height:18px;
+  width:18px;
+}
+
+#content-img{
+  width:100%;
+  height:500px;
+  margin-top:30px;
+  cursor: pointer;
+}
 #poster{
   background-color: rgb(242, 243, 245);
-  overflow:hidden;/* 父子之间margin重叠问题 */
+  /* 父子之间margin重叠问题 */
+  overflow:hidden;
 }
 #poster-header{
   position:fixed;
@@ -58,7 +104,7 @@
 #content-left{
   position: fixed;
   top:160px;
-  margin-left:-85px;
+  margin-left:-110px;
   display:flex;
   flex-direction: column;
   gap:28px;
@@ -73,8 +119,9 @@
   margin-top:100px;
   margin-left:18%;
   width:50%;
-  height:800px;
   background-color:white;
+  box-sizing: border-box;
+  padding:30px 25px;
 }
 #poster-comments{
   box-sizing: border-box;
@@ -99,7 +146,7 @@
   height:115px;
   display:flex;
 }
-#input-avator{
+#input-avatar{
   width:50px;
   height:50px;
   border-radius: 50%;
@@ -159,12 +206,63 @@ import BadgeStores from '@/components/Badge/BadgeStores.vue';
 import Brief from '@/components/Brief.vue';
 import Comment from '@/components/Comment.vue';
 import Header from '@/components/Header.vue'
-import { show } from '@/datas/config'
-import { ref } from 'vue'
+import { getResource } from '@/utils/preRequest';
+import { onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import useInfoStore from '@/store/info'
+import { limitTitle, locateHeight } from '@/utils/operate';
 
-let commentNum = ref(5)
+let goodNum = ref(0)
+let commentNum = ref(0)
+let authorName = ref('')
+let viewNum = ref(1839)
+let url = ''
+let coverUrl = ref('')
+let publishTime = ref('2025-2-28')
+let title = ref('')
+
+const commentRef = ref(null)
 let textarea = ref('')
 let select = ref(true)
+const route = useRoute()
+const infoStore = useInfoStore()
+
+onMounted(() => {
+  // window.addEventListener('scroll', () => console.log(document.documentElement.scrollTop))
+  // document.documentElement.scrollTop = 0
+})
+
+const goComment = () => {
+  locateHeight(commentRef.value.offsetTop - 64)
+}
+
+// 判断当前根据id获取当前具体内容
+const getPoster = () => {
+  getResource(route.params.id).then((data) => {
+    // console.log(data)
+    coverUrl.value = data.coverUrl
+    authorName.value = data.authorName
+    publishTime.value = data.publishTime
+    goodNum.value = data.likeCount
+    viewNum.value = data.viewCount
+    commentNum.value = data.commentCount
+    title.value = data.title
+    url = data.url
+})
+}
+
+const jump = () => {
+  window.open(url)
+}
+
+getPoster()
+
+// 参考b站只要登陆状态发生变化就重新发送浏览请求帮后台刷新历史记录
+watch(()=>infoStore.id, (val) => {
+    getPoster()
+})
+
+
 
 // 点击显示最热评论
 const updateHotSelect = function () {

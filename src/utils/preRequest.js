@@ -1,9 +1,9 @@
 import request from "./request"
 import useInfoStore from "@/store/info"
 import { menu } from "@/datas/config"
-import { commitMessage } from "@/datas/config"
+import { commitMessage } from "./operate"
 import useSystemStore from "@/store/system"
-import { sendBlockMessage, sendInfoMessage, sendKeywordMessage, sendPlatformMessage } from "./broadcast"
+import { sendInfoMessage, } from "./broadcast"
 const infoStore = useInfoStore()
 const systemStore = useSystemStore()
 
@@ -46,9 +46,6 @@ async function login(userName, password) {
     localStorage.setItem('token', result.data)
     getUserInfo()
     commitMessage('success', result.message)
-    getBlockList()
-    getKeyWord()
-    getPlatform()
     return true
   }
   return false
@@ -126,6 +123,7 @@ async function getBlockList() {
     data.forEach((item) => {
       menu[item.name].blockId = item.id
     })
+    return 
   }
 }
 
@@ -138,6 +136,7 @@ async function getKeyWord() {
   const result = await request(config)
   if (result) {
     systemStore.setMenuTitle(result.data)
+    return
   }
 }
 
@@ -150,6 +149,7 @@ async function getPlatform() {
   const result = await request(config)
   if (result) {
     systemStore.setPlatform(result.data)
+    return
   }
 }
 
@@ -174,6 +174,22 @@ async function getList(current, size, sourceId, keyword) {
   if (result) return result.data
 }
 
+// 获取资源具体展示信息
+async function getResource(id) {
+  const params = {}
+  if (infoStore.id) {
+    params['userId'] = infoStore.id
+  }
+  const config = {
+    url: `/resource/${id}`,
+    method: 'GET',
+    params: params,
+    token:infoStore.token,
+  }
+  const result = await request(config)
+  if(result) return result.data
+}
+
 export{
   register,
   login,
@@ -184,5 +200,6 @@ export{
   getKeyWord,
   getPlatform,
   getList,
+  getResource,
 
 }

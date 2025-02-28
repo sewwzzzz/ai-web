@@ -1,7 +1,7 @@
 import axios from "axios"
-import { commitMessage } from "@/datas/config"
-import router from "@/router"
+import { commitMessage } from "./operate"
 import useInfoStore from "@/store/info"
+import { sendInfoMessage } from "./broadcast"
 
 const instance = axios.create({
   baseURL:'/api',
@@ -23,6 +23,7 @@ instance.interceptors.response.use(function (response) {
   else if (responseData.code == 601 || responseData.code == 602) {
     const infoStore = useInfoStore()
     infoStore.clearInfo()
+    sendInfoMessage()
     return Promise.reject('您还未登录，请先登录')
   }
   return Promise.reject(responseData)

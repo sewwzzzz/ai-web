@@ -63,16 +63,6 @@ const scrollData = {
   metaScrollTime: 8,//最小间隔时间
 }
 
-const debounce = function(fn,delay) {
-  let timer = null
-  return function () {
-    const context = this
-    if (timer) clearTimeout(timer)
-    timer = setTimeout(() => {
-      fn.apply(context,arguments)
-    }, delay)
-  }
-}
 
 const show = [
   '贡献','获赞','订阅量'
@@ -116,29 +106,11 @@ const headerOption = [
   }
 ]
 
-const commitMessage = (type, msg) => {
-  ElMessage({
-    message: msg,
-    type: type,
-  })
-}
-
-const limitTitle = (title) => {
-  if (title.length > 20) {
-    title = title.slice(0, 21)
-    title += '...'
-  }
-  return title
-}
-
 export{
   menu,
   tools,
   scrollData,
-  debounce,
   show,
   messageMenu,
   headerOption,
-  commitMessage,
-  limitTitle,
 }

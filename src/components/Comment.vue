@@ -1,9 +1,9 @@
 <template>
   <div id="comment">
-    <img id="avator-comment" />
+    <img id="avatar-comment" :src="infoStore.avatarUrl" />
     <div id="right-comment">
       <div id="comment-name">
-        周建辉zjh
+        {{ infoStore.nickName?infoStore.nickName:'未知用户' }}
       </div>
       <div id="comment-content">
       </div>
@@ -33,7 +33,7 @@
   width:100%;
   display:flex;
 }
-#avator-comment{
+#avatar-comment{
   width:50px;
   height:50px;
   margin-right:15px;
@@ -93,7 +93,9 @@
 import { ref } from 'vue'
 import FooterGoods from './Footer/FooterGoods.vue'
 import FooterReply from './Footer/FooterReply.vue'
+import useInfoStore from '@/store/info'
 
+const infoStore = useInfoStore()
 let showReply = ref(false)
 let textarea = ref('')
 

@@ -107,10 +107,29 @@ const sendPlatformMessage = () => {
   )
 }
 
+// 监控window是否加载完成
+function openWindowWithPromise(url) {
+  return new Promise((resolve, reject) => {
+    const newWindow = window.open(url, '_blank');
+
+    if (!newWindow) {
+      reject(new Error('Failed to open new window'));
+    } else {
+      newWindow.addEventListener('load', () => {
+        resolve();
+      }, false);
+      newWindow.addEventListener('error', () => {
+        reject(new Error('Window load error'));
+      }, false);
+    }
+  });
+}
 
 export {
   sendBlockMessage,
   sendInfoMessage,
   sendKeywordMessage,
-  sendPlatformMessage
+  sendPlatformMessage,
+  openWindowWithPromise,
+  
 }

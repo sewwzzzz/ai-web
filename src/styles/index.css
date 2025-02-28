@@ -375,3 +375,7 @@ input{
 input::placeholder{
   color:rgb(192, 192, 192);
 }
+
+div[aria-hidden=true]{
+  inert:true;
+}

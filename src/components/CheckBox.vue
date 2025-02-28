@@ -6,14 +6,14 @@
 
 <style scoped>
 .check-box{
-  height:15px;
-  width:15px;
-  border-width: 0.5px;
-  border-color: rgb(175, 178, 180);
+  height:100%;
+  width:100%;
+  border-width: 2px;
   border-style:solid;
-  border-radius: 5px;
+  border-radius: 3px;
   cursor:pointer;
   transition: all 0.3s ease-in-out;
+  z-index: 1;
 }
 
 .check-box:hover{

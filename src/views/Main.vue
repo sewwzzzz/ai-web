@@ -26,7 +26,7 @@
         <svg-icon id="sign-icon" name="aiweb"></svg-icon>
         <div id="sign-title">AI资讯</div>
       </div>
-      <div v-for="(item,index) in menu" :key="item.blockId" class="aside-title" @click="locateHeight(item.scrollHeight)">
+      <div v-for="(item) in menu" :key="item.blockId" class="aside-title" @click="locateHeight(item.scrollHeight)">
         <div :class="item.icon"></div>
         <div class="title">{{item.title}}</div>
       </div>
@@ -42,7 +42,7 @@
         </ToolIcon>
       </div>
     </div>
-    <div class="article-box" v-for="(item,index) in menu" :key="item.blockId">
+    <div class="article-box" v-for="(item) in menu" :key="item.blockId">
       <div class="box-title">
         {{ item.title }}
       </div>
@@ -52,6 +52,9 @@
           <el-button class="header-more" @click="goBlock(item.blockId)">
             查看更多<el-icon><i-ep-arrow-right></i-ep-arrow-right></el-icon>
           </el-button>
+        </div>
+        <div class="content">
+          <Bilibili class="content-box" v-for="(x) in dataList[item.blockId]" :key="x.id" :records="x" @click="goPoster(x.id)"></Bilibili>
         </div>
       </div>
     </div>
@@ -258,6 +261,25 @@
   z-index:1;
 }
 
+.content{
+  width:100%;
+  box-sizing: border-box;
+  padding:20px 20px;
+  display:flex;
+  flex-direction: space-between;
+  overflow: hidden;
+}
+
+.content-box{
+  flex-basis:20%;
+  flex-shrink: 0;
+  flex-grow: 0;
+  overflow: hidden;
+  cursor:pointer;
+  box-sizing: border-box;
+  padding:0 8px;
+}
+
 .header-more{
   position:absolute;
   top:5px;
@@ -269,14 +291,15 @@
 import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref} from 'vue'
-import { menu,tools,scrollData,debounce} from '@/datas/config'
-import {uploadFile, updateUserInfo} from '@/utils/preRequest'
+import { menu,tools} from '@/datas/config'
+import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform} from '@/utils/preRequest'
 import { useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
 import useSystemStore from '@/store/system'
 import {  getList } from '@/utils/preRequest'
 import Enter from './enter/Enter.vue';
-import { sendInfoMessage } from '@/utils/broadcast';
+import { openWindowWithPromise, sendInfoMessage } from '@/utils/broadcast';
+import { locateHeight,debounce } from '@/utils/operate'
 const menuRef = ref(null)
 const boxContentRef = ref(null)
 const headerRef = ref(null)
@@ -291,31 +314,55 @@ const imageUrl = ref('')
 const nickName = ref('')
 let imgFile
 let hashmap = new Map()
+const dataList = ref({})
+
+Promise.all([getBlockList(), getKeyWord(), getPlatform()]).then((res) => {
+  console.log('获取关键词、平台、模块的结果:', res)
+  // 根据不同的blockID记录展示的关键词和平台的内容
+  for (let key in menu) {
+    const temp = menu[key]
+    // console.log(systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0])
+    const titleItem = systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0]
+    hashmap.set(temp.blockId, [titleItem.name, titleItem.id, 1])
+    getDataList(temp.blockId, 1, titleItem.name)
+  }
+})
+
+// onMounted(() => {
+//   // 这里会出现回到顶部又重新弹回原位置，我推测是由于menuTitle突然重新赋值导致
+//   window.addEventListener('scroll', () => console.log(document.documentElement.scrollTop))
+//   // document.documentElement.scrollTop = 0
+// })
+
+// 前往具体资讯页面
+const goPoster = (id) => {
+  let routeData = router.resolve({
+    path :`/Poster/${id}`
+  })
+  openWindowWithPromise(routeData.href).then(() => {
+    sendInfoMessage()
+  })
+}
 
 // 根据信息获取对应数据列表
-const getDataList = (secondId, firstName, current = 1, size = 5) => {
-  getList(current,size,secondId,firstName)
-}
-// 根据不同的blockID记录展示的关键词和平台的内容
-for (let key in menu) {
-  const temp = menu[key]
-  // console.log(systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0])
-  const titleItem = systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0]
-  hashmap.set(temp.blockId, [titleItem.name, titleItem.id, 1])
-  getDataList(1,titleItem.name)
+const getDataList = (blockId, secondId, firstName, current = 1, size = 5) => {
+  getList(current, size, secondId, firstName).then((data) => {
+    dataList.value[blockId] = data.records
+    console.log(dataList.value)
+  })
 }
 
 // 设置当前点击的平台及关键词
 const setCurrent = (firstName, firstId, secondId, blockId) => {
   hashmap.set(blockId, [firstName, firstId, secondId])
   // console.log("存储的Map:",hashmap)
-  getDataList(secondId,firstName)
+  getDataList(blockId,secondId,firstName)
 }
 
 
 // 查看更多
 const goBlock = (blockId) => {
-  const [keyName,keyId,sourceId] = hashmap.get(blockId)
+  const [,keyId,sourceId] = hashmap.get(blockId)
   router.push(`/block/${blockId}/${keyId}/${sourceId}`)
 }
 
@@ -396,9 +443,9 @@ const updateWidth = debounce(() => {
 }, 100)
 
 // 获取一下scrollTop高度
-const handleScroll = function () {
-  console.log('当前的滚动条高度', document.documentElement.scrollTop)
-}
+// const handleScroll = function () {
+//   console.log('当前的滚动条高度', document.documentElement.scrollTop)
+// }
 
 // 元素挂载后需要执行的操作
 onMounted(() => {
@@ -413,40 +460,6 @@ onBeforeUnmount(()=>{
   // window.removeEventListener('scroll',handleScroll)
 })
 
-// 锚点滚动
-const locateHeight = function (targetHeight) {
-  let nowHeight = document.documentElement.scrollTop
-  const direction = nowHeight < targetHeight ? 1 : -1 
-  let restDistance = Math.abs(nowHeight - targetHeight)
-  document.documentElement.scrollTop += direction * (restDistance % scrollData.metaScrollHeight)
-  restDistance -= restDistance % scrollData.metaScrollHeight
-  let interval = setInterval(() => {
-    document.documentElement.scrollTop += direction * scrollData.metaScrollHeight
-    restDistance -= scrollData.metaScrollHeight
-    if (restDistance <= 0) {
-      clearInterval(interval)
-      document.documentElement.scrollTop = targetHeight
-    }
-  }, scrollData.metaScrollTime)
-}
-
-// 监控window是否加载完成
-function openWindowWithPromise(url) {
-  return new Promise((resolve, reject) => {
-    const newWindow = window.open(url, '_blank');
-
-    if (!newWindow) {
-      reject(new Error('Failed to open new window'));
-    } else {
-      newWindow.addEventListener('load', () => {
-        resolve();
-      }, false);
-      newWindow.addEventListener('error', () => {
-        reject(new Error('Window load error'));
-      }, false);
-    }
-  });
-}
 // 点击 消息/动态/收藏/历史/ 后跳转路由
 const jumpTools = (item) => {
   // router.push(item.path)

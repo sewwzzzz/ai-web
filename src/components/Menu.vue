@@ -7,9 +7,9 @@
     :style="{width:props.fixedWidth?props.fixedWidth:(realWidth + 'px')}"
     :default-active="props.menuIndex+'-'+props.subIndex"
   >
-    <el-sub-menu v-for="(TitleItem,TitleIndex) in props.menuTitle" :key="TitleItem.id" :index = "TitleItem.id.toString()" @click="console.log(TitleItem.id)"> 
+    <el-sub-menu v-for="(TitleItem) in props.menuTitle" :key="TitleItem.id" :index = "TitleItem.id.toString()" @click="console.log(TitleItem.id)"> 
         <template #title>{{ TitleItem.name }}</template>
-        <el-menu-item v-for="(item,index) in props.platform" :key="item.id" :index="TitleItem.id + '-' + item.id" @click="sendCurrentId(TitleItem.name, TitleItem.id, item.id, TitleItem.blockId)">{{ item.name }}</el-menu-item>
+        <el-menu-item v-for="(item) in props.platform" :key="item.id" :index="TitleItem.id + '-' + item.id" @click="sendCurrentId(TitleItem.name, TitleItem.id, item.id, TitleItem.blockId)">{{ item.name }}</el-menu-item>
     </el-sub-menu>
   </el-menu>
 </template>

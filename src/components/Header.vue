@@ -180,14 +180,15 @@
 <script setup>
 import SelectInput from './SelectInput.vue'
 import ToolIcon from './ToolIcon.vue'
-import { tools,debounce } from '@/datas/config'
+import { tools } from '@/datas/config' 
+import { debounce } from '@/utils/operate'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import useSystemStore from '@/store/system'
 import useInfoStore from '@/store/info'
 import { uploadFile, updateUserInfo } from '@/utils/preRequest'
 import Enter from '@/views/enter/Enter.vue'
-import { sendInfoMessage } from '@/utils/broadcast'
+import { openWindowWithPromise, sendInfoMessage } from '@/utils/broadcast'
 const router = useRouter()
 const inputRef = ref(null)
 const headerRef = ref(null)
@@ -282,23 +283,6 @@ const updateWidth = debounce(() => {
   inputRef.value.setInputWidth(headerRef.value.offsetWidth*0.3)
 })
 
-// 监控window是否加载完成
-function openWindowWithPromise(url) {
-  return new Promise((resolve, reject) => {
-    const newWindow = window.open(url, '_blank');
-
-    if (!newWindow) {
-      reject(new Error('Failed to open new window'));
-    } else {
-      newWindow.addEventListener('load', () => {
-        resolve();
-      }, false);
-      newWindow.addEventListener('error', () => {
-        reject(new Error('Window load error'));
-      }, false);
-    }
-  });
-}
 // 点击 消息/动态/收藏/历史/ 后跳转路由
 const jumpTools = (item) => {
   // router.push(item.path)

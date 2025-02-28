@@ -1,7 +1,7 @@
 <template>
   <div>{{ props.title }}</div>
   <input class="password-input" :style="{width:props.inputWidth + 'px'}" :placeholder="props.defaultDes" :type="passwordState"/>
-  <SvgIcon class="password-icon" :name="passwordState === 'password' ? 'passwordunlook' : 'passwordlook'" @click="changePasswordState()"></SvgIcon>
+  <SvgIcon class="password-icon" :name="passwordState === 'password' ? 'unlook' : 'look'" @click="changePasswordState()"></SvgIcon>
 </template>
 
 <style scoped>

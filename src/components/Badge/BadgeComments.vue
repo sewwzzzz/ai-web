@@ -1,7 +1,7 @@
 <template>
   <div id="badge-content" @click="updateState()">
-    <SvgIcon name="comments" :class="[isA?'content-icon-sure':'content-icon']"></SvgIcon>
-    <div :class="[isA?'content-number-sure':'content-number']">{{ num }}</div>
+    <SvgIcon name="comments" :class="[props.isActive?'content-icon-sure':'content-icon']"></SvgIcon>
+    <div :class="[props.isActive?'content-number-sure':'content-number']">{{ props.number }}</div>
   </div>
 </template>
 
@@ -62,7 +62,7 @@
 </style>
 
 <script setup>
-import { defineProps,ref } from 'vue'
+import { defineProps,defineEmits } from 'vue'
 import SvgIcon from '../SvgIcon.vue'
 
 const props = defineProps({
@@ -75,18 +75,10 @@ const props = defineProps({
     default:false
   },
 })
-let num = ref(props.number)
-let isA = ref(props.isActive)
 
+const emits = defineEmits(['goComment'])
 // 点击后更新'评论'徽章状态
 const updateState = function () {
-  if (num.value === props.number) {
-    num.value += 1
-    isA.value = true
-  }
-  else {
-    num.value -= 1
-    isA.value = false
-  }
+  emits('goComment')
 }
 </script>

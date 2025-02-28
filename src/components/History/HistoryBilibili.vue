@@ -2,27 +2,27 @@
   <!-- <SvgIcon id="x" name="comments"></SvgIcon> -->
   <div>
     <div id="bilibili-content">
-      <img id="content-img" :src="props.records.coverUrl">
+      <img id="content-img" :src="records.coverUrl">
       <div id="content-count">
         <div class="count-box">
           <SvgIcon class="box-icon" name="view"></SvgIcon>
-          <div>{{ props.records.viewCount }}</div>
+          <div>{{ records.viewCount }}</div>
         </div>
         <div class="count-box">
           <SvgIcon class="box-icon" name="comment"></SvgIcon>
-          <div>{{ props.records.commentCount }}</div>
+          <div>{{ records.commentCount }}</div>
         </div>
         <div class="count-box">
           <SvgIcon class="box-icon" name="like"></SvgIcon>
-          <div>{{ props.records.likeCount }}</div>
+          <div>{{ records.likeCount }}</div>
         </div>
       </div>
     </div>
-    <div id="bilibili-title">{{ limitTitle(props.records.title )}}</div>
+    <div id="bilibili-title">{{ limitTitle(records.title )}}</div>
     <div id="bilibili-footer">
       <SvgIcon class="box-icon" name="bilibili"></SvgIcon>
-      <div>{{ props.records.authorName }}</div>
-      <div>{{ props.records.publishTime }}</div>
+      <div id="footer-name">{{ records.authorName }}</div>
+      <div id="footer-time">{{ records.publishTime }}</div>
     </div>
   </div>
 </template>
@@ -74,12 +74,21 @@
 }
 
 #bilibili-footer{
+  display: flex;
+  position:relative;
   width:100%;
   margin-top:4px;
-  display:flex;
-  gap:5px;
   font-size:13px;
   color:#9499A0;
+}
+
+#footer-name{
+  margin-left:5px;
+}
+
+#footer-time{
+  position:absolute;
+  right:0;
 }
 </style>
 
@@ -88,19 +97,22 @@
 import { limitTitle } from '@/utils/operate';
 import { defineProps } from 'vue'
 const props = defineProps({
-  records: {
-    type:Object,
-  }
+  // resources: {
+  //   type: Object,
+  // }
 })
 
+const records = {
+  "id": 1,
+  "title": "黑马程序员DeepSeek最新保姆级新手教程，AI大模型应用开发合集直播🤬",
+  "coverUrl": "https://fastly.picsum.photos/id/46/100/100.jpg?hmac=V3N0AGkYVGYKQEWzJVngQWVZl2b351l2LXRs8xkdyjQ",
+  "authorName": "zjh",
+  "url": "https://www.bilibili.com/video/BV1iQNueoEBD/",
+  "publishTime": "8-24",
+  "viewCount": 1839,
+  "likeCount": 50,
+  "commentCount": 70,
+  "keywordId": 1,
+  "sourceId": 1
+}
 </script>
-
-<!-- 
-title,
-coverUrl,
-authorName,
-publishTime,
-viewCount,
-likeCount,
-commentCount,
--->
