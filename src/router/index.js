@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router"
-import useInfoStore from "@/store/info"
-import { commitMessage } from "@/datas/config"
 
 const router = createRouter({
   history: createWebHistory(), //history模式
@@ -19,6 +17,29 @@ const router = createRouter({
       path: '/Poster/:id',
       name: 'poster',
       component:()=>import(`../views/Poster.vue`)
+    },
+    {
+      path: '/user',
+      name: 'user',
+      component: () => import(`../views/User.vue`),
+      children: [
+        {
+          path: '/user',
+          redirect:'/user/footlist'
+        },
+        {
+          path: '/user/footlist',
+          name: 'footlist',
+        },
+        {
+          path: '/user/favlist',
+          name: 'favlist',
+        },
+        {
+          path: '/user/focuslist',
+          name:'focuslist'
+        }
+      ]
     },
     {
       path: '/message',

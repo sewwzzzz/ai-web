@@ -4,22 +4,19 @@
       <Header></Header>
     </div>
     <div id="user-profile">
-      <img src="" id="profile-avator" />
+      <img :src="infoStore.avatarUrl" id="profile-avatar" />
       <div id="profile-box">
-        <div id="box-name">周建辉</div>
-        <el-button type="primary" plain id="box-button">设置</el-button>
+        <div id="box-name">{{ infoStore.nickName}}</div>
+      </div>
+      <div id="profile-naw">
+        <div class="box-module" v-for="(item,index) in headerOption" :key="index" @click="changeOption(item)">
+          <SvgIcon class="box-icon" :name="item.icon"></SvgIcon>
+          <div :class="[currentOption === item.icon? 'box-name-sure' : 'box-name']">{{item.name}}</div>
+        </div>
       </div>
     </div>
     <div id="user-content">
-      <div id="content-naw">
-        <div class="naw-box" v-for="(item,index) in headerOption" :key="index" @click="changeOption(item.icon)">
-          <div class="box-module">
-            <SvgIcon class="box-icon" :name="item.icon"></SvgIcon>
-            <div :class="[currentOption === item.icon? 'box-name-sure' : 'box-name']">{{item.name}}</div>
-          </div>
-          <div class="box-line"></div>
-        </div>
-      </div>
+      <RouterView></RouterView>
     </div>
   </div>
 </template>
@@ -36,74 +33,55 @@
 }
 
 #user-profile{
-  margin-top:20px;
-  margin-left:25%;
-  width:50%;
-  height:200px;
+  margin-top:5px;
+  width:100%;
   background-color: white;
   box-sizing: border-box;
   padding:20px 20px;
   display: flex;
+  position:relative;
 }
 
-#profile-avator{
-  width:100px;
-  height:100px;
+#profile-avatar{
+  width:90px;
+  height:90px;
+  border-radius: 5px;
+  border-color: rgb(234, 230, 230);
+  border-style:dashed;
 }
 
 #profile-box{
   height:100%;
   margin-left:10px;
-  flex:1;
+  width:80px;
   flex-shrink: 0;
   position: relative;
 }
 
 #box-name{
-  font-size:18px;
+  font-size:30px;
   font-weight: 700;
-}
-
-#box-button{
-  position: absolute;
-  right:0;
-  bottom:0;
-  font-size:16px;
-  width:116px;
-  height:32px;
-  cursor:pointer;
 }
 
 #user-content{
   margin-top:20px;
-  margin-left:25%;
-  width:50%;
+  box-sizing: border-box;
+  padding:10px 10px;
   background-color: white;
-  height:400px;
 }
 
-#content-naw{
-  width:100%;
-  height:60px;
+#profile-naw{
+  position:absolute;
+  right:20px;
+  bottom:20px;
   display:flex;
-  border-bottom: rgb(217, 217, 227) 0.5px solid;
-}
-
-.naw-box{
-  
-}
-
-.box-line{
-  width:30px;
-  height:0;
-  border-bottom: #2992ca 2px solid;
-  margin-left:40px;
-  overflow: hidden;
+  /* border-bottom: rgb(217, 217, 227) 0.5px solid; */
 }
 
 .box-module{
   box-sizing: border-box;
   width:fit-content;
+  height:fit-content;
   padding:0 20px;
   display:flex;
   align-items: center;
@@ -117,7 +95,6 @@
 
 .box-name{
   margin-left:2px;
-  height:18px;
   font-size:16px;
   color:rgb(144, 144, 158);
 }
@@ -129,7 +106,7 @@
   color:black;
 }
 
-.box-name:hover{
+.box-module:hover .box-name{
   color:#2992ca;
 }
 </style>
@@ -139,12 +116,18 @@ import Header from '@/components/Header.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import { headerOption } from '@/datas/config'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import useInfoStore from '@/store/info'
 
+
+const infoStore = useInfoStore()
 let currentOption = ref('foot')
+const router = useRouter()
 
 // 选中栏目
-const changeOption = (icon) => {
-  currentOption.value = icon
+const changeOption = (item) => {
+  currentOption.value = item.icon
+  router.push(item.path)
 }
 
 </script>

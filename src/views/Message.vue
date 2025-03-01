@@ -129,11 +129,10 @@
 <script setup>
 import SvgIcon from '@/components/SvgIcon.vue'
 import { messageMenu } from '@/datas/config'
-import { watch, ref, onMounted, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const route = useRoute()
 let ul = ref(null)
 let currentMenu = ref('')
 
@@ -148,22 +147,25 @@ onUnmounted(() => {
   ul.value.removeEventListener('click',jump)
 })
 
-// 更新路由以及页面主题
-const setMenu = (messageCode) => {
-  currentMenu.value = messageCode
-}
-watch(
-  route,
-  (newVal) => {
-    setMenu(newVal.meta.messageCode)
-  },
-  {immediate:true,deep:true}
-)
+
+// 更新页面主题
+// const setMenu = (messageCode) => {
+//   currentMenu.value = messageCode
+// }
+// watch(
+//   route,
+//   (newVal) => {
+//     setMenu(newVal.meta.messageCode)
+//   },
+//   {immediate:true,deep:true}
+// )
 
 // 点击菜单，跳转路由
 const jump = (event) => {
   // console.log(messageMenu[event.target.innerText])
   if (messageMenu[event.target.innerText].EMenu !== currentMenu.value) {
+    // 更新页面主题
+    currentMenu.value = messageMenu[event.target.innerText].EMenu
     router.push(messageMenu[event.target.innerText].path)
   }
 }

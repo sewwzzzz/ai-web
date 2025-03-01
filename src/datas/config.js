@@ -48,14 +48,15 @@ const tools = [
     title: '动态',
   },
   {
-    name: 'collections',
-    title:'收藏'
-  },
-  {
     name: 'histories',
     title: '历史',
     path:'/history'
-  }
+  },
+  {
+    name: 'home',
+    title: '个人',
+    path:'/user'
+  },
 ]
 
 const scrollData = {
@@ -93,16 +94,19 @@ const messageMenu = {
 
 const headerOption = [
   {
-    'icon':'foot',
-    'name':'足迹',
+    path:'/user/footlist',
+    icon:'foot',
+    name:'足迹',
   },
   {
-    'icon':'collectable',
-    'name':'收藏集',
+    path:'/user/favlist',
+    icon:'collectable',
+    name:'收藏集',
   },
   {
-    'icon':'follow',
-    'name':'关注'
+    path:'/user/focuslist',
+    icon:'follow',
+    name:'关注'
   }
 ]
 
