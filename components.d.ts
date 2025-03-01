@@ -47,5 +47,6 @@ declare module '@vue/runtime-core' {
     SvgIcon: typeof import('./src/components/SvgIcon.vue')['default']
     ToolButton: typeof import('./src/components/ToolButton.vue')['default']
     ToolIcon: typeof import('./src/components/ToolIcon.vue')['default']
+    UnLogin: typeof import('./src/components/UnLogin.vue')['default']
   }
 }

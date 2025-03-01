@@ -43,9 +43,28 @@ const limitTitle = (title, len = 20) => {
   return title
 }
 
+const popupMessageBox = (content, title, okCallback ,type = 'warning' , cancelCallback=()=>{}) => {
+  ElMessageBox.confirm(
+    content,
+    title,
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: type,
+    }
+  )
+    .then(() => {
+      okCallback()
+    })
+    .catch(() => {
+      cancelCallback()
+    })
+}
+
 export {
   locateHeight,
   limitTitle,
   commitMessage,
-  debounce
+  debounce,
+  popupMessageBox,
 }

@@ -292,7 +292,7 @@ import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref} from 'vue'
 import { menu,tools} from '@/datas/config'
-import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform} from '@/utils/preRequest'
+import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform, getUserInfo} from '@/utils/preRequest'
 import { useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
 import useSystemStore from '@/store/system'
@@ -328,6 +328,11 @@ Promise.all([getBlockList(), getKeyWord(), getPlatform()]).then((res) => {
   }
 })
 
+// 如果token有存储在本地，那么可以认为上次用户并未主动退出，期望下次自动登录
+if (infoStore.token == '' && localStorage.getItem('token')) {
+  getUserInfo()
+}
+
 // onMounted(() => {
 //   // 这里会出现回到顶部又重新弹回原位置，我推测是由于menuTitle突然重新赋值导致
 //   window.addEventListener('scroll', () => console.log(document.documentElement.scrollTop))
@@ -339,9 +344,10 @@ const goPoster = (id) => {
   let routeData = router.resolve({
     path :`/Poster/${id}`
   })
-  openWindowWithPromise(routeData.href).then(() => {
-    sendInfoMessage()
-  })
+  // openWindowWithPromise(routeData.href).then(() => {
+  //   sendInfoMessage()
+  // })
+  window.open(routeData.href,'_blank')
 }
 
 // 根据信息获取对应数据列表
@@ -381,25 +387,24 @@ const handleFileChange = (event) => {
 }
 
 // 转换文件/图像
-const transformFile = (file) => new Promise((resolve,reject) => {
-  const fileReader = new FileReader()
-  fileReader.onload = (e) => {
-    resolve(String.fromCharCode.apply(null, new Uint8Array(e.target.result)))
+// const transformFile = (file) => new Promise((resolve,reject) => {
+//   const fileReader = new FileReader()
+//   fileReader.onload = (e) => {
+//     resolve(e.target.result)
     
-  }
-  fileReader.onerror = (error) => {
-    reject(error)
-  }
-  fileReader.readAsArrayBuffer(file)
-})
+//   }
+//   fileReader.onerror = (error) => {
+//     reject(error)
+//   }
+//   fileReader.readAsArrayBuffer(file)
+// })
 
 // 上传用户信息
 const updateInfo = async () => {
-  let file = ''
   if (imgFile) {
-    file = await transformFile(imgFile)
+    // file = await transformFile(imgFile)
     // console.log("转换后的二进制文件:",file)
-    uploadFile(file).then((url) => {
+    uploadFile(imgFile).then((url) => {
       updateUserInfo(nickName.value, url)
     })
   } else {

@@ -186,9 +186,8 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import useSystemStore from '@/store/system'
 import useInfoStore from '@/store/info'
-import { uploadFile, updateUserInfo } from '@/utils/preRequest'
+import { uploadFile, updateUserInfo, getUserInfo } from '@/utils/preRequest'
 import Enter from '@/views/enter/Enter.vue'
-import { openWindowWithPromise, sendInfoMessage } from '@/utils/broadcast'
 const router = useRouter()
 const inputRef = ref(null)
 const headerRef = ref(null)
@@ -199,6 +198,13 @@ const showReset = ref(0)
 const imageUrl = ref('')
 const nickName = ref('')
 let imgFile
+
+// 如果token有存储在本地，那么可以认为上次用户并未主动退出，期望下次自动登录
+if (infoStore.token == '' && localStorage.getItem('token')) {
+  getUserInfo()
+}
+
+
 // 修改头像
 const handleImgUpload = () => {
   const fileInput = document.getElementById('chooseImg')
@@ -214,25 +220,25 @@ const handleFileChange = (event) => {
 }
 
 // 转换文件/图像
-const transformFile = (file) => new Promise((resolve,reject) => {
-  const fileReader = new FileReader()
-  fileReader.onload = (e) => {
-    resolve(String.fromCharCode.apply(null, new Uint8Array(e.target.result)))
+// const transformFile = (file) => new Promise((resolve,reject) => {
+//   const fileReader = new FileReader()
+//   fileReader.onload = (e) => {
+//     resolve(String.fromCharCode.apply(null, new Uint8Array(e.target.result)))
     
-  }
-  fileReader.onerror = (error) => {
-    reject(error)
-  }
-  fileReader.readAsArrayBuffer(file)
-})
+//   }
+//   fileReader.onerror = (error) => {
+//     reject(error)
+//   }
+//   fileReader.readAsArrayBuffer(file)
+// })
 
 // 上传用户信息
 const updateInfo = async () => {
-  let file = ''
+  // let file = ''
   if (imgFile) {
-    file = await transformFile(imgFile)
+    // file = await transformFile(imgFile)
     // console.log("转换后的二进制文件:",file)
-    uploadFile(file).then((url) => {
+    uploadFile(imgFile).then((url) => {
       updateUserInfo(nickName.value, url)
     })
   } else {
@@ -289,9 +295,10 @@ const jumpTools = (item) => {
   let routeData = router.resolve({
     path: item.path, // 这里填写的是路由配置中定义的路由路径path或者name
   });
-  openWindowWithPromise(routeData.href).then(() => {
-    sendInfoMessage()
-  })
+  // openWindowWithPromise(routeData.href).then(() => {
+  //   sendInfoMessage()
+  // })
+  window.open(routeData.href, '_blank')
 }
 
 // 刷新首页

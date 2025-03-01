@@ -62,8 +62,6 @@ import { getList } from '@/utils/preRequest'
 import { useRoute,useRouter } from 'vue-router'
 import { reactive, ref } from 'vue'
 import Bilibili from '@/components/Picture/Bilibili.vue'
-import { openWindowWithPromise, sendInfoMessage } from '@/utils/broadcast'
-
 const systemStore = useSystemStore()
 const route = useRoute()
 const router = useRouter()
@@ -84,14 +82,6 @@ const getDataList = (secondId, firstName, current = 1, size = 30) => {
 }
 
 getDataList(sourceId, keyName)
-
-
-// 模拟快捷登录
-// login(1, 1)
-
-
-console.log('组件销毁后重新挂载')
-// document.documentElement.scrollTop = 0
 
 // 设置当前点击的平台id及关键词
 const setCurrent = (firstName, firstId, secondId, thirdId) => {
@@ -131,8 +121,6 @@ const goPoster = (id) => {
   let routeData = router.resolve({
     path :`/Poster/${id}`
   })
-  openWindowWithPromise(routeData.href).then(() => {
-    sendInfoMessage()
-  })
+  window.open(routeData.href,'_blank')
 }
 </script>

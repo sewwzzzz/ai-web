@@ -44,7 +44,8 @@ async function login(userName, password) {
   if (result) {
     infoStore.setToken(result.data)
     localStorage.setItem('token', result.data)
-    getUserInfo()
+    await getUserInfo()
+    sendInfoMessage()
     commitMessage('success', result.message)
     return true
   }
@@ -53,20 +54,26 @@ async function login(userName, password) {
 
 // 获取当前用户信息
 async function getUserInfo() {
+  const token = infoStore.token ? infoStore.token : localStorage.getItem('token')
+  if (!token) {
+    commitMessage('warning', '请登录后再操作')
+    return
+  } 
   const config = {
     url: '/user/loginUserInfo',
     method: 'GET',
-    token: infoStore.token,
+    token: token,
   }
   const result = await request(config)
   console.log('getUserInfo响应结果->', result)
   if (result) {
     const data = result.data
+    infoStore.setToken(token)
     infoStore.setUserName(data.username)
     infoStore.setAvatarUrl(data.avatarUrl)
     infoStore.setNickName(data.nickname)
     infoStore.setId(data.id)
-    sendInfoMessage()
+    // sendInfoMessage()
   }
 }
 
@@ -190,6 +197,41 @@ async function getResource(id) {
   if(result) return result.data
 }
 
+// 获取历史记录
+async function getHistory(current, size) {
+  if (!infoStore.token) {
+    commitMessage('warning', '请登录后再操作')
+    return
+  } 
+  const params = {
+    current: current,
+    size:size,
+  }
+  const data = {
+    userId:infoStore.id
+  }
+  const config = {
+    url: '/browsingHistory/page',
+    method: 'PUT',
+    params: params,
+    data: data,
+    token:infoStore.token
+  }
+  const result = await request(config)
+  if (result) return result.data
+}
+
+// 删除某个历史记录
+async function deleteHistory(id) {
+  const config = {
+    url: `/browsingHistory/${id}`,
+    token: infoStore.token,
+    method:'DELETE'
+  }
+  const result = await request(config)
+  console.log(result)
+}
+
 export{
   register,
   login,
@@ -201,5 +243,7 @@ export{
   getPlatform,
   getList,
   getResource,
+  getHistory,
+  deleteHistory,
 
 }

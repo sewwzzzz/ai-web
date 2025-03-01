@@ -377,5 +377,9 @@ input::placeholder{
 }
 
 div[aria-hidden=true]{
-  inert:true;
+  display: none;
+}
+
+ul[aria-hidden=true]{
+  display:none;
 }

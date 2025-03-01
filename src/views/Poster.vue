@@ -232,10 +232,6 @@ onMounted(() => {
   // document.documentElement.scrollTop = 0
 })
 
-const goComment = () => {
-  locateHeight(commentRef.value.offsetTop - 64)
-}
-
 // 判断当前根据id获取当前具体内容
 const getPoster = () => {
   getResource(route.params.id).then((data) => {
@@ -251,18 +247,23 @@ const getPoster = () => {
 })
 }
 
+// 刚开始进入页面时先请求一次
+getPoster()
+
+// 参考b站只要登陆状态发生变化且id存在就重新发送浏览请求帮后台刷新历史记录
+watch(()=>infoStore.id, (val) => {
+  if (val) {
+    getPoster()
+  }
+})
+
 const jump = () => {
   window.open(url)
 }
 
-getPoster()
-
-// 参考b站只要登陆状态发生变化就重新发送浏览请求帮后台刷新历史记录
-watch(()=>infoStore.id, (val) => {
-    getPoster()
-})
-
-
+const goComment = () => {
+  locateHeight(commentRef.value.offsetTop - 64)
+}
 
 // 点击显示最热评论
 const updateHotSelect = function () {
