@@ -383,3 +383,13 @@ div[aria-hidden=true]{
 ul[aria-hidden=true]{
   display:none;
 }
+
+/* 隐藏掉滚动条，把no-scrollbar替换成产生滚动条的组件的类名 */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+ 
+.no-scrollbar::-webkit-scrollbar { 
+  display: none;  /* Chrome, Safari, Opera*/
+}

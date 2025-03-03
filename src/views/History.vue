@@ -8,40 +8,41 @@
       历史记录
     </div>
     <div id="content-record">
-        <div v-show="!deleteState" :class="[currentMenu === item.id ? 'record-select-sure' : 'record-select']" v-for="(item) in systemStore.platform" :key="item.id" @click="changeMenu(item.id)">
-          {{ item.name }}
-        </div>
-        <div v-show="!deleteState" id="record-right">
-          <el-input
-            placeholder="Please input"
-            class="input-with-select"
-          >
-            <template #append>
-              <el-button>
-                <el-icon>
-                  <i-ep-search></i-ep-search>
-                </el-icon>
-              </el-button>
-            </template>
-          </el-input>
-          <ToolButton name="cleanhistory" func="清空历史" @click="popupMessageBox('记录删除后不可恢复','确定要删除所有的历史记录?',deleteAll)"></ToolButton>
-          <ToolButton id="right-button" name="batchmanagement" func="批量管理" @click="changeDelState()"></ToolButton>
-        </div>
+      <div v-show="!deleteState" :class="[currentMenu === item.id ? 'record-select-sure' : 'record-select']" v-for="(item) in systemStore.platform" :key="item.id" @click="changeMenu(item.id)">
+        {{ item.name }}
+      </div>
+      <div v-show="!deleteState" id="record-right">
+        <el-input
+          v-model="input"
+          placeholder="Please input"
+          class="input-with-select"
+        >
+          <template #append>
+            <el-button @click="selectHistory">
+              <el-icon>
+                <i-ep-search></i-ep-search>
+              </el-icon>
+            </el-button>
+          </template>
+        </el-input>
+        <ToolButton name="cleanhistory" func="清空历史" @click="popupMessageBox('记录删除后不可恢复','确定要删除所有的历史记录?',deleteAll)"></ToolButton>
+        <ToolButton id="right-button" name="batchmanagement" func="批量管理" @click="changeDelState()"></ToolButton>
+      </div>
 
-        <div v-show="deleteState" id="record-left">
-          <div id="left-check" @click="changeAllState">
-            <CheckBox class="check" :isCheck="checkAll"></CheckBox> 
-            <div id="check-font">全选</div>
-          </div>
-          <div id="left-font">
-            已经选择 {{ cnt }} 条记录
-          </div>
-          <div id="left-split">
-            |
-          </div>
-          <ToolButton name="deletehistory" func="删除记录" @click="popupMessageBox('记录删除后不可恢复','确定要删除选中的历史记录?',deleteCheck)"></ToolButton>
+      <div v-show="deleteState" id="record-left">
+        <div id="left-check" @click="changeAllState">
+          <CheckBox class="check" :isCheck="checkAll"></CheckBox> 
+          <div id="check-font">全选</div>
         </div>
-        <ToolButton v-show="deleteState" id="record-right" name="exitmanagement" func="退出管理" @click="changeDelState()"></ToolButton>
+        <div id="left-font">
+          已经选择 {{ cnt }} 条记录
+        </div>
+        <div id="left-split">
+          |
+        </div>
+        <ToolButton name="deletehistory" func="删除记录" @click="judgeCheck(()=>popupMessageBox('记录删除后不可恢复','确定要删除选中的历史记录?',deleteCheck))"></ToolButton>
+      </div>
+      <ToolButton v-show="deleteState" id="record-right" name="exitmanagement" func="退出管理" @click="changeDelState()"></ToolButton>
     </div>
     <div v-show="infoStore.id" id="content">
       <div class="content-box"  @click="changeOrJump(item.id)" v-for="(item) in dataList.filter((x)=>x.sourceId == currentMenu)" :key="item.id">
@@ -52,8 +53,8 @@
   </div>
   <div v-show="!infoStore.id" id="unlogin">
       <UnLogin></UnLogin>
-    </div>
-  <div v-show="infoStore.id" id="history-footer">
+  </div>
+  <div v-show="infoStore.id && dataList.length" id="history-footer">
     <Pagination id="footer-pagination" :paging = paging @sizeChange="sizeChange" @currentChange="currentChange"></Pagination>
   </div>
 </template>
@@ -249,12 +250,12 @@ import { deleteHistory, getHistory, getPlatform} from '@/utils/preRequest';
 import { ref, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
-import { popupMessageBox } from '@/utils/operate';
+import { commitMessage, popupMessageBox } from '@/utils/operate';
 
 const systemStore = useSystemStore()
 const infoStore = useInfoStore()
 const router = useRouter()
-
+const input = ref("")
 // 获取最新平台信息
 getPlatform()
 
@@ -264,6 +265,10 @@ watch(()=>infoStore.id, (val) => {
     getDataList()
   }
 })
+
+const selectHistory = () => {
+  getDataList(1,30,input.value)
+}
 
 let deleteState = ref(0)
 let currentMenu = ref(systemStore.platform[0].id)
@@ -292,16 +297,22 @@ const changeAllState = () => {
   }
 }
 
+// 判断是否选中资讯
+const judgeCheck = (callback) => {
+  if (cnt.value == 0) {
+    commitMessage('warning', '请先选择资讯')
+    return 
+  }
+  callback()
+}
+
 // 删除记录
 const deleteCheck = () => {
   for (let x of trueList) {
     // 调用接口
     deleteHistory(x)
   }
-  getDataList(paging.currentPage,paging.pageSize)
-  trueList.clear()
-  cnt.value = 0
-  deleteState.value = !deleteState.value
+  getDataList()
 }
 
 // 清空所有
@@ -310,7 +321,7 @@ const deleteAll = () => {
     // 调用接口
     deleteHistory(x)
   }
-  getDataList(paging.currentPage,paging.pageSize)
+  getDataList()
 }
 
 // 分页数据
@@ -320,14 +331,18 @@ let paging = reactive({
   totalCount: 400,
 })
 
-const getDataList = (current = 1, size = 30)=>{
-  getHistory(current, size).then((data) => {
+const getDataList = (current = 1, size = 30,keyword = '')=>{
+  getHistory(current, size,keyword).then((data) => {
     if (data) {
       paging.currentPage = data.current
       paging.pageSize = data.size
       paging.totalCount = data.total
       dataList.value = data.resources
       checkList = {}
+      trueList.clear()
+      checkAll.value = false
+      cnt.value = 0
+      deleteState.value = false
       for (let item in data.resources) {
         checkList[item.id] = false
       }

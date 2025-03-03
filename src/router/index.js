@@ -9,6 +9,11 @@ const router = createRouter({
       component:()=>import(`../views/Main.vue`)
     },
     {
+      path: '/select',
+      name: 'select',
+      component:()=>import(`../views/Select.vue`)
+    },
+    {
       path: '/Block/:blockId/:keyId/:sourceId',
       name: 'block',
       component:()=>import(`../views/Block.vue`)
@@ -30,14 +35,25 @@ const router = createRouter({
         {
           path: '/user/footlist',
           name: 'footlist',
+          meta: {
+            messageCode:'footlist'
+          },
+          component:()=>import(`../views/users/Foot.vue`)
         },
         {
           path: '/user/favlist',
           name: 'favlist',
+          meta: {
+            messageCode:'favlist'
+          },
+          component:()=>import(`../views/users/Collect.vue`)
         },
         {
           path: '/user/focuslist',
-          name:'focuslist'
+          name: 'focuslist',
+          meta: {
+            messageCode:'focuslist'
+          },
         }
       ]
     },

@@ -353,8 +353,10 @@ const goPoster = (id) => {
 // 根据信息获取对应数据列表
 const getDataList = (blockId, secondId, firstName, current = 1, size = 5) => {
   getList(current, size, secondId, firstName).then((data) => {
-    dataList.value[blockId] = data.records
-    console.log(dataList.value)
+    if (data) {
+      dataList.value[blockId] = data.records
+    // console.log(dataList.value)
+    }
   })
 }
 

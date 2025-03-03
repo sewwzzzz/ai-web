@@ -43,7 +43,7 @@ const request = async (config) => {
   if (data && Object.keys(data).length != 0) {
     const formdata = new FormData()
     Object.keys(data).forEach((key) => {
-      formdata.append(key,data[key])
+      if(data[key]) formdata.append(key,data[key])
     })
     req['data']=formdata
   }
@@ -51,7 +51,7 @@ const request = async (config) => {
     req['headers'] = {}
     req.headers['access-token'] = `Bearer ${token}`
   }
-  console.log('发送的请求体:',req)
+  console.log('发送的请求体:',data,req)
   return instance(req).catch((error)=> {
     console.log(error)
     commitMessage('error', error)

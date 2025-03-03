@@ -11,7 +11,7 @@
       <div id="profile-naw">
         <div class="box-module" v-for="(item,index) in headerOption" :key="index" @click="changeOption(item)">
           <SvgIcon class="box-icon" :name="item.icon"></SvgIcon>
-          <div :class="[currentOption === item.icon? 'box-name-sure' : 'box-name']">{{item.name}}</div>
+          <div :class="[currentOption === item.menu? 'box-name-sure' : 'box-name']">{{item.name}}</div>
         </div>
       </div>
     </div>
@@ -53,7 +53,7 @@
 #profile-box{
   height:100%;
   margin-left:10px;
-  width:80px;
+  width:fit-content;
   flex-shrink: 0;
   position: relative;
 }
@@ -115,18 +115,31 @@
 import Header from '@/components/Header.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import { headerOption } from '@/datas/config'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
 
 
 const infoStore = useInfoStore()
-let currentOption = ref('foot')
+let currentOption = ref()
 const router = useRouter()
+const route = useRoute()
+
+// 通过route.meta设置当前菜单，可以防止刷新的情况
+const setMenuCode = (menuCode) => {
+  currentOption.value = menuCode
+}
+
+watch(route, (newVal) => {
+  // console.log(newVal.path)
+  setMenuCode(newVal.meta.messageCode)
+},
+{ immediate: true, deep: true })
+
 
 // 选中栏目
 const changeOption = (item) => {
-  currentOption.value = item.icon
+  if(item.menu != currentOption.value)
   router.push(item.path)
 }
 

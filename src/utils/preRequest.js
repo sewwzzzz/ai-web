@@ -44,8 +44,7 @@ async function login(userName, password) {
   if (result) {
     infoStore.setToken(result.data)
     localStorage.setItem('token', result.data)
-    await getUserInfo()
-    sendInfoMessage()
+    getUserInfo()
     commitMessage('success', result.message)
     return true
   }
@@ -73,7 +72,7 @@ async function getUserInfo() {
     infoStore.setAvatarUrl(data.avatarUrl)
     infoStore.setNickName(data.nickname)
     infoStore.setId(data.id)
-    // sendInfoMessage()
+    sendInfoMessage()
   }
 }
 
@@ -198,7 +197,7 @@ async function getResource(id) {
 }
 
 // 获取历史记录
-async function getHistory(current, size) {
+async function getHistory(current, size, keyword) {
   if (!infoStore.token) {
     commitMessage('warning', '请登录后再操作')
     return
@@ -208,7 +207,8 @@ async function getHistory(current, size) {
     size:size,
   }
   const data = {
-    userId:infoStore.id
+    userId: infoStore.id,
+    keyword:keyword
   }
   const config = {
     url: '/browsingHistory/page',
@@ -232,6 +232,102 @@ async function deleteHistory(id) {
   console.log(result)
 }
 
+// 修改收藏夹名称
+async function editCollectName(id, name) {
+  const data = {
+    id: id,
+    name: name
+  }
+  const config = {
+    url: '/collection',
+    method: 'PUT',
+    token: infoStore.token,
+    data: data
+  }
+  const result = await request(config)
+  console.log("修改收藏夹名称:", result)
+}
+
+// 新建收藏夹
+async function newCollect(name) {
+  if (!infoStore.token) {
+    commitMessage('warning', '请登录后再操作')
+    return
+  } 
+  const data = {
+    name: name,
+    userId:infoStore.id
+  }
+  const config = {
+    url: '/collection',
+    method: 'POST',
+    token: infoStore.token,
+    data:data
+  }
+  const result = await request(config)
+  console.log("新建收藏夹:",result)
+}
+
+// 根据收藏夹id获取当前内容
+
+// 删除收藏夹
+async function deleteCollect(id) {
+  const config = {
+    url: `/collection/${id}`,
+    method: 'DELETE',
+    token: infoStore.token,
+  }
+  const result = await request(config)
+  console.log('删除收藏夹结果:',result)
+}
+
+// 移动到另一个收藏夹
+async function moveCollect(id, destCollectionId) {
+  const data = {
+    id: id,
+    destCollectionId:destCollectionId
+  }
+  const config = {
+    url: '/collectionResource/move',
+    token: infoStore.token,
+    method: 'POST',
+    data:data
+  }
+  const result = await request(config)
+  console.log("移动到另一收藏夹:",result)
+}
+
+// 删除收藏夹内容
+const deleteCollectList = async(id) => {
+  const config = {
+    url: `/collectionResource/${id}`,
+    token: infoStore.token,
+    method:'DELETE'
+  }
+  const result = await request(config)
+  console.log("删除收藏夹内容:",result)
+} 
+
+// 收藏内容
+const collect = async (resourceId, collectionId) => {
+  if (!infoStore.token) {
+    commitMessage('warning', '请登录后再操作')
+    return
+  } 
+  const data = {
+    resourceId: resourceId,
+    collectionId:collectionId
+  }
+  const config = {
+    url: '/collectionResource',
+    token: infoStore.token,
+    method: 'POST',
+    data:data
+  }
+  const result = await request(config)
+  console.log("收藏内容:",result)
+}
+
 export{
   register,
   login,
@@ -245,5 +341,10 @@ export{
   getResource,
   getHistory,
   deleteHistory,
-
+  editCollectName,
+  newCollect,
+  deleteCollect,
+  moveCollect,
+  deleteCollectList,
+  collect
 }

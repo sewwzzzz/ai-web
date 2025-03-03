@@ -94,16 +94,19 @@ const messageMenu = {
 
 const headerOption = [
   {
+    menu:'footlist',
     path:'/user/footlist',
     icon:'foot',
     name:'足迹',
   },
   {
+    menu:'favlist',
     path:'/user/favlist',
     icon:'collectable',
     name:'收藏集',
   },
   {
+    menu:'focuslist',
     path:'/user/focuslist',
     icon:'follow',
     name:'关注'

@@ -1,4 +1,19 @@
 <template>
+  <div id="store-edit" v-show="showStore">
+      <Dialog @exit="cancelDialog" @act="storeFavlist">
+        <template v-slot:dialog-content>
+          <div id="dialog-list">
+            <div :class="[checked == item.id?'list-sure':'list']" v-for="(item) in storeList" :key="item.id" @click="selectId(item.id)">
+              <SvgIcon name="folder" class="icon"></SvgIcon>
+              <div>
+                {{ limitTitle(item.name) }}
+              </div>
+            </div>
+          </div>
+        </template>
+      </Dialog>
+    </div>
+  <div id="store-mask" v-show="showStore"></div>
   <div id="poster">
     <div id="poster-header">
       <Header></Header>
@@ -9,7 +24,7 @@
         </BadgeGoods>
         <BadgeComments :number="commentNum" @go-comment="goComment">
         </BadgeComments>
-        <BadgeStores>
+        <BadgeStores :is-active="storeState" @go-store="judgeStore(cancelStore,showDialog)">
         </BadgeStores>
       </div>
       <div id="content-right">
@@ -56,6 +71,60 @@
 </template>
 
 <style scoped>
+#store-edit{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:300px;
+  z-index:3;
+  background-color: #ffffff;
+  border-radius: 5px;
+}
+
+#store-mask{
+  position:fixed;
+  top:0;
+  left:0;
+  height:100%;
+  width:100%;
+  background-color: #555555;
+  z-index:2;
+  opacity: 0.6;
+}
+
+#dialog-list{
+  height: 300px;
+  margin:20px 0;
+  padding:0 20px;
+  overflow:auto;
+}
+
+#dialog-list::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera*/
+}
+
+.list{
+  display: flex;
+  align-items: center;
+  gap:20px;
+  color: rgb(108, 115, 120);
+  cursor:pointer;
+  padding:10px 20px;
+}
+
+.list:hover{
+  color:#337ecc;
+}
+
+.list-sure{
+  display:flex;
+  align-items: center;
+  gap:20px;
+  color:#337ecc;
+  cursor:pointer;
+  padding:10px 20px;
+}
 #content-title{
   font-family: -apple-system, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial ;
   width:100%;
@@ -206,7 +275,7 @@ import BadgeStores from '@/components/Badge/BadgeStores.vue';
 import Brief from '@/components/Brief.vue';
 import Comment from '@/components/Comment.vue';
 import Header from '@/components/Header.vue'
-import { getResource } from '@/utils/preRequest';
+import { collect, deleteCollectList, getResource } from '@/utils/preRequest';
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useInfoStore from '@/store/info'
@@ -226,6 +295,105 @@ let textarea = ref('')
 let select = ref(true)
 const route = useRoute()
 const infoStore = useInfoStore()
+
+let checked = ref(1)
+let storeState = ref(false)
+let showStore = ref(false)
+let storeList = ref([]) // 收藏夹数组
+storeList.value = [
+      {
+        id:1,
+        name:'我的收藏夹1',
+      },
+      {
+        id:2,
+        name:'我的收藏夹2',
+      },
+      {
+        id:3,
+        name:'我的收藏夹3',
+      },
+      {
+        id:4,
+        name:'我的收藏夹4',
+      },
+      {
+        id:5,
+        name:'我的收藏夹5',
+      },
+      {
+        id:6,
+        name:'我的收藏夹6',
+      },
+      {
+        id:7,
+        name:'我的收藏夹7',
+      },
+      {
+        id:8,
+        name:'我的收藏夹8',
+      },
+      {
+        id:9,
+        name:'我的收藏夹9',
+      },
+      {
+        id:10,
+        name:'我的收藏夹10',
+      },
+      {
+        id:11,
+        name:'我的收藏夹11',
+      },
+      {
+        id:12,
+        name:'我的收藏夹12',
+      },
+      {
+        id:13,
+        name:'我的收藏夹13',
+      }
+    ]
+
+const cancelStore = () => {
+  storeState.value = false
+  deleteCollectList(route.params.id)
+  console.log("删除的posterid:", route.params.id)
+}
+
+const judgeStore = (trueCallback,falseCallback) => {
+  if (storeState.value) {
+    trueCallback()
+    return
+  }
+  falseCallback()
+}
+
+// 选中某个收藏夹
+const selectId = (id) => {
+  checked.value = id
+}
+
+// 显示框
+const showDialog = () => {
+  checked.value = storeList.value[0].id
+  showStore.value = true
+}
+
+// 取消框
+const cancelDialog = () => {
+  showStore.value = false
+}
+
+// 收藏到指定收藏夹
+const storeFavlist = () => {
+  // 调用接口
+  collect(route.params.id,checked.value)
+  console.log(checked.value)
+  storeState.value = true
+  // 调接口重新获取当前收藏夹分页数据
+  showStore.value = false
+}
 
 onMounted(() => {
   // window.addEventListener('scroll', () => console.log(document.documentElement.scrollTop))

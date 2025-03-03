@@ -8,11 +8,11 @@
     >
       <template #prepend>
         <el-select v-model="select" placeholder="Select" style="width:130px">
-          <el-option v-for="(item,index) in props.platform" :key="item.id" :label="item.name" :value="item.id.toString()" />
+          <el-option v-for="(item) in props.platform" :key="item.id" :label="item.name" :value="item.name" />
         </el-select>
       </template>
       <template #append>
-        <el-button>
+        <el-button @click="selectPoster">
           <el-icon>
             <i-ep-search></i-ep-search>
           </el-icon>
@@ -31,21 +31,73 @@
 </style>
 
 <script setup>
-import { ref,defineProps, defineExpose} from 'vue'
+import { commitMessage } from '@/utils/operate'
+import { ref,defineProps, defineExpose, inject, onMounted} from 'vue'
+import { useRouter,useRoute } from 'vue-router'
 
-const input = ref('')
-const select = ref('')
+const router = useRouter()
+const route = useRoute()
+const input = ref(route.query.keyName)
+const select = ref(route.query.sourceName)
 const props = defineProps({
   platform: {
     type:Array,
   }
 })
+const target = inject('select',null)
 const realWidth = ref(0)
+
+onMounted(() => {
+  console.log('重新挂载')
+})
+
+const selectPoster = () => {
+  if (!input.value) {
+    commitMessage('warning', '输入的关键词不可为空')
+    return
+  }
+  if (!select.value) {
+    commitMessage('warning', '选择的平台不可为空')
+    return
+  }
+  // 判断是否需要（路径不是select）跳转新界面，retuen
+  if (route.name != 'select') {
+    let routeData = router.resolve({
+      name: 'select',
+      query: {
+        keyName: input.value,
+        sourceName:select.value
+      }
+    })
+    window.open(routeData.href,'_blank')
+    return
+  }
+  // 其他情况正常执行
+
+  if (input.value && select.value) {
+    target.sourceName = select.value
+    target.keyName = input.value
+    target.type = !target.type
+    router.push({
+      name: 'select',
+      query: {
+        keyName: input.value,
+        sourceName:select.value
+      }
+    })
+  }
+}
+
+// 首次页面初始化如果路径是select，需要获取参数后调用一次selectPoster
+if (route.name == 'select') {
+  selectPoster()
+}
 
 // 设置搜索框的宽度
 function setInputWidth(inputWidth) {
   realWidth.value = inputWidth
 }
+
 
 defineExpose({setInputWidth})
 </script>

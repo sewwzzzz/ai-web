@@ -102,6 +102,7 @@
   z-index:2;
   opacity: 0.6;
 }
+
 #header{
   display:flex;
 }

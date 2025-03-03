@@ -25,9 +25,9 @@
   display:inline-block;
   font-family: "Noto Sans SC";
   color: rgb(84, 82, 82);
-  font-size:20px;
+  font-size:18px;
   left:5px;
-  top:6px;
+  top:10px;
 }
 
 #header-exit{
