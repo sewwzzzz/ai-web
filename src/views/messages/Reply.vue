@@ -1,6 +1,6 @@
 <template>
   <div id="reply">
-    我的回复
+    <CardReply></CardReply>
   </div>
 </template>
 
@@ -14,5 +14,7 @@
 </style>
 
 <script setup>
+import SecondComment from '@/components/SecondComment.vue';
+
 
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div id="footer" @click="updateState()">
     <SvgIcon name="footergoods" :class="[isA ? 'footer-goods-sure' : 'footer-goods']"></SvgIcon>
-    <div :class="[isA ? 'footer-num-sure' : 'footer-num']">{{ num === 0 ? '点赞' : num }}</div>
+    <div :class="[isA ? 'footer-num-sure' : 'footer-num']">{{ props.number === 0 ? '点赞' : props.number }}</div>
   </div>
 </template>
 
@@ -46,7 +46,7 @@
 </style>
 
 <script setup>
-import { defineProps, ref } from 'vue'
+import { defineProps, defineEmits } from 'vue'
 
 const props = defineProps({
   number: {
@@ -58,17 +58,14 @@ const props = defineProps({
     default:true
   }
 })
-const num = ref(props.number)
-const isA = ref(props.isActive)
+let isA = props.isActive
 
-// 点击更新评论'点赞'状态
-const updateState = function(){
-  if (isA.value) {
-    num.value -= 1
-    isA.value = false
-  } else {
-    num.value += 1
-    isA.value = true
-  }
+const emits = defineEmits(['update:number'])
+// 点击后更新'点赞'徽章状态
+const updateState = function () {
+  isA = !isA
+  let num = props.number + (isA?1:-1)
+  emits('update:number',num)
 }
+
 </script>

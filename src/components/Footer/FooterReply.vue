@@ -60,13 +60,7 @@ let isComment = ref(false)
 
 // 控制评论的'评论拉起/关闭'状态
 const updateState = function(){
-  if (isComment.value) {
-    isComment.value = false
-    emit('reply',false)
-
-  } else {
-    isComment.value = true
-    emit('reply',true)
-  }
+    isComment.value = !isComment.value
+    emit('reply',isComment.value)
 }
 </script>

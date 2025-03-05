@@ -1,11 +1,14 @@
 <template>
-  <div id="comment">
+  <div id="second-comment">
     <img id="avatar-comment" :src="infoStore.avatarUrl" />
     <div id="right-comment">
-      <div id="comment-name">
-        {{ infoStore.nickName?infoStore.nickName:'未知用户' }}
-      </div>
-      <div id="comment-content">
+      <div id="comment-header">
+        <div id="header-name">
+          {{ infoStore.nickName?infoStore.nickName:'未知用户' }}:
+        </div>
+        <div id="header-content">
+           “春招真的寄了”
+        </div>
       </div>
       <div id="comment-footer">
         <div id="footer-time"> 10月前</div>
@@ -29,7 +32,7 @@
 </template>
 
 <style scoped>
-#comment{
+#second-comment{
   width:100%;
   display:flex;
 }
@@ -43,19 +46,22 @@
 }
 #right-comment{
   flex:1;
+  padding-top:10px;
 }
-#comment-name{
-  height:50px;
+#comment-header{
+  display:flex;
+  align-items: center;
+}
+#header-name{
+  height:14px;
+  line-height:14px;
   font-size: 14px;
 }
-#comment-content{
-  width: 100%;
-  height:100px;
-  border-color: aqua;
-  margin-top:10px;
-  border-width: 1px;
-  border-style: solid;
+#header-content{
+  line-height: 16px;
+  height:16px;
   font-size: 16px;
+  margin-left:5px;
 }
 #comment-footer{
   width:100%;
