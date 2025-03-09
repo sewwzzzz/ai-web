@@ -7,7 +7,8 @@ const useInfoStore = defineStore('info', {
       avatarUrl: '',
       token: '',
       id: 0,
-      
+      role: 0,
+      status:0
     }
   },
   getters: {
@@ -28,9 +29,15 @@ const useInfoStore = defineStore('info', {
     setId(id) {
       this.id = id
     },
+    setRole(role) {
+      this.role = role
+    },
+    setStatus(status) {
+      this.status = status
+    },
     clearInfo() {
       this.token = this.avatarUrl = this.nickName = this.userName = ''
-      this.id = 0
+      this.id = this.role = this.status = 0
     }
   }
 })

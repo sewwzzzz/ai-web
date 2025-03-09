@@ -20,13 +20,13 @@ instance.interceptors.response.use(function (response) {
   if (responseData.code == 200) {
     return responseData
   }
-  else if (responseData.code == 601 || responseData.code == 602) {
+  else if (responseData.code == 203) {
     const infoStore = useInfoStore()
     infoStore.clearInfo()
     sendInfoMessage()
     return Promise.reject('您还未登录，请先登录')
   }
-  return Promise.reject(responseData)
+  return Promise.reject(responseData.description)
 }, function () {
   return Promise.reject('网络错误')
 })
@@ -38,7 +38,11 @@ const request = async (config) => {
     method: method,
   }
   if (params && Object.keys(params).length != 0) {
-    req['params']=params
+    const formParams = {}
+    Object.keys(params).forEach((key) => {
+      if(params[key]) formParams[key] = params[key]
+    })
+    req['params']=formParams
   }
   if (data && Object.keys(data).length != 0) {
     const formdata = new FormData()
@@ -51,9 +55,9 @@ const request = async (config) => {
     req['headers'] = {}
     req.headers['access-token'] = `Bearer ${token}`
   }
-  console.log('发送的请求体:',data,req)
+  console.log('发送的请求体:',req)
   return instance(req).catch((error)=> {
-    console.log(error)
+    console.log("error的description:",error)
     commitMessage('error', error)
     return null
   })

@@ -15,7 +15,7 @@
     </div>
   <div id="collect-mask" v-show="showMove"></div>
   <div id="collect">
-    <AsideMenu id="collect-menu" @get-fav-list="getFavList" @clear-fav-list="clearDataList"></AsideMenu>
+    <AsideMenu id="collect-menu" :collect-list="collectList" @get-fav-list="getFavList" @clear-fav-list="clearDataList" @getCollect="getCollect"></AsideMenu>
     <div id="collect-content">
       <div id="content-record">
         <div v-show="!deleteState" :class="[currentMenu === item.id ? 'record-select-sure' : 'record-select']" v-for="(item) in systemStore.platform" :key="item.id" @click="changeMenu(item.id)">
@@ -24,10 +24,11 @@
         <div v-show="!deleteState" id="record-right">
           <el-input
             placeholder="Please input"
+            v-model="searchText"
             class="input-with-select"
           >
             <template #append>
-              <el-button>
+              <el-button @click="getDataList(collectionId,searchText)">
                 <el-icon>
                   <i-ep-search></i-ep-search>
                 </el-icon>
@@ -301,8 +302,8 @@ import CheckBox from '@/components/CheckBox.vue';
 // import HistoryBilibili from '@/components/History/HistoryBilibili.vue';
 import ToolButton from '@/components/ToolButton.vue'
 import useSystemStore from '@/store/system'
-import { deleteCollectList, getHistory, getPlatform, moveCollect} from '@/utils/preRequest';
-import { ref, reactive} from 'vue'
+import { deleteCollectList, getAllCollect, getCollectList, getPlatform, moveCollect} from '@/utils/preRequest';
+import { ref, reactive, watch} from 'vue'
 import { useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
 import { commitMessage, limitTitle, popupMessageBox } from '@/utils/operate';
@@ -314,6 +315,23 @@ const router = useRouter()
 // 获取最新平台信息
 getPlatform()
 
+// 获取所有收藏夹名称
+const getCollect = () => {
+  getAllCollect().then((data) => {
+      collectList.value = data
+  })
+}
+
+// 参考b站只要登陆状态发生变化且id存在才能发送用户收藏夹
+watch(()=>infoStore.id, (val) => {
+  if (val) {
+    getCollect()
+  }
+}, {
+  immediate: true
+})
+
+
 let deleteState = ref(0)
 let currentMenu = ref(systemStore.platform[0].id)
 let dataList = ref([])
@@ -321,66 +339,12 @@ let checkList = reactive({}) // 记录所有source条件下的id的checkBox情�
 let trueList = new Set() // 记录当前source条件下checkBox选项为true的id
 let cnt = ref(0) // 记录当前source条件下checkBox选项为true的数量
 let checkAll = ref(false) // 全选的checkBox选项情况
-
+let collectionId = ref(0)
+let searchText = ref('')
 
 let checked = ref(1)
 let showMove = ref(false)
 let collectList = ref([]) // 收藏夹数组
-collectList.value = [
-      {
-        id:1,
-        name:'我的收藏夹1',
-      },
-      {
-        id:2,
-        name:'我的收藏夹2',
-      },
-      {
-        id:3,
-        name:'我的收藏夹3',
-      },
-      {
-        id:4,
-        name:'我的收藏夹4',
-      },
-      {
-        id:5,
-        name:'我的收藏夹5',
-      },
-      {
-        id:6,
-        name:'我的收藏夹6',
-      },
-      {
-        id:7,
-        name:'我的收藏夹7',
-      },
-      {
-        id:8,
-        name:'我的收藏夹8',
-      },
-      {
-        id:9,
-        name:'我的收藏夹9',
-      },
-      {
-        id:10,
-        name:'我的收藏夹10',
-      },
-      {
-        id:11,
-        name:'我的收藏夹11',
-      },
-      {
-        id:12,
-        name:'我的收藏夹12',
-      },
-      {
-        id:13,
-        name:'我的收藏夹13',
-      }
-    ]
-
 // 参考b站只要登陆状态发生变化且id存在才能发送历史记录
 // watch(()=>infoStore.id, (val) => {
 //   if (val) {
@@ -388,12 +352,11 @@ collectList.value = [
 //   }
 // })
 // 移动到另一收藏夹
-const moveFavlist = () => {
+const moveFavlist = async() => {
   // 调用接口
-  moveCollect(trueList,checked.value)
-  console.log(checkList)
-  console.log(checked.value)
+  await moveCollect(Array.from(trueList),collectionId.value,checked.value)
   // 调接口重新获取当前收藏夹分页数据
+  getDataList(collectionId.value,searchText.value)
   showMove.value = false
 }
 
@@ -425,7 +388,8 @@ const cancelDialog = () => {
 
 // 点击某个收藏夹id获取该收藏夹的分页内容，前端获得该页内容再分平台展示
 const getFavList = (id) => {
-  getDataList()
+  collectionId.value = id
+  getDataList(id)
 }
 
 // 管理所有数据
@@ -448,12 +412,9 @@ const changeAllState = () => {
 }
 
 // 删除记录
-const deleteCheck = () => {
-  for (let x of trueList) {
-    // 调用接口
-    deleteCollectList(x)
-  }
-  getDataList(paging.currentPage,paging.pageSize)
+const deleteCheck = async() => {
+  await deleteCollectList(collectionId.value,Array.from(trueList))
+  getDataList(collectionId.value,searchText.value)
 }
 
 // 分页数据
@@ -465,21 +426,26 @@ let paging = reactive({
 
 const clearDataList = () => {
   dataList.value = []
+  checkList = {}
+  trueList.clear()
+  checkAll.value = false
+  cnt.value = 0
+  deleteState.value = false
 }
 
-const getDataList = (current = 1, size = 30)=>{
-  getHistory(current, size).then((data) => {
+const getDataList = (collectionId, searchText = '', current = 1, size = paging.pageSize)=>{
+  getCollectList(collectionId, searchText, current, size).then((data) => {
     if (data) {
       paging.currentPage = data.current
       paging.pageSize = data.size
       paging.totalCount = data.total
-      dataList.value = data.resources
+      dataList.value = data.records
       checkList = {}
       trueList.clear()
       checkAll.value = false
       cnt.value = 0
       deleteState.value = false
-      for (let item in data.resources) {
+      for (let item in dataList.value) {
         checkList[item.id] = false
       }
     }
@@ -489,13 +455,13 @@ const getDataList = (current = 1, size = 30)=>{
 // 页数据量变化
 const sizeChange = (val) => {
   paging.pageSize = val
-  getDataList(paging.currentPage,paging.pageSize)
+  getDataList(collectionId.value, searchText.value ,paging.currentPage,paging.pageSize)
 }
 
 // 当前页号变化
 const currentChange = (val) => {
   paging.currentPage = val
-  getDataList(paging.currentPage,paging.pageSize)
+  getDataList(collectionId.value, searchText.value,paging.currentPage,paging.pageSize)
 }
 
 // 改变当前选择框的状态

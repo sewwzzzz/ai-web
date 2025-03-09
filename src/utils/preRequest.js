@@ -10,33 +10,34 @@ const systemStore = useSystemStore()
 // result要么是null要么是code = 200
 
 // 注册
-async function register(userName, password) {
-  const data = {
+async function register(userName, password,checkPassword) {
+  const params = {
     username: userName,
-    password: password
+    password: password,
+    checkPassword:checkPassword,
   }
   const config = {
     url: '/user/register',
-    data: data,
+    params: params,
     method: 'POST'
   }
   const result = await request(config)
   console.log('register响应结果->', result)
   if (result) {
-    commitMessage('success', result.message)
+    commitMessage('success', result.description)
   }
 }
 
 
 // 登录
 async function login(userName, password) {
-  const data = {
+  const params = {
     username: userName,
     password: password
   }
   const config = {
     url:'/user/login',
-    data: data,
+    params: params,
     method: 'POST'
   }
   const result = await request(config)
@@ -45,7 +46,7 @@ async function login(userName, password) {
     infoStore.setToken(result.data)
     localStorage.setItem('token', result.data)
     getUserInfo()
-    commitMessage('success', result.message)
+    commitMessage('success', result.description)
     return true
   }
   return false
@@ -54,12 +55,8 @@ async function login(userName, password) {
 // 获取当前用户信息
 async function getUserInfo() {
   const token = infoStore.token ? infoStore.token : localStorage.getItem('token')
-  if (!token) {
-    commitMessage('warning', '请登录后再操作')
-    return
-  } 
   const config = {
-    url: '/user/loginUserInfo',
+    url: '/user/current',
     method: 'GET',
     token: token,
   }
@@ -72,6 +69,8 @@ async function getUserInfo() {
     infoStore.setAvatarUrl(data.avatarUrl)
     infoStore.setNickName(data.nickname)
     infoStore.setId(data.id)
+    infoStore.setRole(data.role)
+    infoStore.setStatus(data.status)
     sendInfoMessage()
   }
 }
@@ -96,16 +95,16 @@ async function uploadFile(file) {
 
 // 修改登录用户信息
 async function updateUserInfo(nickName , avatarUrl) {
-  const data = {
+  const params = {
     id: infoStore.id,
     nickname: nickName,
-    avatar : avatarUrl
+    avatarUrl : avatarUrl
   }
   const config = {
-    url: '/user',
+    url: '/user/update',
     method: 'PUT',
     token: infoStore.token,
-    data:data
+    params:params
   }
   const result = await request(config)
   if (result) {
@@ -121,6 +120,7 @@ async function getBlockList() {
   const config = {
     url: '/block/list',
     method: 'GET',
+    token:infoStore.token
   }
   const result = await request(config)
   if (result) {
@@ -138,6 +138,7 @@ async function getKeyWord() {
   const config = {
     url: '/keyword/list',
     method: 'GET',
+    token:infoStore.token
   }
   const result = await request(config)
   if (result) {
@@ -151,6 +152,7 @@ async function getPlatform() {
   const config = {
     url: '/source/list',
     method: 'GET',
+    token:infoStore.token
   }
   const result = await request(config)
   if (result) {
@@ -160,20 +162,19 @@ async function getPlatform() {
 }
 
 // 根据分页条件获取资源
-async function getList(current, size, sourceId, keyword) {
+async function getList(current, size, sourceId, keywordId, searchText) {
   const params = {
     current: current,
-    size:size
-  }
-  const data = {
-    sourceId: sourceId,
-    keyword: keyword
+    size: size,
+    keywordId: keywordId,
+    searchText: searchText,
+    sourceId:sourceId
   }
   const config = {
     url: '/resource/list',
-    method: 'POST',
+    method: 'GET',
     params: params,
-    data:data
+    token:infoStore.token
   }
   const result = await request(config)
   console.log("getList响应结果:",result)
@@ -182,54 +183,79 @@ async function getList(current, size, sourceId, keyword) {
 
 // 获取资源具体展示信息
 async function getResource(id) {
-  const params = {}
-  if (infoStore.id) {
-    params['userId'] = infoStore.id
-  }
   const config = {
     url: `/resource/${id}`,
     method: 'GET',
-    params: params,
     token:infoStore.token,
   }
   const result = await request(config)
   if(result) return result.data
 }
 
+
 // 获取历史记录
-async function getHistory(current, size, keyword) {
-  if (!infoStore.token) {
-    commitMessage('warning', '请登录后再操作')
-    return
-  } 
+async function getHistory(current, size, searchText) {
   const params = {
     current: current,
-    size:size,
-  }
-  const data = {
+    size: size,
     userId: infoStore.id,
-    keyword:keyword
+    searchText:searchText
   }
   const config = {
-    url: '/browsingHistory/page',
-    method: 'PUT',
+    url: '/browsingHistory/list',
+    method: 'GET',
     params: params,
-    data: data,
     token:infoStore.token
   }
   const result = await request(config)
   if (result) return result.data
 }
 
-// 删除某个历史记录
-async function deleteHistory(id) {
+// 增加浏览历史记录
+async function addHistory(id) {
+  const data = {
+    resourceId: id,
+    userId:infoStore.id
+  }
   const config = {
-    url: `/browsingHistory/${id}`,
+    url: '/browsingHistory',
     token: infoStore.token,
-    method:'DELETE'
+    method: 'POST',
+    data:data
   }
   const result = await request(config)
-  console.log(result)
+  console.log("添加一条历史记录",result)
+}
+
+// 删除某个历史记录
+async function deleteHistory(ids) {
+  const config = {
+    url: '/browsingHistory',
+    token: infoStore.token,
+    method: 'DELETE',
+    params: {
+      ids:ids
+    }
+  }
+  const result = await request(config)
+  console.log("删除一堆历史记录",result)
+}
+
+// 获取用户所有收藏夹
+async function getAllCollect() {
+  const config = {
+    url: '/collection/list',
+    method: 'GET',
+    token: infoStore.token,
+    params: {
+      userId:infoStore.id
+    }
+  }
+  const result = await request(config)
+  console.log("所有收藏夹", result)
+  if (result) {
+    return result.data
+  }
 }
 
 // 修改收藏夹名称
@@ -250,10 +276,6 @@ async function editCollectName(id, name) {
 
 // 新建收藏夹
 async function newCollect(name) {
-  if (!infoStore.token) {
-    commitMessage('warning', '请登录后再操作')
-    return
-  } 
   const data = {
     name: name,
     userId:infoStore.id
@@ -265,10 +287,8 @@ async function newCollect(name) {
     data:data
   }
   const result = await request(config)
-  console.log("新建收藏夹:",result)
+  console.log("新建收藏夹:", result)
 }
-
-// 根据收藏夹id获取当前内容
 
 // 删除收藏夹
 async function deleteCollect(id) {
@@ -281,28 +301,54 @@ async function deleteCollect(id) {
   console.log('删除收藏夹结果:',result)
 }
 
+// 根据收藏夹id获取当前内容
+async function getCollectList(collectionId,searchText,current,size) {
+  const params = {
+    collectionId: collectionId,
+    searchText: searchText,
+    current: current,
+    size:size,
+  }
+
+  const config = {
+    url: '/collectionResource/list',
+    method: 'GET',
+    params: params,
+    token:infoStore.token
+  }
+  const result = await request(config)
+  console.log("获得的收藏夹内容", result)
+  return result.data
+}
+
 // 移动到另一个收藏夹
-async function moveCollect(id, destCollectionId) {
-  const data = {
-    id: id,
-    destCollectionId:destCollectionId
+async function moveCollect(resourceIds,sourceCollectionId, destCollectionId) {
+  const params = {
+    resourceIds: resourceIds,
+    destCollectionId: destCollectionId,
+    sourceCollectionId:sourceCollectionId
   }
   const config = {
     url: '/collectionResource/move',
     token: infoStore.token,
     method: 'POST',
-    data:data
+    params:params
   }
   const result = await request(config)
   console.log("移动到另一收藏夹:",result)
 }
 
 // 删除收藏夹内容
-const deleteCollectList = async(id) => {
+const deleteCollectList = async (collectionId, resourceIds) => {
+  const params = {
+    collectionId: collectionId,
+    resourceIds:resourceIds
+  }
   const config = {
-    url: `/collectionResource/${id}`,
+    url: '/collectionResource',
     token: infoStore.token,
-    method:'DELETE'
+    method: 'DELETE',
+    params:params
   }
   const result = await request(config)
   console.log("删除收藏夹内容:",result)
@@ -310,11 +356,7 @@ const deleteCollectList = async(id) => {
 
 // 收藏内容
 const collect = async (resourceId, collectionId) => {
-  if (!infoStore.token) {
-    commitMessage('warning', '请登录后再操作')
-    return
-  } 
-  const data = {
+  const params = {
     resourceId: resourceId,
     collectionId:collectionId
   }
@@ -322,7 +364,7 @@ const collect = async (resourceId, collectionId) => {
     url: '/collectionResource',
     token: infoStore.token,
     method: 'POST',
-    data:data
+    params:params
   }
   const result = await request(config)
   console.log("收藏内容:",result)
@@ -334,16 +376,24 @@ export{
   getUserInfo,
   uploadFile,
   updateUserInfo,
+
   getBlockList,
   getKeyWord,
   getPlatform,
+
   getList,
   getResource,
+
   getHistory,
+  addHistory,
   deleteHistory,
+
+  getAllCollect,
   editCollectName,
   newCollect,
   deleteCollect,
+
+  getCollectList,
   moveCollect,
   deleteCollectList,
   collect

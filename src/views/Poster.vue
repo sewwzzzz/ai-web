@@ -275,7 +275,7 @@ import BadgeStores from '@/components/Badge/BadgeStores.vue';
 import Brief from '@/components/Brief.vue';
 import Comment from '@/components/Comment.vue';
 import Header from '@/components/Header.vue'
-import { collect, deleteCollectList, getResource } from '@/utils/preRequest';
+import { collect, deleteCollectList, getResource,addHistory, getAllCollect } from '@/utils/preRequest';
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useInfoStore from '@/store/info'
@@ -297,67 +297,15 @@ const route = useRoute()
 const infoStore = useInfoStore()
 
 let checked = ref(1)
+// 记录当前收藏的收藏夹id
+let checkResult = 0
 let storeState = ref(false)
 let showStore = ref(false)
 let storeList = ref([]) // 收藏夹数组
-storeList.value = [
-      {
-        id:1,
-        name:'我的收藏夹1',
-      },
-      {
-        id:2,
-        name:'我的收藏夹2',
-      },
-      {
-        id:3,
-        name:'我的收藏夹3',
-      },
-      {
-        id:4,
-        name:'我的收藏夹4',
-      },
-      {
-        id:5,
-        name:'我的收藏夹5',
-      },
-      {
-        id:6,
-        name:'我的收藏夹6',
-      },
-      {
-        id:7,
-        name:'我的收藏夹7',
-      },
-      {
-        id:8,
-        name:'我的收藏夹8',
-      },
-      {
-        id:9,
-        name:'我的收藏夹9',
-      },
-      {
-        id:10,
-        name:'我的收藏夹10',
-      },
-      {
-        id:11,
-        name:'我的收藏夹11',
-      },
-      {
-        id:12,
-        name:'我的收藏夹12',
-      },
-      {
-        id:13,
-        name:'我的收藏夹13',
-      }
-    ]
 
 const cancelStore = () => {
   storeState.value = false
-  deleteCollectList(route.params.id)
+  deleteCollectList(checkResult,[route.params.id])
   console.log("删除的posterid:", route.params.id)
 }
 
@@ -376,8 +324,11 @@ const selectId = (id) => {
 
 // 显示框
 const showDialog = () => {
-  checked.value = storeList.value[0].id
-  showStore.value = true
+  getAllCollect().then((data) => {
+    storeList.value = data
+    checked.value = storeList.value[0].id
+    showStore.value = true
+  })
 }
 
 // 取消框
@@ -388,10 +339,10 @@ const cancelDialog = () => {
 // 收藏到指定收藏夹
 const storeFavlist = () => {
   // 调用接口
+  checkResult = checked.value
   collect(route.params.id,checked.value)
   console.log(checked.value)
   storeState.value = true
-  // 调接口重新获取当前收藏夹分页数据
   showStore.value = false
 }
 
@@ -402,6 +353,8 @@ onMounted(() => {
 
 // 判断当前根据id获取当前具体内容
 const getPoster = () => {
+  console.log(infoStore.id)
+  if(infoStore.id) addHistory(route.params.id)
   getResource(route.params.id).then((data) => {
     // console.log(data)
     coverUrl.value = data.coverUrl

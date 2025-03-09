@@ -313,18 +313,17 @@ const showReset = ref(0)
 const imageUrl = ref('')
 const nickName = ref('')
 let imgFile
-let hashmap = new Map()
+let hashmap = ref(new Map())
 const dataList = ref({})
 
-Promise.all([getBlockList(), getKeyWord(), getPlatform()]).then((res) => {
-  console.log('获取关键词、平台、模块的结果:', res)
+Promise.all([getBlockList(), getKeyWord(), getPlatform()]).then(() => {
   // 根据不同的blockID记录展示的关键词和平台的内容
   for (let key in menu) {
     const temp = menu[key]
     // console.log(systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0])
     const titleItem = systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0]
-    hashmap.set(temp.blockId, [titleItem.name, titleItem.id, 1])
-    getDataList(temp.blockId, 1, titleItem.name)
+    hashmap.value.set(temp.blockId, [titleItem.id, systemStore.platform[0].id])
+    getDataList(temp.blockId, systemStore.platform[0].id, titleItem.id)
   }
 })
 
@@ -351,8 +350,8 @@ const goPoster = (id) => {
 }
 
 // 根据信息获取对应数据列表
-const getDataList = (blockId, secondId, firstName, current = 1, size = 5) => {
-  getList(current, size, secondId, firstName).then((data) => {
+const getDataList = (blockId, sourceId, keyId, current = 1, size = 5, searchText = '') => {
+  getList(current, size, sourceId, keyId, searchText).then((data) => {
     if (data) {
       dataList.value[blockId] = data.records
     // console.log(dataList.value)
@@ -361,16 +360,16 @@ const getDataList = (blockId, secondId, firstName, current = 1, size = 5) => {
 }
 
 // 设置当前点击的平台及关键词
-const setCurrent = (firstName, firstId, secondId, blockId) => {
-  hashmap.set(blockId, [firstName, firstId, secondId])
+const setCurrent = (firstId, secondId, thirdId) => {
+  hashmap.value.set(thirdId, [firstId, secondId])
   // console.log("存储的Map:",hashmap)
-  getDataList(blockId,secondId,firstName)
+  getDataList(thirdId,secondId,firstId)
 }
 
 
 // 查看更多
 const goBlock = (blockId) => {
-  const [,keyId,sourceId] = hashmap.get(blockId)
+  const [keyId,sourceId] = hashmap.value.get(blockId)
   router.push(`/block/${blockId}/${keyId}/${sourceId}`)
 }
 

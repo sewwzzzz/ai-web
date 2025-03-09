@@ -59,7 +59,7 @@ const systemStore = useSystemStore()
 const router = useRouter()
 const target = reactive({
   sourceName: '',
-  keyName: '',
+  searchText: '',
   type:false
 })
 
@@ -67,7 +67,7 @@ provide('select', target)
 
 watch(target, (x) => {
   console.log(x)
-  getDataList(systemStore.platform.filter((item)=>item.name == x.sourceName)[0].id,x.keyName)
+  getDataList(systemStore.platform.filter((item)=>item.name == x.sourceName)[0].id,x.searchText)
 })
 // 分页数据
 let paging = reactive({
@@ -79,19 +79,19 @@ let paging = reactive({
 // 页数据量变化
 const sizeChange = (val) => {
   paging.pageSize = val
-  getDataList(target.sourceId,target.keyName,paging.currentPage,paging.pageSize)
+  getDataList(target.sourceId,target.searchText,paging.currentPage,paging.pageSize)
 }
 
 // 当前页号变化
 const currentChange = (val) => {
   paging.currentPage = val
-  getDataList(target.sourceId,target.keyName,paging.currentPage,paging.pageSize)
+  getDataList(target.sourceId,target.searchText ,paging.currentPage,paging.pageSize)
 }
 
 
 // 根据信息获取对应数据列表
-const getDataList = (secondId, firstName, current = 1, size = 30) => {
-  getList(current, size, secondId, firstName).then((data) => {
+const getDataList = (sourceId, searchText, current = 1, size = 30) => {
+  getList(current, size, sourceId, null, searchText).then((data) => {
     paging.pageSize = data.size
     paging.totalCount = data.total
     paging.currentPage = data.current

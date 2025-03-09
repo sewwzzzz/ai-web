@@ -9,7 +9,7 @@
   >
     <el-sub-menu v-for="(TitleItem) in props.menuTitle" :key="TitleItem.id" :index = "TitleItem.id.toString()" @click="console.log(TitleItem.id)"> 
       <template #title>{{ TitleItem.name }}</template>
-      <el-menu-item v-for="(item) in props.platform" :key="item.id" :index="TitleItem.id + '-' + item.id" @click="sendCurrentId(TitleItem.name, TitleItem.id, item.id, TitleItem.blockId)">{{ item.name }}</el-menu-item>
+      <el-menu-item v-for="(item) in props.platform" :key="item.id" :index="TitleItem.id + '-' + item.id" @click="sendCurrentId(TitleItem.id, item.id, TitleItem.blockId)">{{ item.name }}</el-menu-item>
     </el-sub-menu>
   </el-menu>
 </template>
@@ -32,12 +32,12 @@ const props = defineProps({
     type: String
   },
   menuIndex: {
-    type: String,
-    default:"1",
+    type: Number,
+    default:1,
   },
   subIndex: {
-    type: String,
-    default:"1"
+    type: Number,
+    default:1
   }
 })
 let realWidth = ref(0)
@@ -50,7 +50,7 @@ function setMenuWidth(menuWidth) {
 defineExpose({ setMenuWidth })
 
 const emits = defineEmits(['sendId'])
-const sendCurrentId = (keyName, keyId, sourceId, blockId) => {
-  emits('sendId',keyName, keyId, sourceId, blockId)
+const sendCurrentId = ( keyId, sourceId, blockId) => {
+  emits('sendId',keyId, sourceId, blockId)
 }
 </script>

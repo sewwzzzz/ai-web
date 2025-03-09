@@ -106,7 +106,7 @@ const submit = () => {
   registerFormRef.value.validate(async (valid) => {
     if (valid) {
       // console.log(registerForm)
-      register(registerForm.account, registerForm.pass)
+      register(registerForm.account, registerForm.pass, registerForm.checkPass)
     }
   })
 }

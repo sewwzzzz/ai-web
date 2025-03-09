@@ -45,7 +45,7 @@
       <ToolButton v-show="deleteState" id="record-right" name="exitmanagement" func="退出管理" @click="changeDelState()"></ToolButton>
     </div>
     <div v-show="infoStore.id" id="content">
-      <div class="content-box"  @click="changeOrJump(item.id)" v-for="(item) in dataList.filter((x)=>x.sourceId == currentMenu)" :key="item.id">
+      <div class="content-box"  @click="changeOrJump(item.id)" v-for="(item) in dataList.filter((x)=>x.resource.sourceId == currentMenu)" :key="item.id">
         <CheckBox v-show="deleteState" class="box-check" :isCheck="checkList[item.id]"></CheckBox>
         <HistoryBilibili :records="item"></HistoryBilibili>
       </div>
@@ -267,7 +267,7 @@ watch(()=>infoStore.id, (val) => {
 })
 
 const selectHistory = () => {
-  getDataList(1,30,input.value)
+  getDataList(input.value)
 }
 
 let deleteState = ref(0)
@@ -281,7 +281,7 @@ let checkAll = ref(false) // 全选的checkBox选项情况
 // 管理所有数据
 const changeAllState = () => {
   checkAll.value = !checkAll.value
-  const datas = dataList.value.filter((item) => item.sourceId == currentMenu.value)
+  const datas = dataList.value.filter((item) => item.resource.sourceId == currentMenu.value)
   if (checkAll.value) {
     for (let x of datas) {
       checkList[x.id] = true
@@ -308,20 +308,14 @@ const judgeCheck = (callback) => {
 
 // 删除记录
 const deleteCheck = () => {
-  for (let x of trueList) {
-    // 调用接口
-    deleteHistory(x)
-  }
-  getDataList()
+  deleteHistory(Array.from(trueList))
+  getDataList(input.value)
 }
 
 // 清空所有
 const deleteAll = () => {
-  for (let x of dataList.value) {
-    // 调用接口
-    deleteHistory(x)
-  }
-  getDataList()
+  deleteHistory(dataList.value.map((item)=>item.id))
+  getDataList(input.value)
 }
 
 // 分页数据
@@ -331,19 +325,19 @@ let paging = reactive({
   totalCount: 400,
 })
 
-const getDataList = (current = 1, size = 30,keyword = '')=>{
-  getHistory(current, size,keyword).then((data) => {
+const getDataList = (searchText = '', current = 1, size = paging.pageSize)=>{
+  getHistory(current, size, searchText).then((data) => {
     if (data) {
       paging.currentPage = data.current
       paging.pageSize = data.size
       paging.totalCount = data.total
-      dataList.value = data.resources
+      dataList.value = data.records
       checkList = {}
       trueList.clear()
       checkAll.value = false
       cnt.value = 0
       deleteState.value = false
-      for (let item in data.resources) {
+      for (let item in dataList.value) {
         checkList[item.id] = false
       }
     }
@@ -353,13 +347,13 @@ const getDataList = (current = 1, size = 30,keyword = '')=>{
 // 页数据量变化
 const sizeChange = (val) => {
   paging.pageSize = val
-  getDataList(paging.currentPage,paging.pageSize)
+  getDataList(input.value,paging.currentPage,paging.pageSize)
 }
 
 // 当前页号变化
 const currentChange = (val) => {
   paging.currentPage = val
-  getDataList(paging.currentPage,paging.pageSize)
+  getDataList(input.value,paging.currentPage,paging.pageSize)
 }
 
 // 改变当前选择框的状态

@@ -4,7 +4,7 @@
     <el-button @click="goBack">
       <el-icon><i-ep-arrow-left></i-ep-arrow-left></el-icon>返回主页
     </el-button>
-    <Menu id="navigation-menu" :menu-index="route.params.keyId" :sub-index="route.params.sourceId" @send-id="setCurrent" fixed-width="calc(100% - 160px)" :menuTitle="systemStore.menuTitle.filter((keyword)=>keyword.blockId == route.params.blockId)" :platform="systemStore.platform" ></Menu>
+    <Menu id="navigation-menu" :menu-index="parseInt(route.params.keyId)" :sub-index="parseInt(route.params.sourceId)" @send-id="setCurrent" fixed-width="calc(100% - 160px)" :menuTitle="systemStore.menuTitle.filter((keyword)=>keyword.blockId == route.params.blockId)" :platform="systemStore.platform" ></Menu>
   </div>
   <div id="block-content">
     <Bilibili id="content-box" v-for="(item) in dataList" :key="item.id" :records="item" @click="goPoster(item.id)"></Bilibili>
@@ -68,11 +68,11 @@ const router = useRouter()
 let dataList = ref([])
 // 当前展示的关键词和平台
 let sourceId = route.params.sourceId
-let keyName = systemStore.menuTitle.filter((item) => item.id == route.params.keyId)[0].name
+let keyId = route.params.keyId
 
 // 根据信息获取对应数据列表
-const getDataList = (secondId, firstName, current = 1, size = 30) => {
-  getList(current, size, secondId, firstName).then((data) => {
+const getDataList = (sourceId, keyId, current = 1, size = paging.pageSize, searchText = '') => {
+  getList(current, size, sourceId, keyId, searchText).then((data) => {
     paging.pageSize = data.size
     paging.totalCount = data.total
     paging.currentPage = data.current
@@ -81,15 +81,15 @@ const getDataList = (secondId, firstName, current = 1, size = 30) => {
   })
 }
 
-getDataList(sourceId, keyName)
+getDataList(sourceId, keyId)
 
 // 设置当前点击的平台id及关键词
-const setCurrent = (firstName, firstId, secondId, thirdId) => {
-  keyName = firstName
+const setCurrent = (firstId, secondId, thirdId) => {
+  keyId = firstId
   sourceId = secondId
-  console.log("当前关键词和平台id:", keyName, sourceId)
-  router.push(`/block/${thirdId}/${firstId}/${secondId}`)
-  getDataList(sourceId,keyName)
+  console.log("当前关键词id和平台id:", keyId, sourceId)
+  router.replace(`/block/${thirdId}/${firstId}/${secondId}`)
+  getDataList(sourceId,keyId)
 }
 
 // 分页数据
@@ -102,13 +102,13 @@ let paging = reactive({
 // 页数据量变化
 const sizeChange = (val) => {
   paging.pageSize = val
-  getDataList(sourceId,keyName,paging.currentPage,paging.pageSize)
+  getDataList(sourceId,keyId,paging.currentPage,paging.pageSize)
 }
 
 // 当前页号变化
 const currentChange = (val) => {
   paging.currentPage = val
-  getDataList(sourceId,keyName,paging.currentPage,paging.pageSize)
+  getDataList(sourceId,keyId,paging.currentPage,paging.pageSize)
 }
 
 // 返回主页

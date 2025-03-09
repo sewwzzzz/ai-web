@@ -33,11 +33,11 @@
 <script setup>
 import { commitMessage } from '@/utils/operate'
 import { ref,defineProps, defineExpose, inject, onMounted} from 'vue'
-import { useRouter,useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
-const input = ref(route.query.keyName)
+const input = ref(route.query.searchText)
 const select = ref(route.query.sourceName)
 const props = defineProps({
   platform: {
@@ -65,8 +65,8 @@ const selectPoster = () => {
     let routeData = router.resolve({
       name: 'select',
       query: {
-        keyName: input.value,
-        sourceName:select.value
+        searchText: input.value,
+        sourceName: select.value
       }
     })
     window.open(routeData.href,'_blank')
@@ -76,12 +76,12 @@ const selectPoster = () => {
 
   if (input.value && select.value) {
     target.sourceName = select.value
-    target.keyName = input.value
+    target.searchText = input.value
     target.type = !target.type
     router.push({
       name: 'select',
       query: {
-        keyName: input.value,
+        searchText: input.value,
         sourceName:select.value
       }
     })

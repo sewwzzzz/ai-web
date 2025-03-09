@@ -2,33 +2,32 @@
   <!-- <SvgIcon id="x" name="comments"></SvgIcon> -->
   <div>
     <div id="bilibili-content">
-      <img id="content-img" :src="records.coverUrl">
+      <img id="content-img" :src="props.records.resource.coverUrl">
       <div id="content-count">
         <div class="count-box">
           <SvgIcon class="box-icon" name="view"></SvgIcon>
-          <div>{{ props.records.viewCount }}</div>
+          <div>{{ props.records.resource.viewCount }}</div>
         </div>
         <div class="count-box">
           <SvgIcon class="box-icon" name="comment"></SvgIcon>
-          <div>{{ props.records.commentCount }}</div>
+          <div>{{ props.records.resource.commentCount }}</div>
         </div>
         <div class="count-box">
           <SvgIcon class="box-icon" name="like"></SvgIcon>
-          <div>{{ props.records.likeCount }}</div>
+          <div>{{ props.records.resource.likeCount }}</div>
         </div>
       </div>
     </div>
-    <div id="bilibili-title">{{ limitTitle(props.records.title )}}</div>
+    <div id="bilibili-title">{{ limitTitle(props.records.resource.title )}}</div>
     <div id="bilibili-footer">
       <SvgIcon class="box-icon" name="bilibili"></SvgIcon>
-      <div id="footer-name">{{ props.records.authorName }}</div>
-      <div id="footer-time">{{ props.records.publishTime }}</div>
+      <div id="footer-name">{{ props.records.resource.authorName }}</div>
+      <div id="footer-time">{{ props.records.browsingTime }}</div>
     </div>
   </div>
 </template>
 
 <style scoped>
-
 #bilibili-content{
   width:100%;
   height:140px;

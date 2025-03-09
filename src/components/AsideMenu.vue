@@ -145,60 +145,6 @@ const props = defineProps({
   collectList: {
     type: Array,
     // eslint-disable-next-line vue/require-valid-default-prop
-    default: [
-      {
-        id:1,
-        name:'我的收藏夹1',
-      },
-      {
-        id:2,
-        name:'我的收藏夹2',
-      },
-      {
-        id:3,
-        name:'我的收藏夹3',
-      },
-      {
-        id:4,
-        name:'我的收藏夹4',
-      },
-      {
-        id:5,
-        name:'我的收藏夹5',
-      },
-      {
-        id:6,
-        name:'我的收藏夹6',
-      },
-      {
-        id:7,
-        name:'我的收藏夹7',
-      },
-      {
-        id:8,
-        name:'我的收藏夹8',
-      },
-      {
-        id:9,
-        name:'我的收藏夹9',
-      },
-      {
-        id:10,
-        name:'我的收藏夹10',
-      },
-      {
-        id:11,
-        name:'我的收藏夹11',
-      },
-      {
-        id:12,
-        name:'我的收藏夹12',
-      },
-      {
-        id:13,
-        name:'我的收藏夹13',
-      }
-    ]
   }
 })
 let showEdit = ref(false)
@@ -207,7 +153,7 @@ let targetId = ref(0)
 // 0:创建， 1:修改
 let type = ref(0)
 
-const emits=defineEmits(['getFavList','clearFavList'])
+const emits=defineEmits(['getFavList','clearFavList','getCollect'])
 // 设置当前点击的选项
 const setCurrent = (id) => {
   current.value = id
@@ -234,14 +180,13 @@ const cancelDialog = () => {
 // 新建 或者 编辑
 const newOrEdit = async() => {
   if (type.value == 0) {
-    console.log(targetName.value)
     await newCollect(targetName.value)
   } else {
     console.log(targetId.value, targetName.value)
     await editCollectName(targetId.value,targetName.value)
   }
   // 重新获取收藏夹列表和当前id显示的收藏夹内容
-
+  emits('getCollect')
   showEdit.value = false
 }
 
@@ -250,7 +195,7 @@ const deleteFolder = async (id) => {
   // 调用接口删除
   await deleteCollect(id)
   // 重新拉取一遍收藏夹列表
-
+  emits('getCollect')
   // 如果删除的是current，那么清空外部的dataList
   if (current.value == id) {
     current.value = 0
