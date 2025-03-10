@@ -78,11 +78,12 @@ const props = defineProps({
 
 let isA = props.isActive
 
-const emits = defineEmits(['update:number'])
+const emits = defineEmits(['update:number','like'])
 // 点击后更新'点赞'徽章状态
 const updateState = function () {
   isA = !isA
   let num = props.number + (isA?1:-1)
-  emits('update:number',num)
+  emits('update:number', num)
+  emits('like',isA)
 }
 </script>

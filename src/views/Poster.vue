@@ -20,7 +20,7 @@
     </div>
     <div id="poster-content">
       <div id="content-left">
-        <BadgeGoods v-model:number="goodNum">
+        <BadgeGoods v-model:number="goodNum" @like="likeOrUnlike">
         </BadgeGoods>
         <BadgeComments :number="commentNum" @go-comment="goComment">
         </BadgeComments>
@@ -63,7 +63,12 @@
         <div :class="[select?'sort':'sort-sure']" @click="updateNewSelect()">最新</div>
       </div>
       <div id="comments">
-        <Comment></Comment>
+        <div v-for="(item) in example" :key="item.id">
+          <Comment class="comment" :comment="item">
+          </Comment>
+          <SecondComment class="second-comment" v-for="(subItem) in item.sonComments" :key="subItem.id" :sub-comment="subItem"></SecondComment>
+          <div class="comment-line"></div>
+        </div>
       </div>
     </div>
     <div id="poster-bottom"></div>
@@ -258,8 +263,23 @@
 }
 #comments{
   width:100%;
-  margin-top:20px;
 }
+
+.comment{
+  margin-top:22px;
+  margin-bottom: 5px;
+}
+
+.second-comment{
+  margin-left: 65px;
+  padding:10px 0;
+}
+
+.comment-line{
+  margin:0 0 0 65px;
+  padding:0 0 14px;
+}
+
 #poster-bottom{
   margin-left:18%;
   width:50%;
@@ -269,17 +289,109 @@
 
 
 <script setup>
+// test
+const example = [
+  {
+    "id": 6,
+    "user": {
+      "id": 2,
+      "username": "lizsen",
+      "nickname": "lizhaosheng",
+      "avatarUrl": "fake_avaterUrl.jpg",
+      "status": 0,
+      "role": 0
+    },
+    "sonComments": [],
+    "content": "my third comment",
+    "commentTime": "2025-03-08T04:43:59.000+00:00"
+  },
+  {
+    "id": 5,
+    "user": {
+      "id": 2,
+      "username": "lizsen",
+      "nickname": "lizhaosheng",
+      "avatarUrl": "fake_avaterUrl.jpg",
+      "status": 0,
+      "role": 0
+    },
+    "sonComments": [],
+    "content": "my second comment",
+    "commentTime": "2025-03-08T04:43:49.000+00:00"
+  },
+  {
+    "id": 4,
+    "user": {
+      "id": 2,
+      "username": "lizsen",
+      "nickname": "lizhaosheng",
+      "avatarUrl": "fake_avaterUrl.jpg",
+      "status": 0,
+      "role": 0
+    },
+    "sonComments": [
+      {
+        "id": 8,
+        "user": {
+          "id": 3,
+          "username": "lindc",
+          "nickname": "ldc",
+          "avatarUrl": null,
+          "status": 0,
+          "role": 0
+        },
+        "rootId": 4,
+        "toComment": {
+          "id": 7,
+          "user": {
+            "id": 2,
+            "username": "lizsen",
+            "nickname": "lizhaosheng",
+            "avatarUrl": "fake_avaterUrl.jpg",
+            "status": 0,
+            "role": 0
+          },
+          "rootId": 4,
+          "content": "my first son comment",
+          "commentTime": "2025-03-08T05:13:28.000+00:00",
+          "isDelete": 0
+        },
+        "content": "this is also my first son comment",
+        "commentTime": "2025-03-08T05:15:13.000+00:00"
+      },
+      {
+        "id": 7,
+        "user": {
+          "id": 2,
+          "username": "lizsen",
+          "nickname": "lizhaosheng",
+          "avatarUrl": "fake_avaterUrl.jpg",
+          "status": 0,
+          "role": 0
+        },
+        "rootId": 4,
+        "toComment": null,
+        "content": "my first son comment",
+        "commentTime": "2025-03-08T05:13:28.000+00:00"
+      }
+    ],
+    "content": "my first comment",
+    "commentTime": "2025-03-08T04:43:36.000+00:00"
+  }
+]
+
 import BadgeComments from '@/components/Badge/BadgeComments.vue';
 import BadgeGoods from '@/components/Badge/BadgeGoods.vue'
 import BadgeStores from '@/components/Badge/BadgeStores.vue';
 import Brief from '@/components/Brief.vue';
 import Comment from '@/components/Comment.vue';
 import Header from '@/components/Header.vue'
-import { collect, deleteCollectList, getResource,addHistory, getAllCollect } from '@/utils/preRequest';
+import { collect, deleteCollectList, getResource,addHistory, getAllCollect, likeResource, unlikeResource } from '@/utils/preRequest';
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useInfoStore from '@/store/info'
 import { limitTitle, locateHeight } from '@/utils/operate';
+import SecondComment from '@/components/SecondComment.vue';
 
 let goodNum = ref(0)
 let commentNum = ref(0)
@@ -396,5 +508,14 @@ const updateHotSelect = function () {
 const updateNewSelect = function () {
   if (!select.value) return
   select.value = !select.value
+}
+
+// 点赞或取消点赞
+const likeOrUnlike = (type) => {
+  if (type) {
+    likeResource(route.params.id)
+  } else {
+    unlikeResource(route.params.id)
+  }
 }
 </script>

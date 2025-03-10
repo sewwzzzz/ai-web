@@ -1,17 +1,18 @@
 <template>
   <div id="second-comment">
-    <img id="avatar-comment" :src="infoStore.avatarUrl" />
+    <img id="avatar-comment" :src="props.subComment.user.avatarUrl" />
     <div id="right-comment">
       <div id="comment-header">
         <div id="header-name">
-          {{ infoStore.nickName?infoStore.nickName:'未知用户' }}:
+          {{ props.subComment.user.nickname?props.subComment.user.nickname:'未知用户' }}
+          <span> {{ props.subComment.toComment?`回复 ${props.subComment.toComment.isDelete?'已删除 :':props.subComment.toComment.user.nickname} :`:''}}</span>
         </div>
         <div id="header-content">
-           “春招真的寄了”
+           {{ props.subComment.content }}
         </div>
       </div>
       <div id="comment-footer">
-        <div id="footer-time"> 10月前</div>
+        <div id="footer-time">{{ props.subComment.commentTime }}</div>
         <FooterGoods></FooterGoods>
         <FooterReply @reply="updateReplyState"></FooterReply>
       </div>
@@ -37,25 +38,29 @@
   display:flex;
 }
 #avatar-comment{
-  width:50px;
-  height:50px;
-  margin-right:15px;
+  width:24px;
+  height:24px;
+  margin-right:10px;
   border-radius: 50%;
   cursor:pointer;
   flex-shrink: 0;
 }
 #right-comment{
   flex:1;
-  padding-top:10px;
 }
 #comment-header{
   display:flex;
   align-items: center;
 }
 #header-name{
-  height:14px;
-  line-height:14px;
+  height:24px;
+  line-height:24px;
   font-size: 14px;
+  color:#61666D;
+}
+
+#header-name span{
+  color:#18191c;
 }
 #header-content{
   line-height: 16px;
@@ -66,7 +71,7 @@
 #comment-footer{
   width:100%;
   display:flex;
-  margin-top:10px;
+  margin-top:15px;
 }
 #footer-time{
   height:100%;
@@ -97,7 +102,7 @@
 </style>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,defineProps } from 'vue'
 import FooterGoods from './Footer/FooterGoods.vue'
 import FooterReply from './Footer/FooterReply.vue'
 import useInfoStore from '@/store/info'
@@ -105,6 +110,41 @@ import useInfoStore from '@/store/info'
 const infoStore = useInfoStore()
 let showReply = ref(false)
 let textarea = ref('')
+
+const props = defineProps({
+  subComment: {
+    type: Array,
+    // {
+    //   "id": 8,
+    //   "user": {
+    //     "id": 3,
+    //     "username": "lindc",
+    //     "nickname": "ldc",
+    //     "avatarUrl": null,
+    //     "status": 0,
+    //     "role": 0
+    //   },
+    //   "rootId": 4,
+    //   "toComment": {
+    //     "id": 7,
+    //     "user": {
+    //       "id": 2,
+    //       "username": "lizsen",
+    //       "nickname": "lizhaosheng",
+    //       "avatarUrl": "fake_avaterUrl.jpg",
+    //       "status": 0,
+    //       "role": 0
+    //     },
+    //     "rootId": 4,
+    //     "content": "my first son comment",
+    //     "commentTime": "2025-03-08T05:13:28.000+00:00",
+    //     "isDelete": 0
+    //   },
+    //   "content": "this is also my first son comment",
+    //   "commentTime": "2025-03-08T05:15:13.000+00:00"
+    // }
+  }
+})
 
 // 控制评论的'评论拉起/关闭'状态 子组件: ./Footer/FooterReply.vue
 const updateReplyState = function (state) {

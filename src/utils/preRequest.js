@@ -108,7 +108,6 @@ async function updateUserInfo(nickName , avatarUrl) {
   }
   const result = await request(config)
   if (result) {
-    commitMessage('success', '信息更新成功')
     infoStore.nickName = nickName
     infoStore.avatarUrl = avatarUrl
     sendInfoMessage()
@@ -370,6 +369,38 @@ const collect = async (resourceId, collectionId) => {
   console.log("收藏内容:",result)
 }
 
+// 点赞资讯
+async function likeResource(resourceId) {
+  const params = {
+    resourceId: resourceId,
+    userId:infoStore.id
+  }
+  const config = {
+    url: '/resourceLike',
+    params: params,
+    token: infoStore.token,
+    method:'POST'
+  }
+  const result = await request(config)
+  console.log("点赞资讯结果:",result)
+}
+
+// 取消点赞资讯
+async function unlikeResource(resourceId) {
+  const params = {
+    resourceId: resourceId,
+    userId:infoStore.id
+  }
+  const config = {
+    url: '/resourceLike',
+    params: params,
+    token: infoStore.token,
+    method:'DELETE'
+  }
+  const result = await request(config)
+  console.log("取消点赞资讯结果:",result)
+}
+
 export{
   register,
   login,
@@ -396,5 +427,10 @@ export{
   getCollectList,
   moveCollect,
   deleteCollectList,
-  collect
+  collect,
+
+  likeResource,
+  unlikeResource,
+
+  
 }

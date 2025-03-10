@@ -1,14 +1,15 @@
 <template>
   <div id="comment">
-    <img id="avatar-comment" :src="infoStore.avatarUrl" />
+    <img id="avatar-comment" :src="props.comment.user.avatarUrl" />
     <div id="right-comment">
       <div id="comment-name">
-        {{ infoStore.nickName?infoStore.nickName:'未知用户' }}
+        {{ props.comment.user.nickname?props.comment.user.nickname:'未知用户' }}
       </div>
       <div id="comment-content">
+        {{ props.comment.content }}
       </div>
       <div id="comment-footer">
-        <div id="footer-time"> 10月前</div>
+        <div id="footer-time">{{ props.comment.commentTime }}</div>
         <FooterGoods></FooterGoods>
         <FooterReply @reply="updateReplyState"></FooterReply>
       </div>
@@ -34,9 +35,9 @@
   display:flex;
 }
 #avatar-comment{
-  width:50px;
-  height:50px;
-  margin-right:15px;
+  width:40px;
+  height:40px;
+  margin-right:20px;
   border-radius: 50%;
   cursor:pointer;
   flex-shrink: 0;
@@ -45,16 +46,12 @@
   flex:1;
 }
 #comment-name{
-  height:50px;
   font-size: 14px;
+  color:#61666D;
 }
 #comment-content{
   width: 100%;
-  height:100px;
-  border-color: aqua;
   margin-top:10px;
-  border-width: 1px;
-  border-style: solid;
   font-size: 16px;
 }
 #comment-footer{
@@ -91,7 +88,7 @@
 </style>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,defineProps } from 'vue'
 import FooterGoods from './Footer/FooterGoods.vue'
 import FooterReply from './Footer/FooterReply.vue'
 import useInfoStore from '@/store/info'
@@ -99,6 +96,26 @@ import useInfoStore from '@/store/info'
 const infoStore = useInfoStore()
 let showReply = ref(false)
 let textarea = ref('')
+
+const props = defineProps({
+  comment: {
+    type: Array,
+    //   {
+    //     "id": 6,
+    //     "user": {
+    //       "id": 2,
+    //       "username": "lizsen",
+    //       "nickname": "lizhaosheng",
+    //       "avatarUrl": "fake_avaterUrl.jpg",
+    //       "status": 0,
+    //       "role": 0
+    //     },
+    //     "sonComments": [],
+    //     "content": "my third comment",
+    //     "commentTime": "2025-03-08T04:43:59.000+00:00"
+    //    }
+  }
+})
 
 // 控制评论的'评论拉起/关闭'状态 子组件: ./Footer/FooterReply.vue
 const updateReplyState = function (state) {
