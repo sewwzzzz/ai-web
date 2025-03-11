@@ -1,7 +1,7 @@
 <template>
   <div id="footer" @click="updateState()">
-    <SvgIcon name="footerreply" :class="[isComment ? 'footer-reply-sure' : 'footer-reply']"></SvgIcon>
-    <div :class="[isComment ? 'footer-num-sure' : 'footer-num']">{{ isComment ? '取消回复' : (num === 0 ? '评论' : num) }}</div>
+    <SvgIcon name="footerreply" :class="[props.isComment ? 'footer-reply-sure' : 'footer-reply']"></SvgIcon>
+    <div :class="[props.isComment ? 'footer-num-sure' : 'footer-num']">{{ props.isComment ? '取消回复' : '回复'}}</div>
   </div>
 </template>
 
@@ -33,12 +33,12 @@
   transition: color 0.3s linear;
 }
 .footer-num{
-  height:18px;
+  font-size:14px;
   color:#8a919f;
   transition: color 0.3s linear;
 }
 .footer-num-sure{
-  height:18px;
+  font-size:14px;
   color:rgb(30, 128, 255);
   transition: color 0.3s linear;
 }
@@ -46,21 +46,17 @@
 </style>
 
 <script setup>
-import { defineProps, ref, defineEmits } from 'vue'
-
+import {  defineEmits,defineProps } from 'vue'
 const props = defineProps({
-  number: {
-    type: Number,
-    default:1
-  },
+  isComment: {
+    type:Boolean
+  }
 })
+
 const emit = defineEmits(['reply'])
-let num = ref(props.number)
-let isComment = ref(false)
 
 // 控制评论的'评论拉起/关闭'状态
 const updateState = function(){
-    isComment.value = !isComment.value
-    emit('reply',isComment.value)
+    emit('reply',!props.isComment)
 }
 </script>

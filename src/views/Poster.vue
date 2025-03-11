@@ -64,9 +64,9 @@
       </div>
       <div id="comments">
         <div v-for="(item) in example" :key="item.id">
-          <Comment class="comment" :comment="item">
+          <Comment class="comment" :comment="item" @deleteComment="popupMessageBox('删除评论后，评论下所有回复都会被删除,是否继续?','删除评论',()=>deleteBothComment(item.id,item.rootId))">
           </Comment>
-          <SecondComment class="second-comment" v-for="(subItem) in item.sonComments" :key="subItem.id" :sub-comment="subItem"></SecondComment>
+          <SecondComment class="second-comment" v-for="(subItem) in item.sonComments" :key="subItem.id" :sub-comment="subItem" @deleteComment="popupMessageBox('删除评论后，评论下所有回复都会被删除,是否继续?','删除评论',()=>deleteBothComment(subItem.id,subItem.rootId))"></SecondComment>
           <div class="comment-line"></div>
         </div>
       </div>
@@ -290,11 +290,11 @@
 
 <script setup>
 // test
-const example = [
+const example = ref([
   {
     "id": 6,
     "user": {
-      "id": 2,
+      "id": 1,
       "username": "lizsen",
       "nickname": "lizhaosheng",
       "avatarUrl": "fake_avaterUrl.jpg",
@@ -333,7 +333,7 @@ const example = [
       {
         "id": 8,
         "user": {
-          "id": 3,
+          "id": 1,
           "username": "lindc",
           "nickname": "ldc",
           "avatarUrl": null,
@@ -378,7 +378,7 @@ const example = [
     "content": "my first comment",
     "commentTime": "2025-03-08T04:43:36.000+00:00"
   }
-]
+])
 
 import BadgeComments from '@/components/Badge/BadgeComments.vue';
 import BadgeGoods from '@/components/Badge/BadgeGoods.vue'
@@ -390,7 +390,7 @@ import { collect, deleteCollectList, getResource,addHistory, getAllCollect, like
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useInfoStore from '@/store/info'
-import { limitTitle, locateHeight } from '@/utils/operate';
+import { limitTitle, locateHeight, popupMessageBox } from '@/utils/operate';
 import SecondComment from '@/components/SecondComment.vue';
 
 let goodNum = ref(0)
@@ -516,6 +516,36 @@ const likeOrUnlike = (type) => {
     likeResource(route.params.id)
   } else {
     unlikeResource(route.params.id)
+  }
+}
+
+// 删除某条评论
+const deleteBothComment = (id,rootId) => {
+  console.log('删除id为：', id,rootId)
+  // 接口
+  // example
+  if (rootId) {
+    for (let i = 0; i < example.value.length; i++){
+      const item = example.value[i]
+      if (item.id == rootId) {
+        const subs = item.sonComments
+        for (let j = 0; j < subs.length; j++){
+          if (subs[j].id == id) {
+            example.value[i].sonComments.splice(j, 1)
+            break
+          }
+        }
+        break
+      }
+    }
+  }
+  else {
+    for (let i = 0; i < example.value.length; i++){
+      if (example.value[i].id == id) {
+        example.value.splice(i,1)
+        break
+      }
+    }
   }
 }
 </script>

@@ -148,7 +148,7 @@
 #header-input{
   position:absolute;
   top:50%;
-  left:50%;
+  left:45%;
   transform:translate(-50%,-50%)
 }
 

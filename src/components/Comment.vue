@@ -11,7 +11,10 @@
       <div id="comment-footer">
         <div id="footer-time">{{ props.comment.commentTime }}</div>
         <FooterGoods></FooterGoods>
-        <FooterReply @reply="updateReplyState"></FooterReply>
+        <FooterReply :is-comment="showReply" @reply="updateReplyState"></FooterReply>
+        <SvgIcon v-show="props.comment.user.id == infoStore.id" name="deletecomment" class="delete-icon" @click="visible = true">
+        </SvgIcon>
+        <div v-show="visible" class="delete-popover" @mouseleave="visible = false" @click="deleteComment">删除</div>
       </div>
       <div id="footer-input" v-show="showReply">
         <el-input
@@ -31,7 +34,7 @@
 
 <style scoped>
 #comment{
-  width:100%;
+  width:98%;
   display:flex;
 }
 #avatar-comment{
@@ -58,7 +61,45 @@
   width:100%;
   display:flex;
   margin-top:10px;
+  position:relative;
 }
+
+#comment-footer:hover .delete-icon{
+  visibility:visible;
+}
+
+.delete-icon{
+  position:absolute;
+  right:0;
+  top:0;
+  size:16;
+  visibility:hidden;
+  color:#9499a0;
+}
+
+.delete-icon:hover{
+  color:#79bbff;
+}
+
+.delete-popover{
+  position:absolute;
+  right:0;
+  top:-33px;
+  transform: translateX(40%);
+  box-sizing:border-box;
+  padding:8px 30px;
+  border-radius:5px;
+  color:rgb(97, 102, 109);
+  font-size:14px;
+  box-shadow:0 0 1.5px 1.5px #F1F2F3;
+}
+
+.delete-popover:hover{
+  background-color:rgb(236, 242, 249);
+  box-shadow:0 0 1.5px 1.5px #edeef0;
+  cursor: pointer;
+}
+
 #footer-time{
   height:100%;
   margin-right: 10px;
@@ -88,7 +129,7 @@
 </style>
 
 <script setup>
-import { ref,defineProps } from 'vue'
+import { ref,defineProps,defineEmits } from 'vue'
 import FooterGoods from './Footer/FooterGoods.vue'
 import FooterReply from './Footer/FooterReply.vue'
 import useInfoStore from '@/store/info'
@@ -96,10 +137,12 @@ import useInfoStore from '@/store/info'
 const infoStore = useInfoStore()
 let showReply = ref(false)
 let textarea = ref('')
+let visible = ref(false)
+const emits = defineEmits(['deleteComment'])
 
 const props = defineProps({
   comment: {
-    type: Array,
+    type: Object,
     //   {
     //     "id": 6,
     //     "user": {
@@ -121,5 +164,10 @@ const props = defineProps({
 const updateReplyState = function (state) {
   showReply.value = state
   console.log(state)
+}
+
+// 传递删除消息
+const deleteComment = () => {
+  emits('deleteComment')
 }
 </script>
