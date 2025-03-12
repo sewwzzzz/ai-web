@@ -3,7 +3,7 @@
     :current-page="props.paging.currentPage"
     :page-size="props.paging.pageSize"
     :page-sizes="[30,50,100,200]"
-    layout="total,sizes,prev,pager,next,jumper"
+    :layout="props.layout?props.layout:'total,sizes,prev,pager,next,jumper'"
     :total="props.paging.totalCount"
     @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
@@ -19,7 +19,14 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
 const props = defineProps({
-  paging: Object,
+  paging: {
+    type: Object,
+  },
+  layout: {
+    type: String,
+    // eslint-disable-next-line vue/require-valid-default-prop
+    default: ""
+  }
 })
 
 const emits = defineEmits(['sizeChange','currentChange'])

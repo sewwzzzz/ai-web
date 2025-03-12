@@ -70,14 +70,23 @@ let dataList = ref([])
 let sourceId = route.params.sourceId
 let keyId = route.params.keyId
 
+// 分页数据
+let paging = reactive({
+  currentPage: 1,
+  pageSize: 30,
+  totalCount: 400,
+})
+
 // 根据信息获取对应数据列表
 const getDataList = (sourceId, keyId, current = 1, size = paging.pageSize, searchText = '') => {
   getList(current, size, sourceId, keyId, searchText).then((data) => {
-    paging.pageSize = data.size
-    paging.totalCount = data.total
-    paging.currentPage = data.current
-    dataList.value = data.records
-    console.log(dataList)
+    if (data) {
+      paging.pageSize = data.size
+      paging.totalCount = data.total
+      paging.currentPage = data.current
+      dataList.value = data.records
+      console.log(dataList)
+    }
   })
 }
 
@@ -91,13 +100,6 @@ const setCurrent = (firstId, secondId, thirdId) => {
   router.replace(`/block/${thirdId}/${firstId}/${secondId}`)
   getDataList(sourceId,keyId)
 }
-
-// 分页数据
-let paging = reactive({
-  currentPage: 1,
-  pageSize: 30,
-  totalCount: 400,
-})
 
 // 页数据量变化
 const sizeChange = (val) => {

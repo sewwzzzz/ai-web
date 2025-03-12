@@ -26,7 +26,7 @@
         show-word-limit
         >
         </el-input>
-        <el-button id="input-button" type="primary" :disabled="textarea === ''?true:false">回复</el-button>
+        <el-button id="input-button" type="primary" :disabled="textarea === ''?true:false" @click="sendResponse">回复</el-button>
       </div> 
     </div>
   </div>
@@ -138,7 +138,7 @@ const infoStore = useInfoStore()
 let showReply = ref(false)
 let textarea = ref('')
 let visible = ref(false)
-const emits = defineEmits(['deleteComment'])
+const emits = defineEmits(['deleteComment','sendResponse'])
 
 const props = defineProps({
   comment: {
@@ -163,11 +163,19 @@ const props = defineProps({
 // 控制评论的'评论拉起/关闭'状态 子组件: ./Footer/FooterReply.vue
 const updateReplyState = function (state) {
   showReply.value = state
+  if(state)textarea.value = ''
   console.log(state)
 }
 
 // 传递删除消息
 const deleteComment = () => {
   emits('deleteComment')
+}
+
+// 发送评论
+const sendResponse = () => {
+  showReply.value = false
+  emits('sendResponse', textarea.value, props.comment.rootId, props.comment.id)
+  textarea.value = ''
 }
 </script>

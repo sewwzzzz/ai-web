@@ -401,6 +401,53 @@ async function unlikeResource(resourceId) {
   console.log("取消点赞资讯结果:",result)
 }
 
+// 获取资讯评论
+async function getCommentList(current, resourceId, size) {
+  const params = {
+    current: current,
+    resourceId: resourceId,
+    size:size
+  }
+  const config = {
+    url: '/resourceComment/list',
+    params: params,
+    method: 'GET',
+    token:infoStore.token
+  }
+  const result = await request(config)
+  if(result) return result.data
+}
+
+// 添加评论
+async function comment(content, resourceId, told, rootId) {
+  const params = {
+    content: content,
+    resourceId: resourceId,
+    told: told,
+    rootId: rootId,
+    userId: infoStore.id
+  }
+  const config = {
+    url: '/resourceComment',
+    method: 'POST',
+    params: params,
+    token:infoStore.token
+  }
+  const result = await request(config)
+  if(result) return result.data
+}
+
+// 删除评论
+async function deleteComment(id) {
+  const config = {
+    url: `/resourceComment/${id}`,
+    method: 'DELETE',
+    token:infoStore.token
+  }
+  const result = await request(config)
+  console.log("删除评论：",result)
+}
+
 export{
   register,
   login,
@@ -432,5 +479,10 @@ export{
   likeResource,
   unlikeResource,
 
+  comment,
+  deleteComment,
+  getCommentList,
+
+  
   
 }

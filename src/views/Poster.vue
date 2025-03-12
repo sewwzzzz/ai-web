@@ -55,7 +55,7 @@
             show-word-limit
           >
         </el-input>
-        <el-button id="input-button" type="primary" :disabled="textarea === ''?true:false">发送</el-button>
+        <el-button id="input-button" type="primary" :disabled="textarea === ''?true:false" @click="commentOrReply(textarea),textarea = ''">发送</el-button>
       </div>
       <div id="comments-sort">
         <div :class="[select?'sort-sure':'sort']" @click="updateHotSelect()">最热</div>
@@ -63,12 +63,13 @@
         <div :class="[select?'sort':'sort-sure']" @click="updateNewSelect()">最新</div>
       </div>
       <div id="comments">
-        <div v-for="(item) in example" :key="item.id">
-          <Comment class="comment" :comment="item" @deleteComment="popupMessageBox('删除评论后，评论下所有回复都会被删除,是否继续?','删除评论',()=>deleteBothComment(item.id,item.rootId))">
+        <div v-for="(item) in commentList" :key="item.id">
+          <Comment class="comment" :comment="item" @deleteComment="popupMessageBox('删除评论后，评论下所有回复都会被删除,是否继续?','删除评论',()=>deleteBothComment(item.id,item.rootId))" @sendResponse="commentOrReply">
           </Comment>
-          <SecondComment class="second-comment" v-for="(subItem) in item.sonComments" :key="subItem.id" :sub-comment="subItem" @deleteComment="popupMessageBox('删除评论后，评论下所有回复都会被删除,是否继续?','删除评论',()=>deleteBothComment(subItem.id,subItem.rootId))"></SecondComment>
+          <SecondComment class="second-comment" v-for="(subItem) in item.sonComments" :key="subItem.id" :sub-comment="subItem" @deleteComment="popupMessageBox('删除评论后，评论下所有回复都会被删除,是否继续?','删除评论',()=>deleteBothComment(subItem.id,subItem.rootId))" @sendResponse="commentOrReply"></SecondComment>
           <div class="comment-line"></div>
         </div>
+        <Pagination id="comments-pagination" :paging="paging" layout="prev,pager,next" @currentChange="currentChange"></Pagination>
       </div>
     </div>
     <div id="poster-bottom"></div>
@@ -263,6 +264,15 @@
 }
 #comments{
   width:100%;
+  position: relative;
+  padding-bottom:60px;
+}
+
+#comments-pagination{
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
 }
 
 .comment{
@@ -287,107 +297,15 @@
 }
 </style>
 
-
 <script setup>
-// test
-const example = ref([
-  {
-    "id": 6,
-    "user": {
-      "id": 1,
-      "username": "lizsen",
-      "nickname": "lizhaosheng",
-      "avatarUrl": "fake_avaterUrl.jpg",
-      "status": 0,
-      "role": 0
-    },
-    "sonComments": [],
-    "content": "my third comment",
-    "commentTime": "2025-03-08T04:43:59.000+00:00"
-  },
-  {
-    "id": 5,
-    "user": {
-      "id": 2,
-      "username": "lizsen",
-      "nickname": "lizhaosheng",
-      "avatarUrl": "fake_avaterUrl.jpg",
-      "status": 0,
-      "role": 0
-    },
-    "sonComments": [],
-    "content": "my second comment",
-    "commentTime": "2025-03-08T04:43:49.000+00:00"
-  },
-  {
-    "id": 4,
-    "user": {
-      "id": 2,
-      "username": "lizsen",
-      "nickname": "lizhaosheng",
-      "avatarUrl": "fake_avaterUrl.jpg",
-      "status": 0,
-      "role": 0
-    },
-    "sonComments": [
-      {
-        "id": 8,
-        "user": {
-          "id": 1,
-          "username": "lindc",
-          "nickname": "ldc",
-          "avatarUrl": null,
-          "status": 0,
-          "role": 0
-        },
-        "rootId": 4,
-        "toComment": {
-          "id": 7,
-          "user": {
-            "id": 2,
-            "username": "lizsen",
-            "nickname": "lizhaosheng",
-            "avatarUrl": "fake_avaterUrl.jpg",
-            "status": 0,
-            "role": 0
-          },
-          "rootId": 4,
-          "content": "my first son comment",
-          "commentTime": "2025-03-08T05:13:28.000+00:00",
-          "isDelete": 0
-        },
-        "content": "this is also my first son comment",
-        "commentTime": "2025-03-08T05:15:13.000+00:00"
-      },
-      {
-        "id": 7,
-        "user": {
-          "id": 2,
-          "username": "lizsen",
-          "nickname": "lizhaosheng",
-          "avatarUrl": "fake_avaterUrl.jpg",
-          "status": 0,
-          "role": 0
-        },
-        "rootId": 4,
-        "toComment": null,
-        "content": "my first son comment",
-        "commentTime": "2025-03-08T05:13:28.000+00:00"
-      }
-    ],
-    "content": "my first comment",
-    "commentTime": "2025-03-08T04:43:36.000+00:00"
-  }
-])
-
 import BadgeComments from '@/components/Badge/BadgeComments.vue';
 import BadgeGoods from '@/components/Badge/BadgeGoods.vue'
 import BadgeStores from '@/components/Badge/BadgeStores.vue';
 import Brief from '@/components/Brief.vue';
 import Comment from '@/components/Comment.vue';
 import Header from '@/components/Header.vue'
-import { collect, deleteCollectList, getResource,addHistory, getAllCollect, likeResource, unlikeResource } from '@/utils/preRequest';
-import { onMounted, ref, watch } from 'vue'
+import { collect, deleteCollectList, getResource,addHistory, getAllCollect, likeResource, unlikeResource, getCommentList} from '@/utils/preRequest';
+import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useInfoStore from '@/store/info'
 import { limitTitle, locateHeight, popupMessageBox } from '@/utils/operate';
@@ -415,12 +333,45 @@ let storeState = ref(false)
 let showStore = ref(false)
 let storeList = ref([]) // 收藏夹数组
 
+const commentList = ref([])
+let paging = reactive({
+  currentPage: 1,
+  pageSize: 10, // 固定
+  totalCount:100
+})
+
+const getDataList = (current) => {
+  getCommentList(current, route.params.id, paging.pageSize).then((data) => {
+    if (data) {
+      commentList.value = data.records
+      paging.currentPage = data.current
+      paging.totalCount = data.total 
+    }
+  })
+}
+
+getDataList(1)
+
+// 根据点击的currentPage请求新的数据
+const currentChange = (val) => {
+  paging.currentPage = val
+  getDataList(val)
+}
+
+// 进行评论
+const commentOrReply = (content,rootId,told) => {
+  console.log(content, rootId, told)
+  
+}
+
+// 取消收藏
 const cancelStore = () => {
   storeState.value = false
   deleteCollectList(checkResult,[route.params.id])
   console.log("删除的posterid:", route.params.id)
 }
 
+// 判断是进行哪个回调
 const judgeStore = (trueCallback,falseCallback) => {
   if (storeState.value) {
     trueCallback()
@@ -494,6 +445,7 @@ const jump = () => {
   window.open(url)
 }
 
+// 移动到评论区位置
 const goComment = () => {
   locateHeight(commentRef.value.offsetTop - 64)
 }
@@ -525,13 +477,13 @@ const deleteBothComment = (id,rootId) => {
   // 接口
   // example
   if (rootId) {
-    for (let i = 0; i < example.value.length; i++){
-      const item = example.value[i]
+    for (let i = 0; i < commentList.value.length; i++){
+      const item = commentList.value[i]
       if (item.id == rootId) {
         const subs = item.sonComments
         for (let j = 0; j < subs.length; j++){
           if (subs[j].id == id) {
-            example.value[i].sonComments.splice(j, 1)
+            commentList.value[i].sonComments.splice(j, 1)
             break
           }
         }
@@ -540,9 +492,9 @@ const deleteBothComment = (id,rootId) => {
     }
   }
   else {
-    for (let i = 0; i < example.value.length; i++){
-      if (example.value[i].id == id) {
-        example.value.splice(i,1)
+    for (let i = 0; i < commentList.value.length; i++){
+      if (commentList.value[i].id == id) {
+        commentList.value.splice(i,1)
         break
       }
     }
