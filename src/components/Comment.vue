@@ -175,7 +175,7 @@ const deleteComment = () => {
 // 发送评论
 const sendResponse = () => {
   showReply.value = false
-  emits('sendResponse', textarea.value, props.comment.rootId, props.comment.id)
+  emits('sendResponse', textarea.value, props.comment.id, props.comment.id)
   textarea.value = ''
 }
 </script>
