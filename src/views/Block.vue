@@ -58,7 +58,7 @@
 
 <script setup>
 import useSystemStore from '@/store/system'
-import { getList } from '@/utils/preRequest'
+import { addEyes, getList } from '@/utils/preRequest'
 import { useRoute,useRouter } from 'vue-router'
 import { reactive, ref } from 'vue'
 import Bilibili from '@/components/Picture/Bilibili.vue'
@@ -120,6 +120,7 @@ const goBack = ()=>{
 
 // 前往具体资讯页面
 const goPoster = (id) => {
+  addEyes(id)
   let routeData = router.resolve({
     path :`/Poster/${id}`
   })

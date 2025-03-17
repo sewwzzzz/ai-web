@@ -246,7 +246,7 @@ import CheckBox from '@/components/CheckBox.vue';
 import HistoryBilibili from '@/components/History/HistoryBilibili.vue';
 import ToolButton from '@/components/ToolButton.vue'
 import useSystemStore from '@/store/system'
-import { deleteHistory, getHistory, getPlatform} from '@/utils/preRequest';
+import { addEyes, deleteHistory, getHistory, getPlatform} from '@/utils/preRequest';
 import { ref, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
@@ -372,6 +372,7 @@ const changeCheckState = (id) => {
 
 // 前往具体资讯页面
 const goPoster = (id) => {
+  addEyes(id)
   let routeData = router.resolve({
     path :`/Poster/${id}`
   })

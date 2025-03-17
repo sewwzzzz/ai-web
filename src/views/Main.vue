@@ -292,7 +292,7 @@ import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref} from 'vue'
 import { menu,tools} from '@/datas/config'
-import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform, getUserInfo} from '@/utils/preRequest'
+import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform, getUserInfo, addEyes} from '@/utils/preRequest'
 import { useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
 import useSystemStore from '@/store/system'
@@ -340,6 +340,7 @@ if (infoStore.token == '' && localStorage.getItem('token')) {
 
 // 前往具体资讯页面
 const goPoster = (id) => {
+  addEyes(id)
   let routeData = router.resolve({
     path :`/Poster/${id}`
   })

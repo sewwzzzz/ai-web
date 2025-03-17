@@ -49,7 +49,7 @@
 </style>
 
 <script setup>
-import { getList } from '@/utils/preRequest'
+import { addEyes, getList } from '@/utils/preRequest'
 import { ref,reactive, provide, watch } from 'vue'
 let dataList = ref([])
 import { useRouter } from 'vue-router'
@@ -102,6 +102,7 @@ const getDataList = (sourceId, searchText, current = 1, size = 30) => {
 
 // 前往具体资讯页面
 const goPoster = (id) => {
+  addEyes(id)
   let routeData = router.resolve({
     path :`/Poster/${id}`
   })

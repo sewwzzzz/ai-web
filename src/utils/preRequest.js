@@ -180,6 +180,21 @@ async function getList(current, size, sourceId, keywordId, searchText) {
   if (result) return result.data
 }
 
+// 浏览量+1
+async function addEyes(id) {
+  const params = {
+    id:id
+  }
+  const config = {
+    url: '/resource/view/increase',
+    method: 'PUT',
+    token: infoStore.token,
+    params:params
+  }
+  const result = await request(config)
+  console.log("浏览量+1:",result)
+}
+
 // 获取资源具体展示信息
 async function getResource(id) {
   const config = {
@@ -419,11 +434,11 @@ async function getCommentList(current, resourceId, size) {
 }
 
 // 添加评论
-async function comment(content, resourceId, told, rootId) {
+async function comment(content, resourceId, toId, rootId) {
   const params = {
     content: content,
     resourceId: resourceId,
-    told: told,
+    toId: toId,
     rootId: rootId,
     userId: infoStore.id
   }
@@ -435,6 +450,22 @@ async function comment(content, resourceId, told, rootId) {
   }
   const result = await request(config)
   if(result) return result.data
+}
+
+// 根据id获取评论
+async function getCommentById(id) {
+  const params = {
+    id:id
+  }
+  const config = {
+    url: '/resourceComment',
+    method: 'GET',
+    token: infoStore.token,
+    params:params
+  }
+  const result = await request(config)
+  console.log("根据id获取评论：", result)
+  return result.data
 }
 
 // 删除评论
@@ -460,6 +491,7 @@ export{
   getPlatform,
 
   getList,
+  addEyes,
   getResource,
 
   getHistory,
@@ -482,7 +514,7 @@ export{
   comment,
   deleteComment,
   getCommentList,
+  getCommentById,
 
-  
-  
+
 }

@@ -304,7 +304,7 @@ import BadgeStores from '@/components/Badge/BadgeStores.vue';
 import Brief from '@/components/Brief.vue';
 import Comment from '@/components/Comment.vue';
 import Header from '@/components/Header.vue'
-import { collect, deleteCollectList, getResource,addHistory, getAllCollect, likeResource, unlikeResource, getCommentList, deleteComment, comment} from '@/utils/preRequest';
+import { collect, deleteCollectList, getResource,addHistory, getAllCollect, likeResource, unlikeResource, getCommentList, deleteComment, comment, getCommentById} from '@/utils/preRequest';
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useInfoStore from '@/store/info'
@@ -359,14 +359,16 @@ const currentChange = (val) => {
 }
 
 // 进行评论
-const commentOrReply = async (content,rootId,told) => {
-  console.log(content, rootId, told)
-  const result = await comment(content, route.params.id, told, rootId)
+const commentOrReply = async (content,rootId,toId,toComment) => {
+  console.log(content, rootId, toId,toComment)
+  const id = await comment(content, route.params.id, toId, rootId)
+  const result = await getCommentById(id)
   if (result) {
     if (rootId == null) {
       commentList.value.unshift(result)
     }
     else {
+      result['toComment'] = toComment
       for (let i = 0; i < commentList.value.length; i++){
         if (commentList.value[i].id == result.rootId) {
           commentList.value[i].sonComments.unshift(result)
