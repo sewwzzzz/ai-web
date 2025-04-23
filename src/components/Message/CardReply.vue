@@ -1,17 +1,17 @@
 <template>
     <div class="reply">
-      <img class="reply-avatar" src="../../assets/img/AIWeb.png">
+      <img class="reply-avatar" :src="props.records.sendUser.avatarUrl">
       <div class="reply-content">
-        <div class="content-header">
-          <span class="review-name">{{ props.nickName }}</span>
+        <div class="content-header" @click="jumpTo(props.resourceId)">
+          <span class="review-name">{{ props.records.sendUser.nickname }}</span>
           <span class="review-font">回复了我的评论</span>
-          <div class="review-reply">{{ props.reply }}</div>
-          <div class="header-source">{{ props.source }}</div>
+          <div class="review-reply">{{ props.records.content }}</div>
+          <div class="header-source">{{ props.records.source }}</div>
         </div>
         <div class="content-footer">
-          <div class="footer-time">10月前</div>
+          <div class="footer-time">{{ props.records.sendTime }}</div>
           <FooterGoods></FooterGoods>
-          <FooterReply @reply=changeReplyState></FooterReply>
+          <FooterReply :is-comment="showReply" @reply=changeReplyState></FooterReply>
         </div>
         <div class="footer-input" v-show="showReply">
           <el-input
@@ -24,12 +24,27 @@
           >
           </el-input>
           <el-button class="input-button" type="primary" :disabled="textarea === ''?true:false">回复</el-button>
-      </div> 
+        </div> 
       </div>
     </div>
+    <div class="divider-line"></div>
 </template>
 
 <style scoped>
+.divider-line{
+  width:calc(100% - 76px);
+  height:0px;
+  border:rgb(227, 229, 231) 0.8px solid;
+  margin-left:76px;
+}
+
+
+hr{
+  margin-top:20px;
+  width:100%;
+  border:0.25px #bfc2c4 solid;
+}
+
 .reply{
   width:100%;
   height:fit-content;
@@ -118,27 +133,45 @@
 </style>
 
 <script setup>
+import { addEyes } from '@/utils/preRequest'
 import { defineProps, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+// const props = defineProps({
+//   avatar: {
+//     type:String,
+//   },
+//   nickName: {
+//     type: String,
+//     default:'周建辉'
+//   },
+//   reply: {
+//     type: String,
+//     default:'他回复了我的评论区信息'
+//   },
+//   source: {
+//     type: String,
+//     default:'吕德华真滴C！！！'
+//   }
+// })
 const props = defineProps({
-  avatar: {
-    type:String,
-  },
-  nickName: {
-    type: String,
-    default:'周建辉'
-  },
-  reply: {
-    type: String,
-    default:'他回复了我的评论区信息'
-  },
-  source: {
-    type: String,
-    default:'吕德华真滴C！！！'
+  records: {
+    type: Object,
   }
 })
 
+const textarea = ref('')
 const showReply = ref(false)
 const changeReplyState = (type) => {
   showReply.value = type
+}
+
+const jumpTo = function (id) {
+  addEyes(id)
+  let routeData = router.resolve({
+    path :`/Poster/${id}`
+  })
+  window.open(routeData.href,'_blank')
 }
 </script>

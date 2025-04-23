@@ -28,7 +28,7 @@
         </BadgeStores>
       </div>
       <div id="content-right">
-        <Brief :name="authorName"></Brief>
+        <Brief :keywordId="keywordId"></Brief>
       </div>
       <div id="content-title">
         {{ limitTitle(title,100)}}
@@ -319,6 +319,7 @@ let url = ''
 let coverUrl = ref('')
 let publishTime = ref('2025-2-28')
 let title = ref('')
+let keywordId = ref(0) 
 
 const commentRef = ref(null)
 let textarea = ref('')
@@ -443,6 +444,7 @@ const getPoster = () => {
     commentNum.value = data.commentCount
     title.value = data.title
     url = data.url
+    keywordId.value = data.keywordId
 })
 }
 

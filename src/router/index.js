@@ -9,7 +9,7 @@ const router = createRouter({
       component:()=>import(`../views/Main.vue`)
     },
     {
-      path: '/select',
+      path: '/search',
       name: 'select',
       component:()=>import(`../views/Select.vue`)
     },

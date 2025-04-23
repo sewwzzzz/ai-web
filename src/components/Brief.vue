@@ -1,36 +1,8 @@
 <template>
   <div id="brief-content">
     <div id="content-header">
-      <img id="header-avatar"/>
-      <div id="header-name">
-        {{ props.name }}
-      </div>
-    </div>
-    <div id="content-article">
-      <div class="article-data">
-        <div>
-          114
-        </div>
-        <div class="data-name">
-          贡献
-        </div>
-      </div>
-      <div class="article-data">
-        <div>
-          114
-        </div>
-        <div class="data-name">
-          获赞
-        </div>
-      </div>
-      <div class="article-data">
-        <div>
-          114
-        </div>
-        <div class="data-name">
-          订阅量
-        </div>
-      </div>
+      <!-- <img id="header-avatar"/> -->
+      {{ keyWord?keyWord.name:'' }}
     </div>
     <el-button id="content-footer" :type="state" @click="updateState()">
       <el-icon v-if="state === ''">
@@ -48,7 +20,7 @@
 #brief-content{
   padding:20px;
   box-sizing: content-box;
-  height:170px;
+  height:100px;
   width:300px;
   background-color: white;
   display: flex;
@@ -58,6 +30,8 @@
   width:100%;
   height: 50px;
   display:flex;
+  justify-content: center;
+  align-items: center;
 }
 #header-avatar{
   width:50px;
@@ -105,30 +79,27 @@
 </style>
 
 <script setup>
-import { defineProps, ref } from 'vue'
+import { computed, defineProps, ref } from 'vue'
+import useSystemStore from '@/store/system'
+import { updateSubscription } from '@/utils/preRequest';
+
+
+const systemStore = useSystemStore();
 
 const props = defineProps({
-  avatar: {
-    type:String,
-  },
-  name: {
-    type: String,
-  },
-  number: {
-    type:Array
-  },
-  address: {
-    type:Array
-  },
-  isSubscribe:{
-    type: Boolean,
-    default:false,
+  keywordId: {
+    type:Number,
   }
 })
-let state = props.isSubscribe ? ref('') : ref('primary')
+let keyWord = ref(systemStore.menuTitle.filter((x)=> x.id === props.keywordId)[0])
+console.log("keyword",keyWord.value)
+let state = computed(() => {
+  return keyWord.value.status ? '' : 'primary'
+})
 
 // 更新作者简介的'订阅'状态
 const updateState = function () {
-  state.value = state.value === '' ? 'primary' : ''
+  keyWord.value.status = !keyWord.value.status
+  updateSubscription(keyWord.value.subscribeId, keyWord.value.status);
 }
 </script>

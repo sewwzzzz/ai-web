@@ -15,7 +15,12 @@
 </template>
 
 <style scoped>
-
+::v-deep .el-sub-menu__title::before{
+  content:'●';
+  color:red;
+  font-size:5px;
+  margin-right:3px;
+}
 </style>
 
 <script setup>

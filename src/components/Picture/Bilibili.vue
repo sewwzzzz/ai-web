@@ -2,7 +2,7 @@
   <!-- <SvgIcon id="x" name="comments"></SvgIcon> -->
   <div>
     <div id="bilibili-content">
-      <img id="content-img" :src="props.records.coverUrl">
+      <img id="content-img" v-lazy="props.records.coverUrl">
       <div id="content-count">
         <div class="count-box">
           <SvgIcon class="box-icon" name="view"></SvgIcon>

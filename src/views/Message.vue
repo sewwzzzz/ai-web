@@ -15,7 +15,9 @@
       </div>
       <div id="content-right">
         <div id="right-title">{{ currentMenu }}</div>
-        <RouterView class="right-content"></RouterView> 
+        <router-view v-slot="{ Component }"  class="right-content">
+          <component ref="childComponent" :is="Component" />
+        </router-view>
       </div>
     </div>
   </div>
@@ -24,8 +26,6 @@
 
 <style scoped>
 #message{
-  background-color:rgb(199, 230, 229);
-  overflow:hidden; 
   display:flex;
   flex-direction:column;
   width:100%;
@@ -130,8 +130,9 @@
 import SvgIcon from '@/components/SvgIcon.vue'
 import { messageMenu } from '@/datas/config'
 import {watch,ref, onMounted, onUnmounted} from 'vue'
-import { useRoute,useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const childComponent = ref()
 const router = useRouter()
 const route = useRoute()
 let ul = ref(null)
@@ -157,6 +158,9 @@ watch(
   route,
   (newVal) => {
     setMenu(newVal.meta.messageCode)
+    // if (newVal.meta.messageCode === 'reply') {
+    //   nextTick(() => { childComponent.value.getDataList() })
+    // }
   },
   {immediate:true,deep:true}
 )

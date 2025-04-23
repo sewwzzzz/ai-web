@@ -35,92 +35,92 @@ const useSystemStore = defineStore('system', {
         },
         {
           name: 'Numpy',
-          id: 1,
+          id: 7,
           blockId:2
         },
         {
           name: 'Pandas',
-          id: 2,
+          id: 8,
           blockId:2
         },
         {
           name: '数据分析与实战',
-          id: 3,
+          id: 9,
           blockId:2
         },
         {
           name: 'Pytorch',
-          id: 4,
+          id: 10,
           blockId:2
         },
         {
           name: 'TenserFlow',
-          id: 5,
+          id: 11,
           blockId:2
         },
         {
           name: '机器学习理论',
-          id: 1,
+          id: 12,
           blockId:3
         },
         {
           name: '机器学习实战',
-          id: 2,
+          id: 13,
           blockId:3
         },
         {
           name: '深度学习理论',
-          id: 1,
+          id: 14,
           blockId:4
         },
         {
           name: '深度学习实战',
-          id: 2,
+          id: 15,
           blockId:4
         },
         {
           name: '图像分类',
-          id: 1,
+          id: 16,
           blockId:5
         },
         {
           name: '目标检测',
-          id: 2,
+          id: 17,
           blockId:5
         },
         {
           name: '图像分割',
-          id: 3,
+          id: 18,
           blockId:5
         },
         {
           name: '目标跟踪',
-          id: 4,
+          id: 19,
           blockId:5
         },
         {
           name: '图像生成',
-          id: 5,
+          id: 20,
           blockId:5
         },
         {
           name: '文本分类',
-          id: 1,
+          id: 21,
           blockId:6
         },
         {
           name: '文本匹配',
-          id: 2,
+          id: 22,
           blockId:6
         },
         {
           name: '文本生成',
-          id: 3,
+          id: 23,
           blockId:6
         },
         {
           name: '序列标注',
-          id: 4,
+          id: 24,
           blockId:6
         },
       ],

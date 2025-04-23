@@ -479,6 +479,91 @@ async function deleteComment(id) {
   console.log("删除评论：",result)
 }
 
+// 分页获取消息
+async function getMessage(current, size) {
+  const params = {
+    current: current,
+    size: size,
+    userId:infoStore.id
+  }
+  const config = {
+    url: '/message',
+    method: 'GET',
+    token: infoStore.token,
+    params:params
+  }
+  const result = await request(config)
+  if(result) return result.data
+}
+
+// 修改消息状态
+async function readedState(id) {
+  const data = {
+    id:id,
+  }
+  const config = {
+    url: "/message",
+    method: 'PUT',
+    token: infoStore.token,
+    data:data
+  }
+  const result = await request(config)
+  if(result) return result.data
+}
+
+// 查看用户订阅状态
+async function getSubscriptionList() {
+  const params = {
+    userId:infoStore.id
+  }
+  const config = {
+    url: "/subscription",
+    method: 'GET',
+    token: infoStore.token,
+    params: params,
+  }
+  const result = await request(config);
+  if (result) {
+    result.data.forEach((item) => {
+      const menuItem = systemStore.menuTitle.filter((x) => x.id === item.keywordId)
+      menuItem.status = item.status
+      menuItem.subscribeId = item.id
+    })
+  }
+}
+
+// 订阅关键字
+async function subscribe(id) {
+  const data = {
+    keywordId: id,
+    userId: infoStore.id
+  }
+  const config = {
+    url: '/subscription',
+    method: 'POST',
+    data: data,
+    token:infoStore.token
+  }
+  const result = request(config)
+  if(result) return result.data
+}
+
+// 修改订阅状态
+async function updateSubscription(id, status) {
+  const data = {
+    id: id,
+    status: status
+  }
+  const config = {
+    url: 'subscription',
+    method: 'PUT',
+    data: data,
+    token: infoStore.token
+  }
+  const result = request(config)
+  if(result) return result.data
+}
+
 export{
   register,
   login,
@@ -516,5 +601,10 @@ export{
   getCommentList,
   getCommentById,
 
+  getMessage,
+  readedState,
 
+  getSubscriptionList,
+  subscribe,
+  updateSubscription
 }

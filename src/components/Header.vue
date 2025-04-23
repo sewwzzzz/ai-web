@@ -30,8 +30,11 @@
       <div id="header-right">
         <img v-if="infoStore.id" id="right-avatar" @click="touchAvatar" :src="infoStore.avatarUrl">
         <div  v-else id="right-avatar" @click="touchLogin">登录</div>
-        <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title" @click="jumpTools(item)">
-        </ToolIcon>
+        <div v-for="(item,index) in tools" :key="index" class="right-icon" @click="jumpTools(item)">
+          <ToolIcon :name="item.name" :title="item.title">
+          </ToolIcon>
+          <div v-show="item.title === '消息'" class="right-number">20</div>
+        </div>
       </div>
     </div>
   </div>
@@ -39,6 +42,24 @@
 
 
 <style scoped>
+.right-icon{
+  position:relative;
+}
+
+.right-number{
+  position:absolute;
+  right:-6px;
+  top:-4px;
+  border-radius: 50%;
+  width:16px;
+  height:16px;
+  text-align: center;
+  font-size: 12px;
+  color: #e0dbdb;
+  background-color: red;
+  /* border:1px white solid; */
+}
+
 #main-login{
   position:fixed;
   top:50%;

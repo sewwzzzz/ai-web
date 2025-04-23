@@ -16,6 +16,7 @@
     "unplugin-auto-import": "^0.16.1",
     "unplugin-vue-components": "^0.25.0",
     "vue": "^3.2.13",
+    "vue-lazyload": "^3.0.0",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {

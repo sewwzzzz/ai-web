@@ -292,7 +292,7 @@ import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
 import { onBeforeUnmount, onMounted, ref} from 'vue'
 import { menu,tools} from '@/datas/config'
-import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform, getUserInfo, addEyes} from '@/utils/preRequest'
+import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform, getUserInfo, addEyes, getSubscriptionList} from '@/utils/preRequest'
 import { useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
 import useSystemStore from '@/store/system'
@@ -316,7 +316,7 @@ let imgFile
 let hashmap = ref(new Map())
 const dataList = ref({})
 
-Promise.all([getBlockList(), getKeyWord(), getPlatform()]).then(() => {
+Promise.all([getBlockList(), getKeyWord(), getSubscriptionList() ,getPlatform()]).then(() => {
   // 根据不同的blockID记录展示的关键词和平台的内容
   for (let key in menu) {
     const temp = menu[key]
