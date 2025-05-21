@@ -2,7 +2,8 @@
   <!-- <SvgIcon id="x" name="comments"></SvgIcon> -->
   <div>
     <div id="bilibili-content">
-      <img id="content-img" v-lazy="props.records.coverUrl">
+      <img v-if="props.records.coverUrl" id="content-img" :src="coverUrl">
+      <SvgIcon v-else :name="coverUrl" id="content-img"></SvgIcon>
       <div id="content-count">
         <div class="count-box">
           <SvgIcon class="box-icon" name="view"></SvgIcon>
@@ -20,14 +21,14 @@
     </div>
     <div id="bilibili-title">{{ limitTitle(props.records.title )}}</div>
     <div id="bilibili-footer">
-      <SvgIcon class="box-icon" name="bilibili"></SvgIcon>
-      <div>{{ props.records.authorName }}</div>
-      <div>{{ props.records.publishTime }}</div>
+      <div>{{ limitTitle(props.records.authorName,10) }}</div>
+      <div>{{ limitTime(props.records.publishTime) }}</div>
     </div>
   </div>
 </template>
 
 <style scoped>
+
 
 #bilibili-content{
   width:100%;
@@ -44,17 +45,21 @@
 #content-count{
   position:absolute;
   left:0;
-  bottom:5px;
+  bottom: 0px;
+  width:100%;
+  height:25px;
   display:flex;
+  align-items:center;
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .5) 100%);
 }
 
 .count-box{
   display:flex;
   margin-right:10px;
   gap:3px;
-  color:aliceblue;
+  color:rgb(255, 255, 255);
   font-family: PingFang SC, HarmonyOS_Medium, Helvetica Neue, Microsoft YaHei, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   margin-left: 5px;
 }
 
@@ -85,13 +90,25 @@
 
 <script setup>
 
-import { limitTitle } from '@/utils/operate';
-import { defineProps } from 'vue'
+import { limitTime, limitTitle } from '@/utils/operate';
+import { computed, defineProps } from 'vue'
+import useSystemStore from '@/store/system'
+const systemStore = useSystemStore();
 const props = defineProps({
   records: {
     type:Object,
   }
 })
+
+
+const coverUrl = computed(() => {
+  if (systemStore.platform.length === 5) {
+    return props.records.coverUrl ? props.records.coverUrl : systemStore.platform.filter((x) => {
+      return x.id === props.records.sourceId
+    })[0].name
+  }
+  return ''
+}) 
 
 </script>
 

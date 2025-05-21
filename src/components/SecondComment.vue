@@ -4,16 +4,16 @@
     <div id="right-comment">
       <div id="comment-header">
         <div id="header-name">
-          {{ props.subComment.user.nickname?props.subComment.user.nickname:'未知用户' }}
-          <span> {{ props.subComment.toComment?`回复 ${props.subComment.toComment.isDelete?'已删除 :':props.subComment.toComment.user.nickname} :`:''}}</span>
+          {{ props.subComment.user.nickname?limitTitle(props.subComment.user.nickname,8):'未知用户' }}
+          <span> {{ props.subComment.toComment?`回复 ${props.subComment.toComment.isDelete?'已删除':limitTitle(props.subComment.toComment.user.nickname,8)} :`:': '}}</span>
         </div>
         <div id="header-content">
            {{ props.subComment.content }}
         </div>
       </div>
       <div id="comment-footer">
-        <div id="footer-time">{{ props.subComment.commentTime }}</div>
-        <FooterGoods></FooterGoods>
+        <div id="footer-time">{{ limitTime(props.subComment.commentTime) }}</div>
+        <!-- <FooterGoods></FooterGoods> -->
         <FooterReply :is-comment="showReply" @reply="updateReplyState"></FooterReply>
         <SvgIcon v-show="props.subComment.user.id == infoStore.id" name="deletecomment" class="delete-icon" @click="visible = true">
         </SvgIcon>
@@ -49,17 +49,16 @@
   flex-shrink: 0;
 }
 #right-comment{
-  flex:1;
+  width: calc(100% - 34px);
 }
 #comment-header{
-  display:flex;
-  align-items: center;
+  width: 100%;
+  display: flex;
 }
 #header-name{
-  height:24px;
-  line-height:24px;
   font-size: 14px;
   color:#61666D;
+  flex-shrink: 0;
 }
 
 #header-name span{
@@ -67,9 +66,9 @@
 }
 #header-content{
   line-height: 16px;
-  height:16px;
   font-size: 16px;
-  margin-left:5px;
+  word-wrap:break-word;
+  flex: 1;
 }
 #comment-footer{
   width:100%;
@@ -144,9 +143,9 @@
 
 <script setup>
 import { ref,defineProps,defineEmits } from 'vue'
-import FooterGoods from './Footer/FooterGoods.vue'
 import FooterReply from './Footer/FooterReply.vue'
 import useInfoStore from '@/store/info'
+import { limitTime, limitTitle } from '@/utils/operate'
 
 const infoStore = useInfoStore()
 let showReply = ref(false)
@@ -193,7 +192,7 @@ const props = defineProps({
 const updateReplyState = function (state) {
   showReply.value = state
   if(state)textarea.value = ''
-  console.log(state)
+  // console.log(state)
 }
 
 // 传递删除消息

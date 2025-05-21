@@ -1,5 +1,5 @@
 <template>
-  <div id="collect-edit" v-show="showMove">
+  <!-- <div id="collect-edit" v-show="showMove">
       <Dialog title="移动到" @exit="cancelDialog" @act="moveFavlist">
         <template v-slot:dialog-content>
           <div id="dialog-list">
@@ -12,8 +12,26 @@
           </div>
         </template>
       </Dialog>
+  </div> -->
+  <!-- <div id="collect-mask" v-show="showMove"></div> -->
+  <el-dialog v-model="showMove" title="移动资讯" width="500">
+    <div id="dialog-list">
+      <div :class="[checked == item.id?'list-sure':'list']" v-for="(item) in collectList" :key="item.id" @click="selectId(item.id)">
+        <SvgIcon name="folder" class="icon"></SvgIcon>
+        <div>
+          {{ limitTitle(item.name) }}
+        </div>
+      </div>
     </div>
-  <div id="collect-mask" v-show="showMove"></div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancelDialog">Cancel</el-button>
+        <el-button type="primary" @click="moveFavlist">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
   <div id="collect">
     <AsideMenu id="collect-menu" :collect-list="collectList" @get-fav-list="getFavList" @clear-fav-list="clearDataList" @getCollect="getCollect"></AsideMenu>
     <div id="collect-content">
@@ -60,10 +78,10 @@
           <Bilibili :records="item"></Bilibili>
         </div>
       </div>
-      <div v-show="!infoStore.id" id="unlogin">
+      <div v-show="infoStore.id <= 0" id="unlogin">
         <UnLogin></UnLogin>
       </div>
-      <div v-show="infoStore.id && dataList.length" id="content-footer">
+      <div v-show="infoStore.id > 0 && dataList.length" id="content-footer">
         <Pagination id="footer-pagination" :paging = paging @sizeChange="sizeChange" @currentChange="currentChange"></Pagination>
       </div>
     </div>
@@ -324,8 +342,9 @@ const getCollect = () => {
 
 // 参考b站只要登陆状态发生变化且id存在才能发送用户收藏夹
 watch(()=>infoStore.id, (val) => {
-  if (val) {
+  if (val > 0) {
     getCollect()
+    dataList.value = []
   }
 }, {
   immediate: true
@@ -396,6 +415,7 @@ const getFavList = (id) => {
 const changeAllState = () => {
   checkAll.value = !checkAll.value
   const datas = dataList.value.filter((item) => item.sourceId == currentMenu.value)
+  // console.log("收藏夹内容",datas)
   if (checkAll.value) {
     for (let x of datas) {
       checkList[x.id] = true
@@ -420,8 +440,8 @@ const deleteCheck = async() => {
 // 分页数据
 let paging = reactive({
   currentPage: 1,
-  pageSize: 30,
-  totalCount: 400,
+  pageSize: 10,
+  totalCount: 0,
 })
 
 const clearDataList = () => {
@@ -455,7 +475,8 @@ const getDataList = (collectionId, searchText = '', current = 1, size = paging.p
 // 页数据量变化
 const sizeChange = (val) => {
   paging.pageSize = val
-  getDataList(collectionId.value, searchText.value ,paging.currentPage,paging.pageSize)
+  paging.currentPage = 1
+  getDataList(collectionId.value, searchText.value ,1,paging.pageSize)
 }
 
 // 当前页号变化

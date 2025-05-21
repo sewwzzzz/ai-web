@@ -1,7 +1,7 @@
 <template>
   <div id="badge-content" @click="updateState()">
-    <SvgIcon name="goods" :class="[isA?'content-icon-sure':'content-icon']"></SvgIcon>
-    <div :class="[isA?'content-number-sure':'content-number']">{{ props.number }}</div>
+    <SvgIcon name="goods" :class="[props.isActive?'content-icon-sure':'content-icon']"></SvgIcon>
+    <div :class="[props.isActive?'content-number-sure':'content-number']">{{ props.number }}</div>
   </div>
 </template>
 
@@ -62,9 +62,12 @@
 </style>
 
 <script setup>
-import { defineProps, defineEmits} from 'vue'
-import SvgIcon from '../SvgIcon.vue';
+import { defineProps, defineEmits, ref} from 'vue'
+import SvgIcon from '../SvgIcon.vue'
+import useInfoStore from '@/store/info'
+import { commitMessage } from '@/utils/operate'
 
+const infoStore = useInfoStore()
 const props = defineProps({
   number: {
     type: Number,
@@ -76,14 +79,15 @@ const props = defineProps({
   },
 })
 
-let isA = props.isActive
-
 const emits = defineEmits(['update:number','like'])
 // 点击后更新'点赞'徽章状态
 const updateState = function () {
-  isA = !isA
-  let num = props.number + (isA?1:-1)
-  emits('update:number', num)
-  emits('like',isA)
+  if (infoStore.id <= 0) {
+    commitMessage('warning','请先登录')
+    return
+  }
+  // console.log("infoStore的id",infoStore.id)
+  let num = props.number + (!props.isActive?1:-1)
+  emits('like',!props.isActive,num)
 }
 </script>

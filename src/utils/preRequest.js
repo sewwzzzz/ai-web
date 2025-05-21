@@ -22,9 +22,9 @@ async function register(userName, password,checkPassword) {
     method: 'POST'
   }
   const result = await request(config)
-  console.log('register响应结果->', result)
+  // console.log('register响应结果->', result)
   if (result) {
-    commitMessage('success', result.description)
+    commitMessage('success', '注册成功')
   }
 }
 
@@ -41,12 +41,13 @@ async function login(userName, password) {
     method: 'POST'
   }
   const result = await request(config)
-  console.log('login响应结果->', result)
+  // console.log('login响应结果->', result)
   if (result) {
+    if(!infoStore.token) commitMessage('success', '登陆成功')
     infoStore.setToken(result.data)
     localStorage.setItem('token', result.data)
+    localStorage.setItem('password',password)
     getUserInfo()
-    commitMessage('success', result.description)
     return true
   }
   return false
@@ -55,13 +56,16 @@ async function login(userName, password) {
 // 获取当前用户信息
 async function getUserInfo() {
   const token = infoStore.token ? infoStore.token : localStorage.getItem('token')
+  if (token === null) {
+    return;
+  }
   const config = {
     url: '/user/current',
     method: 'GET',
     token: token,
   }
   const result = await request(config)
-  console.log('getUserInfo响应结果->', result)
+  // console.log('getUserInfo响应结果->', result)
   if (result) {
     const data = result.data
     infoStore.setToken(token)
@@ -86,7 +90,7 @@ async function uploadFile(file) {
     }
   }
   const result = await request(config)
-  console.log('uploadFile响应结果->', result)
+  // console.log('uploadFile响应结果->', result)
   if (result) {
     return result.data
   }
@@ -108,9 +112,11 @@ async function updateUserInfo(nickName , avatarUrl) {
   }
   const result = await request(config)
   if (result) {
-    infoStore.nickName = nickName
-    infoStore.avatarUrl = avatarUrl
-    sendInfoMessage()
+    await login(infoStore.userName, localStorage.getItem('password'))
+    getUserInfo()
+    // infoStore.nickName = nickName
+    // infoStore.avatarUrl = avatarUrl
+
   }
 }
 
@@ -124,9 +130,20 @@ async function getBlockList() {
   const result = await request(config)
   if (result) {
     const data = result.data
-    console.log(data)
+    // console.log(data)
     data.forEach((item) => {
-      menu[item.name].blockId = item.id
+      if (menu[item.name]) {
+        menu[item.name].blockId = item.id
+      }
+      // 后来新加的板块
+      else {
+        menu[item.name] = {
+          title: item.name,
+          blockId: item.id,
+          icon: 'iconfont icon-new',
+          scrollHeight: 1893
+        }
+      }
     })
     return 
   }
@@ -156,12 +173,14 @@ async function getPlatform() {
   const result = await request(config)
   if (result) {
     systemStore.setPlatform(result.data)
+    // console.log("平台信息",result);
     return
   }
 }
 
 // 根据分页条件获取资源
 async function getList(current, size, sourceId, keywordId, searchText) {
+  if(sourceId === null) return
   const params = {
     current: current,
     size: size,
@@ -176,7 +195,7 @@ async function getList(current, size, sourceId, keywordId, searchText) {
     token:infoStore.token
   }
   const result = await request(config)
-  console.log("getList响应结果:",result)
+  // console.log("getList响应结果:",result)
   if (result) return result.data
 }
 
@@ -188,11 +207,10 @@ async function addEyes(id) {
   const config = {
     url: '/resource/view/increase',
     method: 'PUT',
-    token: infoStore.token,
     params:params
   }
   const result = await request(config)
-  console.log("浏览量+1:",result)
+  // console.log("浏览量+1:",result)
 }
 
 // 获取资源具体展示信息
@@ -227,6 +245,9 @@ async function getHistory(current, size, searchText) {
 
 // 增加浏览历史记录
 async function addHistory(id) {
+  if (infoStore.id <= 0) {
+    return;
+  }
   const data = {
     resourceId: id,
     userId:infoStore.id
@@ -235,10 +256,11 @@ async function addHistory(id) {
     url: '/browsingHistory',
     token: infoStore.token,
     method: 'POST',
-    data:data
+    data: data,
+    type:'application/json'
   }
   const result = await request(config)
-  console.log("添加一条历史记录",result)
+  // console.log("添加一条历史记录",result)
 }
 
 // 删除某个历史记录
@@ -248,15 +270,18 @@ async function deleteHistory(ids) {
     token: infoStore.token,
     method: 'DELETE',
     params: {
-      ids:ids
+      ids:ids.join(',')
     }
   }
   const result = await request(config)
-  console.log("删除一堆历史记录",result)
+  // console.log("删除一堆历史记录",result)
 }
 
 // 获取用户所有收藏夹
 async function getAllCollect() {
+  if (infoStore.id <= 0) {
+    return;
+  }
   const config = {
     url: '/collection/list',
     method: 'GET',
@@ -266,7 +291,7 @@ async function getAllCollect() {
     }
   }
   const result = await request(config)
-  console.log("所有收藏夹", result)
+  // console.log("所有收藏夹", result)
   if (result) {
     return result.data
   }
@@ -282,14 +307,18 @@ async function editCollectName(id, name) {
     url: '/collection',
     method: 'PUT',
     token: infoStore.token,
-    data: data
+    data: data,
+    type:'application/json'
   }
   const result = await request(config)
-  console.log("修改收藏夹名称:", result)
+  // console.log("修改收藏夹名称:", result)
 }
 
 // 新建收藏夹
 async function newCollect(name) {
+  if (infoStore.id <= 0) {
+    return;
+  }
   const data = {
     name: name,
     userId:infoStore.id
@@ -298,10 +327,11 @@ async function newCollect(name) {
     url: '/collection',
     method: 'POST',
     token: infoStore.token,
-    data:data
+    data: data,
+    type:'application/json'
   }
   const result = await request(config)
-  console.log("新建收藏夹:", result)
+  // console.log("新建收藏夹:", result)
 }
 
 // 删除收藏夹
@@ -312,7 +342,7 @@ async function deleteCollect(id) {
     token: infoStore.token,
   }
   const result = await request(config)
-  console.log('删除收藏夹结果:',result)
+  // console.log('删除收藏夹结果:',result)
 }
 
 // 根据收藏夹id获取当前内容
@@ -331,14 +361,14 @@ async function getCollectList(collectionId,searchText,current,size) {
     token:infoStore.token
   }
   const result = await request(config)
-  console.log("获得的收藏夹内容", result)
+  // console.log("获得的收藏夹内容", result)
   return result.data
 }
 
 // 移动到另一个收藏夹
 async function moveCollect(resourceIds,sourceCollectionId, destCollectionId) {
   const params = {
-    resourceIds: resourceIds,
+    resourceIds: resourceIds.join(),
     destCollectionId: destCollectionId,
     sourceCollectionId:sourceCollectionId
   }
@@ -349,14 +379,14 @@ async function moveCollect(resourceIds,sourceCollectionId, destCollectionId) {
     params:params
   }
   const result = await request(config)
-  console.log("移动到另一收藏夹:",result)
+  // console.log("移动到另一收藏夹:",result)
 }
 
 // 删除收藏夹内容
 const deleteCollectList = async (collectionId, resourceIds) => {
   const params = {
     collectionId: collectionId,
-    resourceIds:resourceIds
+    resourceIds:resourceIds.join(',')
   }
   const config = {
     url: '/collectionResource',
@@ -365,7 +395,7 @@ const deleteCollectList = async (collectionId, resourceIds) => {
     params:params
   }
   const result = await request(config)
-  console.log("删除收藏夹内容:",result)
+  // console.log("删除收藏夹内容:", result)
 } 
 
 // 收藏内容
@@ -381,7 +411,8 @@ const collect = async (resourceId, collectionId) => {
     params:params
   }
   const result = await request(config)
-  console.log("收藏内容:",result)
+  // console.log("收藏内容:", result)
+  if(result) commitMessage('success','收藏成功')
 }
 
 // 点赞资讯
@@ -397,7 +428,8 @@ async function likeResource(resourceId) {
     method:'POST'
   }
   const result = await request(config)
-  console.log("点赞资讯结果:",result)
+  // console.log("点赞资讯结果:", result)
+  if(result) return true
 }
 
 // 取消点赞资讯
@@ -413,7 +445,8 @@ async function unlikeResource(resourceId) {
     method:'DELETE'
   }
   const result = await request(config)
-  console.log("取消点赞资讯结果:",result)
+  // console.log("取消点赞资讯结果:", result)
+  if(result) return true
 }
 
 // 获取资讯评论
@@ -433,8 +466,31 @@ async function getCommentList(current, resourceId, size) {
   if(result) return result.data
 }
 
+// 查看用户是否点赞某条资讯
+async function selectLike(resourceId) {
+  if (infoStore.id <= 0) {
+    return 
+  }
+  const params = {
+    resourceId: resourceId,
+    userId: infoStore.id
+  }
+  const config = {
+    url: '/resourceLike/clicked',
+    params: params,
+    method: 'GET',
+    token:infoStore.token
+  }
+  const result = await request(config)
+  if(result) return result.data
+}
+
 // 添加评论
 async function comment(content, resourceId, toId, rootId) {
+  if (infoStore.id <= 0) {
+    commitMessage('warning', '请先登录')
+    return
+  }
   const params = {
     content: content,
     resourceId: resourceId,
@@ -446,7 +502,7 @@ async function comment(content, resourceId, toId, rootId) {
     url: '/resourceComment',
     method: 'POST',
     params: params,
-    token:infoStore.token
+    token: infoStore.token
   }
   const result = await request(config)
   if(result) return result.data
@@ -464,8 +520,8 @@ async function getCommentById(id) {
     params:params
   }
   const result = await request(config)
-  console.log("根据id获取评论：", result)
-  return result.data
+  // console.log("根据id获取评论：", result)
+  if(result) return result.data
 }
 
 // 删除评论
@@ -476,7 +532,7 @@ async function deleteComment(id) {
     token:infoStore.token
   }
   const result = await request(config)
-  console.log("删除评论：",result)
+  // console.log("删除评论：",result)
 }
 
 // 分页获取消息
@@ -499,20 +555,43 @@ async function getMessage(current, size) {
 // 修改消息状态
 async function readedState(id) {
   const data = {
-    id:id,
+    id: id,
+    status:1
   }
   const config = {
     url: "/message",
     method: 'PUT',
     token: infoStore.token,
-    data:data
+    data: data,
+    type:'application/json'
   }
   const result = await request(config)
   if(result) return result.data
 }
 
+// 删除消息
+async function deleteNotice(id) {
+  const data = {
+    id:id
+  }
+  const config = {
+    url: '/message',
+    method: 'DELETE',
+    token: infoStore.token,
+    data: data,
+    type:'application/json'
+  }
+  const result = await request(config)
+  if (result) {
+    commitMessage('success','删除成功')
+  }
+}
+
 // 查看用户订阅状态
 async function getSubscriptionList() {
+  if (infoStore.id <= 0) {
+    return;
+  }
   const params = {
     userId:infoStore.id
   }
@@ -524,16 +603,20 @@ async function getSubscriptionList() {
   }
   const result = await request(config);
   if (result) {
-    result.data.forEach((item) => {
-      const menuItem = systemStore.menuTitle.filter((x) => x.id === item.keywordId)
-      menuItem.status = item.status
-      menuItem.subscribeId = item.id
-    })
+    systemStore.subscribeList = result.data
+    // systemStore.subscribeList.forEach((item) => {
+    //   item.status = 1
+    // })
+    // console.log("订阅列表",result.data)
   }
 }
 
 // 订阅关键字
 async function subscribe(id) {
+  if (infoStore.id <= 0) {
+    commitMessage('warning','请先登录')
+    return;
+  }
   const data = {
     keywordId: id,
     userId: infoStore.id
@@ -542,25 +625,43 @@ async function subscribe(id) {
     url: '/subscription',
     method: 'POST',
     data: data,
+    token: infoStore.token,
+    type:'application/json'
+  }
+  const result = await request(config)
+  // console.log("订阅关键字",result)
+}
+
+// 取消订阅状态
+async function unSubsribe(id) {
+  if (infoStore.id <= 0) {
+    commitMessage('warning','请先登录')
+    return;
+  }
+  const config = {
+    url: `/subscription/${id}`,
+    method: 'DELETE',
     token:infoStore.token
   }
-  const result = request(config)
-  if(result) return result.data
+  const result = await request(config)
+  // console.log('取消订阅状态',result)
 }
 
 // 修改订阅状态
 async function updateSubscription(id, status) {
+  if(infoStore.id <= 0) return 
   const data = {
     id: id,
     status: status
   }
   const config = {
-    url: 'subscription',
+    url: '/subscription',
     method: 'PUT',
     data: data,
-    token: infoStore.token
+    token: infoStore.token,
+     type:'application/json'
   }
-  const result = request(config)
+  const result = await request(config)
   if(result) return result.data
 }
 
@@ -595,6 +696,7 @@ export{
 
   likeResource,
   unlikeResource,
+  selectLike,
 
   comment,
   deleteComment,
@@ -603,8 +705,10 @@ export{
 
   getMessage,
   readedState,
+  deleteNotice,
 
   getSubscriptionList,
   subscribe,
+  unSubsribe,
   updateSubscription
 }

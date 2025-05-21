@@ -1,6 +1,6 @@
 <template>
-  <div id="store-edit" v-show="showStore">
-      <Dialog @exit="cancelDialog" @act="storeFavlist">
+  <!-- <div id="store-edit" v-show="showStore">
+      <Dialog @exit="cancelDialog" title="收藏资讯" @act="storeFavlist">
         <template v-slot:dialog-content>
           <div id="dialog-list">
             <div :class="[checked == item.id?'list-sure':'list']" v-for="(item) in storeList" :key="item.id" @click="selectId(item.id)">
@@ -13,18 +13,36 @@
         </template>
       </Dialog>
     </div>
-  <div id="store-mask" v-show="showStore"></div>
+  <div id="store-mask" v-show="showStore"></div> -->
+  <el-dialog v-model="showStore" title="收藏资讯" width="500">
+    <div id="dialog-list">
+      <div :class="[checked == item.id?'list-sure':'list']" v-for="(item) in storeList" :key="item.id" @click="selectId(item.id)">
+        <SvgIcon name="folder" class="icon"></SvgIcon>
+        <div>
+          {{ limitTitle(item.name) }}
+        </div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancelDialog">Cancel</el-button>
+        <el-button type="primary" @click="storeFavlist">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
   <div id="poster">
     <div id="poster-header">
       <Header></Header>
     </div>
     <div id="poster-content">
       <div id="content-left">
-        <BadgeGoods v-model:number="goodNum" @like="likeOrUnlike">
+        <BadgeGoods @like="likeOrUnlike" :number="goodNum" :is-active="isActive">
         </BadgeGoods>
         <BadgeComments :number="commentNum" @go-comment="goComment">
         </BadgeComments>
-        <BadgeStores :is-active="storeState" @go-store="judgeStore(cancelStore,showDialog)">
+        <BadgeStores @go-store="judgeStore(showDialog)">
         </BadgeStores>
       </div>
       <div id="content-right">
@@ -34,13 +52,16 @@
         {{ limitTitle(title,100)}}
       </div>
       <div id="content-tips">
-        <div>{{ publishTime }}</div>
+        <div>{{ limitTime(publishTime) }}</div>
         <div>
           <SvgIcon id="tips-icon" name="look"></SvgIcon>
           <div>{{ viewNum }}</div>
         </div>
       </div>
-      <img :src="coverUrl" id="content-img" @click="jump">
+      <el-tooltip content="点击跳转" placement="top">
+        <img v-if="coverUrl" id="content-img" :src="realUrl" @click="jump">
+        <SvgIcon v-else :name="realUrl?realUrl:''" id="content-img" @click="jump"></SvgIcon>
+      </el-tooltip>
     </div>
     <div id="poster-comments" ref="commentRef">
       <div id="comments-title">评论 {{commentNum}}</div>
@@ -57,11 +78,6 @@
         </el-input>
         <el-button id="input-button" type="primary" :disabled="textarea === ''?true:false" @click="commentOrReply(textarea),textarea = ''">发送</el-button>
       </div>
-      <div id="comments-sort">
-        <div :class="[select?'sort-sure':'sort']" @click="updateHotSelect()">最热</div>
-        <div id="sort-divider">|</div>
-        <div :class="[select?'sort':'sort-sure']" @click="updateNewSelect()">最新</div>
-      </div>
       <div id="comments">
         <div v-for="(item) in commentList" :key="item.id">
           <Comment class="comment" :comment="item" @deleteComment="popupMessageBox('删除评论后，评论下所有回复都会被删除,是否继续?','删除评论',()=>deleteBothComment(item.id,item.rootId))" @sendResponse="commentOrReply">
@@ -69,7 +85,7 @@
           <SecondComment class="second-comment" v-for="(subItem) in item.sonComments" :key="subItem.id" :sub-comment="subItem" @deleteComment="popupMessageBox('删除评论后，评论下所有回复都会被删除,是否继续?','删除评论',()=>deleteBothComment(subItem.id,subItem.rootId))" @sendResponse="commentOrReply"></SecondComment>
           <div class="comment-line"></div>
         </div>
-        <Pagination id="comments-pagination" :paging="paging" layout="prev,pager,next" @currentChange="currentChange"></Pagination>
+        <Pagination v-show="commentList.length" id="comments-pagination" :paging="paging" layout="prev,pager,next" @currentChange="currentChange"></Pagination>
       </div>
     </div>
     <div id="poster-bottom"></div>
@@ -82,7 +98,7 @@
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  width:300px;
+  width:450px;
   z-index:3;
   background-color: #ffffff;
   border-radius: 5px;
@@ -100,7 +116,7 @@
 }
 
 #dialog-list{
-  height: 300px;
+  height: 200px;
   margin:20px 0;
   padding:0 20px;
   overflow:auto;
@@ -304,14 +320,15 @@ import BadgeStores from '@/components/Badge/BadgeStores.vue';
 import Brief from '@/components/Brief.vue';
 import Comment from '@/components/Comment.vue';
 import Header from '@/components/Header.vue'
-import { collect, deleteCollectList, getResource,addHistory, getAllCollect, likeResource, unlikeResource, getCommentList, deleteComment, comment, getCommentById} from '@/utils/preRequest';
-import { onMounted, reactive, ref, watch } from 'vue'
+import { collect, getResource,addHistory, getAllCollect, likeResource, unlikeResource, getCommentList, deleteComment, comment, getCommentById, getPlatform, selectLike} from '@/utils/preRequest';
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useInfoStore from '@/store/info'
-import { limitTitle, locateHeight, popupMessageBox } from '@/utils/operate';
+import { commitMessage, limitTime, limitTitle, locateHeight, popupMessageBox } from '@/utils/operate';
 import SecondComment from '@/components/SecondComment.vue';
 
 let goodNum = ref(0)
+let isActive = ref(false)
 let commentNum = ref(0)
 let authorName = ref('')
 let viewNum = ref(1839)
@@ -320,6 +337,7 @@ let coverUrl = ref('')
 let publishTime = ref('2025-2-28')
 let title = ref('')
 let keywordId = ref(0) 
+let sourceId = ref(1)
 
 const commentRef = ref(null)
 let textarea = ref('')
@@ -330,7 +348,6 @@ const infoStore = useInfoStore()
 let checked = ref(1)
 // 记录当前收藏的收藏夹id
 let checkResult = 0
-let storeState = ref(false)
 let showStore = ref(false)
 let storeList = ref([]) // 收藏夹数组
 
@@ -338,11 +355,12 @@ const commentList = ref([])
 let paging = reactive({
   currentPage: 1,
   pageSize: 10, // 固定
-  totalCount:100
+  totalCount:0
 })
+let id = ref(parseInt(route.params.id))
 
 const getDataList = (current) => {
-  getCommentList(current, route.params.id, paging.pageSize).then((data) => {
+  getCommentList(current, id.value, paging.pageSize).then((data) => {
     if (data) {
       commentList.value = data.records
       paging.currentPage = data.current
@@ -361,9 +379,13 @@ const currentChange = (val) => {
 
 // 进行评论
 const commentOrReply = async (content,rootId,toId,toComment) => {
-  console.log(content, rootId, toId,toComment)
-  const id = await comment(content, route.params.id, toId, rootId)
-  const result = await getCommentById(id)
+  // console.log(content, rootId, toId, toComment)
+  let cId = null
+  cId = await comment(content, id.value, toId, rootId)
+  let result = null
+  if (cId) {
+    result = await getCommentById(cId)
+  }
   if (result) {
     if (rootId == null) {
       commentList.value.unshift(result)
@@ -372,6 +394,7 @@ const commentOrReply = async (content,rootId,toId,toComment) => {
       result['toComment'] = toComment
       for (let i = 0; i < commentList.value.length; i++){
         if (commentList.value[i].id == result.rootId) {
+          if (!commentList.value[i].sonComments) commentList.value[i].sonComments = []
           commentList.value[i].sonComments.unshift(result)
           break
         }
@@ -381,18 +404,14 @@ const commentOrReply = async (content,rootId,toId,toComment) => {
 }
 
 // 取消收藏
-const cancelStore = () => {
-  storeState.value = false
-  deleteCollectList(checkResult,[route.params.id])
-  console.log("删除的posterid:", route.params.id)
-}
+// const cancelStore = () => {
+//   storeState.value = false
+//   deleteCollectList(checkResult,[id.value])
+//   console.log("删除的posterid:", id.value)
+// }
 
 // 判断是进行哪个回调
-const judgeStore = (trueCallback,falseCallback) => {
-  if (storeState.value) {
-    trueCallback()
-    return
-  }
+const judgeStore = (falseCallback) => {
   falseCallback()
 }
 
@@ -405,6 +424,10 @@ const selectId = (id) => {
 const showDialog = () => {
   getAllCollect().then((data) => {
     storeList.value = data
+    if (storeList.value.length === 0) {
+      commitMessage('warning','请先创建收藏夹')
+      return
+    }  
     checked.value = storeList.value[0].id
     showStore.value = true
   })
@@ -419,9 +442,8 @@ const cancelDialog = () => {
 const storeFavlist = () => {
   // 调用接口
   checkResult = checked.value
-  collect(route.params.id,checked.value)
-  console.log(checked.value)
-  storeState.value = true
+  collect(id.value,checked.value)
+  // console.log(checked.value)
   showStore.value = false
 }
 
@@ -432,9 +454,14 @@ onMounted(() => {
 
 // 判断当前根据id获取当前具体内容
 const getPoster = () => {
-  console.log(infoStore.id)
-  if(infoStore.id) addHistory(route.params.id)
-  getResource(route.params.id).then((data) => {
+  // console.log(infoStore.id)
+  if (infoStore.id > 0) {
+    addHistory(id.value)
+    selectLike(id.value).then((val) => {
+      isActive.value = val
+    })
+  }
+  getResource(id.value).then((data) => {
     // console.log(data)
     coverUrl.value = data.coverUrl
     authorName.value = data.authorName
@@ -444,17 +471,31 @@ const getPoster = () => {
     commentNum.value = data.commentCount
     title.value = data.title
     url = data.url
+    sourceId.value = data.sourceId
     keywordId.value = data.keywordId
 })
 }
+getPlatform()
+import useSystemStore from '@/store/system'
+const systemStore = useSystemStore()
+const realUrl = computed(() => {
+  if (sourceId.value > 0 && systemStore.platform.length === 5) {
+    return coverUrl.value ? coverUrl.value : systemStore.platform.filter((x) => {
+      // console.log(x)
+      return x.id === sourceId.value
+    })[0].name
+  }
+  return null
+}) 
 
 // 刚开始进入页面时先请求一次
 getPoster()
 
 // 参考b站只要登陆状态发生变化且id存在就重新发送浏览请求帮后台刷新历史记录
 watch(()=>infoStore.id, (val) => {
-  if (val) {
+  if (val > 0) {
     getPoster()
+    
   }
 })
 
@@ -468,29 +509,39 @@ const goComment = () => {
 }
 
 // 点击显示最热评论
-const updateHotSelect = function () {
-  if(select.value) return
-  select.value = !select.value
-}
+// const updateHotSelect = function () {
+//   if(select.value) return
+//   select.value = !select.value
+// }
 
-// 点击显示最新评论
-const updateNewSelect = function () {
-  if (!select.value) return
-  select.value = !select.value
-}
+// // 点击显示最新评论
+// const updateNewSelect = function () {
+//   if (!select.value) return
+//   select.value = !select.value
+// }
 
 // 点赞或取消点赞
-const likeOrUnlike = (type) => {
+const likeOrUnlike = (type,num) => {
   if (type) {
-    likeResource(route.params.id)
+    likeResource(id.value).then((val) => {
+      if (val) {
+        goodNum.value = num
+        isActive.value = type
+      }
+    })
   } else {
-    unlikeResource(route.params.id)
+    unlikeResource(id.value).then((val) => {
+      if (val) {
+        goodNum.value = num
+        isActive.value = type
+      }
+    })
   }
 }
 
 // 删除某条评论
 const deleteBothComment = (id,rootId) => {
-  console.log('删除id为：', id,rootId)
+  // console.log('删除id为：', id,rootId)
   // 接口
   deleteComment(id)
   // example

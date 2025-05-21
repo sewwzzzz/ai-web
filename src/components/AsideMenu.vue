@@ -2,14 +2,25 @@
   <el-menu
     class="el-menu-vertical-demo"
   >
-    <div id="aside-edit" v-show="showEdit">
+  <el-dialog v-model="showEdit" :title="type?'编辑收藏夹':'新建收藏夹'" width="500">
+    <ElInput v-model="targetName" id="edit-input"></ElInput>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancelDialog">Cancel</el-button>
+        <el-button type="primary" @click="newOrEdit">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+    <!-- <div id="aside-edit" v-show="showEdit">
       <Dialog :title="type?'编辑收藏夹':'新建收藏夹'" @exit="cancelDialog" @act="newOrEdit">
         <template v-slot:dialog-content>
           <ElInput v-model="targetName" id="edit-input"></ElInput>
         </template>
       </Dialog>
-    </div>
-    <div id="aside-mask" v-show="showEdit"></div>
+    </div> -->
+    <!-- <div id="aside-mask" v-show="showEdit"></div> -->
     <el-sub-menu index="1">
       <template #title>
         <span>我创建的收藏夹</span>
@@ -182,7 +193,7 @@ const newOrEdit = async() => {
   if (type.value == 0) {
     await newCollect(targetName.value)
   } else {
-    console.log(targetId.value, targetName.value)
+    // console.log(targetId.value, targetName.value)
     await editCollectName(targetId.value,targetName.value)
   }
   // 重新获取收藏夹列表和当前id显示的收藏夹内容

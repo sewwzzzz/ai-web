@@ -45,16 +45,16 @@
       <ToolButton v-show="deleteState" id="record-right" name="exitmanagement" func="退出管理" @click="changeDelState()"></ToolButton>
     </div>
     <div v-show="infoStore.id" id="content">
-      <div class="content-box"  @click="changeOrJump(item.id)" v-for="(item) in dataList.filter((x)=>x.resource.sourceId == currentMenu)" :key="item.id">
+      <div class="content-box"  @click="changeOrJump(deleteState? item.id:item.resource.id)" v-for="(item) in dataList.filter((x)=>x.resource.sourceId == currentMenu)" :key="item.id">
         <CheckBox v-show="deleteState" class="box-check" :isCheck="checkList[item.id]"></CheckBox>
         <HistoryBilibili :records="item"></HistoryBilibili>
       </div>
     </div>
   </div>
-  <div v-show="!infoStore.id" id="unlogin">
+  <div v-show="infoStore.id <= 0" id="unlogin">
       <UnLogin></UnLogin>
   </div>
-  <div v-show="infoStore.id && dataList.length" id="history-footer">
+  <div v-show="infoStore.id > 0 && dataList.length" id="history-footer">
     <Pagination id="footer-pagination" :paging = paging @sizeChange="sizeChange" @currentChange="currentChange"></Pagination>
   </div>
 </template>
@@ -127,7 +127,7 @@
 }
 
 #history-content{
-  padding:20px 15%;
+  padding:20px 5%;
   /* background-color: beige; */
   overflow:hidden;
 }
@@ -261,7 +261,7 @@ getPlatform()
 
 // 参考b站只要登陆状态发生变化且id存在才能发送历史记录
 watch(()=>infoStore.id, (val) => {
-  if (val) {
+  if (val > 0) {
     getDataList()
   }
 })
@@ -307,22 +307,22 @@ const judgeCheck = (callback) => {
 }
 
 // 删除记录
-const deleteCheck = () => {
-  deleteHistory(Array.from(trueList))
+const deleteCheck = async() => {
+  await deleteHistory(Array.from(trueList))
   getDataList(input.value)
 }
 
 // 清空所有
-const deleteAll = () => {
-  deleteHistory(dataList.value.map((item)=>item.id))
+const deleteAll = async() => {
+  await deleteHistory(dataList.value.map((item)=>item.id))
   getDataList(input.value)
 }
 
 // 分页数据
 let paging = reactive({
   currentPage: 1,
-  pageSize: 30,
-  totalCount: 400,
+  pageSize: 10,
+  totalCount: 0,
 })
 
 const getDataList = (searchText = '', current = 1, size = paging.pageSize)=>{
@@ -337,7 +337,7 @@ const getDataList = (searchText = '', current = 1, size = paging.pageSize)=>{
       checkAll.value = false
       cnt.value = 0
       deleteState.value = false
-      for (let item in dataList.value) {
+      for (let item of dataList.value) {
         checkList[item.id] = false
       }
     }
@@ -347,7 +347,8 @@ const getDataList = (searchText = '', current = 1, size = paging.pageSize)=>{
 // 页数据量变化
 const sizeChange = (val) => {
   paging.pageSize = val
-  getDataList(input.value,paging.currentPage,paging.pageSize)
+  paging.currentPage = 1
+  getDataList(input.value,1,paging.pageSize)
 }
 
 // 当前页号变化

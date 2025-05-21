@@ -2,7 +2,7 @@
   <el-pagination
     :current-page="props.paging.currentPage"
     :page-size="props.paging.pageSize"
-    :page-sizes="[30,50,100,200]"
+    :page-sizes="[10,30,50]"
     :layout="props.layout?props.layout:'total,sizes,prev,pager,next,jumper'"
     :total="props.paging.totalCount"
     @size-change="handleSizeChange"

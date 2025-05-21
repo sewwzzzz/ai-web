@@ -9,7 +9,7 @@
   <div id="block-content">
     <Bilibili id="content-box" v-for="(item) in dataList" :key="item.id" :records="item" @click="goPoster(item.id)"></Bilibili>
   </div>
-  <div id="block-footer">
+  <div id="block-footer" v-show="dataList.length">
     <Pagination id="footer-pagination" :paging = paging @sizeChange="sizeChange" @currentChange="currentChange"></Pagination>
   </div>
 </template>
@@ -58,11 +58,13 @@
 
 <script setup>
 import useSystemStore from '@/store/system'
-import { addEyes, getList } from '@/utils/preRequest'
+import { addEyes, getList, getPlatform, getSubscriptionList } from '@/utils/preRequest'
 import { useRoute,useRouter } from 'vue-router'
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import Bilibili from '@/components/Picture/Bilibili.vue'
+import useInfoStore from '@/store/info'
 const systemStore = useSystemStore()
+const infoStore = useInfoStore()
 const route = useRoute()
 const router = useRouter()
 let dataList = ref([])
@@ -70,11 +72,17 @@ let dataList = ref([])
 let sourceId = route.params.sourceId
 let keyId = route.params.keyId
 
+getPlatform()
+watch(()=>infoStore.id, (val) => {
+  if (val > 0) {
+    getSubscriptionList()
+  }
+})
 // 分页数据
 let paging = reactive({
   currentPage: 1,
-  pageSize: 30,
-  totalCount: 400,
+  pageSize: 10,
+  totalCount: 0,
 })
 
 // 根据信息获取对应数据列表
@@ -85,7 +93,7 @@ const getDataList = (sourceId, keyId, current = 1, size = paging.pageSize, searc
       paging.totalCount = data.total
       paging.currentPage = data.current
       dataList.value = data.records
-      console.log(dataList)
+      // console.log(dataList)
     }
   })
 }
@@ -96,7 +104,7 @@ getDataList(sourceId, keyId)
 const setCurrent = (firstId, secondId, thirdId) => {
   keyId = firstId
   sourceId = secondId
-  console.log("当前关键词id和平台id:", keyId, sourceId)
+  // console.log("当前关键词id和平台id:", keyId, sourceId)
   router.replace(`/block/${thirdId}/${firstId}/${secondId}`)
   getDataList(sourceId,keyId)
 }
@@ -104,7 +112,8 @@ const setCurrent = (firstId, secondId, thirdId) => {
 // 页数据量变化
 const sizeChange = (val) => {
   paging.pageSize = val
-  getDataList(sourceId,keyId,paging.currentPage,paging.pageSize)
+  paging.currentPage = 1
+  getDataList(sourceId,keyId,1,paging.pageSize)
 }
 
 // 当前页号变化

@@ -44,10 +44,6 @@ const tools = [
     path:'/message'
   },
   {
-    name: 'dynamics',
-    title: '动态',
-  },
-  {
     name: 'histories',
     title: '历史',
     path:'/history'
@@ -57,6 +53,10 @@ const tools = [
     title: '个人',
     path:'/user'
   },
+  {
+    name: 'exitlogin',
+    title: '注销',
+  }
 ]
 
 const scrollData = {
@@ -75,42 +75,42 @@ const messageMenu = {
     CMenu: '回复我的' ,
     path: '/message/reply'
   },
-  '@我的':{
-    EMenu: 'at',
-    CMenu: '@我的',
-    path:'/message/at'
-  },
-  '收到的赞':{
-    EMenu: 'love',
-    CMenu: '收到的赞',
-    path:'/message/love',
-  },
-  '系统通知':{
-    EMenu: 'system',
-    CMenu: '系统通知',
-    path:'/message/system'
-  }
+  // '@我的':{
+  //   EMenu: 'at',
+  //   CMenu: '@我的',
+  //   path:'/message/at'
+  // },
+  // '收到的赞':{
+  //   EMenu: 'love',
+  //   CMenu: '收到的赞',
+  //   path:'/message/love',
+  // },
+  // '系统通知':{
+  //   EMenu: 'system',
+  //   CMenu: '系统通知',
+  //   path:'/message/system'
+  // }
 }
 
 const headerOption = [
-  {
-    menu:'footlist',
-    path:'/user/footlist',
-    icon:'foot',
-    name:'足迹',
-  },
+  // {
+  //   menu:'footlist',
+  //   path:'/user/footlist',
+  //   icon:'foot',
+  //   name:'足迹',
+  // },
   {
     menu:'favlist',
     path:'/user/favlist',
     icon:'collectable',
     name:'收藏集',
   },
-  {
-    menu:'focuslist',
-    path:'/user/focuslist',
-    icon:'follow',
-    name:'关注'
-  }
+  // {
+  //   menu:'focuslist',
+  //   path:'/user/focuslist',
+  //   icon:'follow',
+  //   name:'关注'
+  // }
 ]
 
 export{

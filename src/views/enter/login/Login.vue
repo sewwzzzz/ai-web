@@ -85,7 +85,7 @@ const submit = () => {
   if (!loginFormRef.value) return
   loginFormRef.value.validate((valid) => {
     if (valid) {
-      console.log(loginForm)
+      // console.log(loginForm)
       login(loginForm.account, loginForm.pass).then((code) => {
         if (code) {
           emit('exit')

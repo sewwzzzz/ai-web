@@ -32,7 +32,7 @@
 
 <script setup>
 import { commitMessage } from '@/utils/operate'
-import { ref,defineProps, defineExpose, inject, onMounted} from 'vue'
+import { ref,defineProps, defineExpose, onMounted} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
@@ -44,11 +44,10 @@ const props = defineProps({
     type:Array,
   }
 })
-const target = inject('select',null)
 const realWidth = ref(0)
 
 onMounted(() => {
-  console.log('重新挂载')
+  // console.log('重新挂载')
 })
 
 const selectPoster = () => {
@@ -75,9 +74,6 @@ const selectPoster = () => {
   // 其他情况正常执行
 
   if (input.value && select.value) {
-    target.sourceName = select.value
-    target.searchText = input.value
-    target.type = !target.type
     router.push({
       name: 'select',
       query: {

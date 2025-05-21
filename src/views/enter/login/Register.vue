@@ -68,8 +68,8 @@ const registerForm = reactive({
 })
 
 const validatePass = (rule, value, callback) => {
-  if (value.length < 6 || value.length > 15) {
-    callback(('长度请控制在 6 到 15 个字符'))
+  if (value.length < 8 || value.length > 15) {
+    callback(('长度请控制在 8 个字符以上'))
   }
   if (registerForm.checkPass !== '') {
     if (!registerFormRef.value) return
@@ -89,7 +89,7 @@ const validateCheckPass = (rule, value, callback) => {
 const rules = reactive({
   account: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
-    {min:3,max:15,message:'长度请控制在 3 到 15 个字符', trigger:'blur'}
+    {min:3,max:15,message:'长度请控制在 4 个字符以上', trigger:'blur'}
   ],
   pass: [
     { required: true, message: '请输入登录密码', trigger: 'blur' },

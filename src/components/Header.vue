@@ -2,7 +2,7 @@
   <div id="main-login" v-show="showLogin">
     <Enter @exit-login="showLoginCmpt"></Enter>
   </div>
-  <div id="main-reset" v-show="showReset">
+  <!-- <div id="main-reset" v-show="showReset">
     <Dialog title="修改个人信息" @exit="exitReset" @act="updateInfo">
       <template v-slot:dialog-content>
         <div id="dialog-name">
@@ -17,8 +17,28 @@
         </div>
       </template>
     </Dialog>
-  </div>
-  <div id="main-mask" v-show="showLogin || showReset">
+  </div> -->
+  <el-dialog v-model="showReset" title="修改个人信息" width="500">
+    <div id="dialog-name">
+      <el-tag type="primary" size="large">昵称</el-tag>
+      <el-input class="dialog-input" v-model="nickName" :placeholder="infoStore.nickName" />
+    </div>
+    <div id="dialog-avatar">
+      <el-tag type="primary" size="large">头像</el-tag>
+      <img class="dialog-image" :src="imageUrl" alt="">
+      <el-button @click="handleImgUpload">上传文件</el-button>
+      <input type="file" id="chooseImg" style="display:none;" @change="handleFileChange">
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="exitReset">Cancel</el-button>
+        <el-button type="primary" @click="updateInfo">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+  <div id="main-mask" v-show="showLogin">
   </div>
   <div id="header">
     <div id="aside-sign" @click="backMain()">
@@ -28,12 +48,12 @@
     <div ref="headerRef" id="article-header">
       <SelectInput ref="inputRef" id="header-input" :platform="systemStore.platform"></SelectInput>
       <div id="header-right">
-        <img v-if="infoStore.id" id="right-avatar" @click="touchAvatar" :src="infoStore.avatarUrl">
+        <img v-if="infoStore.id>0" id="right-avatar" @click="touchAvatar" :src="infoStore.avatarUrl">
         <div  v-else id="right-avatar" @click="touchLogin">登录</div>
         <div v-for="(item,index) in tools" :key="index" class="right-icon" @click="jumpTools(item)">
           <ToolIcon :name="item.name" :title="item.title">
           </ToolIcon>
-          <div v-show="item.title === '消息'" class="right-number">20</div>
+          <!-- <div v-show="item.title === '消息'" class="right-number">20</div> -->
         </div>
       </div>
     </div>
@@ -210,13 +230,14 @@ import useSystemStore from '@/store/system'
 import useInfoStore from '@/store/info'
 import { uploadFile, updateUserInfo, getUserInfo } from '@/utils/preRequest'
 import Enter from '@/views/enter/Enter.vue'
+import { sendInfoMessage } from '@/utils/broadcast'
 const router = useRouter()
 const inputRef = ref(null)
 const headerRef = ref(null)
 const systemStore = useSystemStore()
 const infoStore = useInfoStore()
-const showLogin = ref(0)
-const showReset = ref(0)   
+const showLogin = ref(false)
+const showReset = ref(false)   
 const imageUrl = ref('')
 const nickName = ref('')
 let imgFile
@@ -238,7 +259,7 @@ const handleFileChange = (event) => {
   imgFile = event.target.files[0]
   event.target.value = ''
   imageUrl.value = URL.createObjectURL(imgFile)
-  console.log(imgFile)
+  // console.log(imgFile)
 }
 
 // 转换文件/图像
@@ -274,24 +295,24 @@ const updateInfo = async () => {
 
 // 点击头像
 const touchAvatar = () => {
-  showReset.value = 1
+  showReset.value = true
   nickName.value = infoStore.nickName
   imageUrl.value = infoStore.avatarUrl
 }
 
 // 退出重置信息界面
 const exitReset = () => {
-  showReset.value = 0
+  showReset.value = false
 }
 
 // 点击登录
 const touchLogin = () => {
-  showLogin.value = 1
+  showLogin.value = true
 }
 
 // 关闭登录界面
 const showLoginCmpt = () => {
-  showLogin.value = 0
+  showLogin.value = false
 }
 
 
@@ -313,6 +334,13 @@ const updateWidth = debounce(() => {
 
 // 点击 消息/动态/收藏/历史/ 后跳转路由
 const jumpTools = (item) => {
+  if (item.title === '注销') {
+    infoStore.clearInfo()
+    localStorage.removeItem('token')
+    localStorage.removeItem('password')
+    sendInfoMessage()
+    return
+  }
   // router.push(item.path)
   let routeData = router.resolve({
     path: item.path, // 这里填写的是路由配置中定义的路由路径path或者name

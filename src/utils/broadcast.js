@@ -8,7 +8,7 @@ const channel = new BroadcastChannel('store-channel')
 
 // msg必须为对象
 const sendStoreMessage = (msg) => {
-  console.log(msg)
+  // console.log(msg)
   channel.postMessage(msg)
 }
 
@@ -41,7 +41,7 @@ channel.onmessage = function(event){
     }
     systemStore.setPlatform(temp)
   }
-  console.log(event.data)
+  // console.log(event.data)
 }
 
 const sendInfoMessage = () => {

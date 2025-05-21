@@ -2,7 +2,8 @@
   <!-- <SvgIcon id="x" name="comments"></SvgIcon> -->
   <div>
     <div id="bilibili-content">
-      <img id="content-img" v-lazy="props.records.resource.coverUrl">
+      <img v-if="props.records.resource.coverUrl" id="content-img" :src="coverUrl">
+      <SvgIcon v-else :name="coverUrl" id="content-img"></SvgIcon>
       <div id="content-count">
         <div class="count-box">
           <SvgIcon class="box-icon" name="view"></SvgIcon>
@@ -20,9 +21,8 @@
     </div>
     <div id="bilibili-title">{{ limitTitle(props.records.resource.title )}}</div>
     <div id="bilibili-footer">
-      <SvgIcon class="box-icon" name="bilibili"></SvgIcon>
-      <div id="footer-name">{{ props.records.resource.authorName }}</div>
-      <div id="footer-time">{{ props.records.browsingTime }}</div>
+      <div id="footer-name">{{ limitTitle(props.records.resource.authorName,10) }}</div>
+      <div id="footer-time">{{ limitTime(props.records.browsingTime) }}</div>
     </div>
   </div>
 </template>
@@ -43,17 +43,21 @@
 #content-count{
   position:absolute;
   left:0;
-  bottom:5px;
+  bottom: 0px;
+  width:100%;
+  height:25px;
   display:flex;
+  align-items:center;
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .5) 100%);
 }
 
 .count-box{
   display:flex;
   margin-right:10px;
   gap:3px;
-  color:aliceblue;
+  color:rgb(255, 255, 255);
   font-family: PingFang SC, HarmonyOS_Medium, Helvetica Neue, Microsoft YaHei, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   margin-left: 5px;
 }
 
@@ -93,11 +97,23 @@
 
 <script setup>
 
-import { limitTitle } from '@/utils/operate';
-import { defineProps } from 'vue'
+import { limitTitle,limitTime } from '@/utils/operate';
+import { defineProps, computed } from 'vue'
+import useSystemStore from '@/store/system'
 const props = defineProps({
   records: {
     type: Object,
   }
 })
+const systemStore = useSystemStore()
+
+const coverUrl = computed(() => {
+  if (systemStore.platform.length === 5) {
+    return props.records.resource.coverUrl ? props.records.resource.coverUrl : systemStore.platform.filter((x) => {
+      // console.log("历史图片",x.id,props.records.sourceId)
+      return x.id === props.records.resource.sourceId
+    })[0].name
+  }
+  return ''
+}) 
 </script>

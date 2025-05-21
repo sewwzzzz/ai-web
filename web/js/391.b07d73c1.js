@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkai_web"]=self["webpackChunkai_web"]||[]).push([[391],{8391:function(e,n,a){a.r(n),a.d(n,{default:function(){return d}});var r=a(6768);const t={id:"love"};function u(e,n){return(0,r.uX)(),(0,r.CE)("div",t," 我的点赞 ")}var c=a(1241);const i={},s=(0,c.A)(i,[["render",u],["__scopeId","data-v-142909ae"]]);var d=s}}]);
+//# sourceMappingURL=391.b07d73c1.js.map

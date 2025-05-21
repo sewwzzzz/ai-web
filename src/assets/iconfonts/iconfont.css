@@ -5,6 +5,14 @@
        url('iconfont.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: "iconfont"; /* Project id 4692039 */
+  src: url('iconfont1.woff2') format('woff2'),
+       url('iconfont1.woff') format('woff'),
+       url('iconfont1.ttf') format('truetype');
+}
+
+
 .iconfont {
   font-family: "iconfont" !important;
   font-size: 21px;
@@ -37,3 +45,6 @@
   content: "\e68f";
 }
 
+.icon-new:before {
+  content: "\e667";
+}

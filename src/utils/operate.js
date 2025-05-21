@@ -43,6 +43,11 @@ const limitTitle = (title, len = 20) => {
   return title
 }
 
+const limitTime = (time) => {
+  const arr = time.slice(0, 19)
+  return arr.replace('T',' ')
+}
+
 const popupMessageBox = (content, title, okCallback ,type = 'warning' , cancelCallback=()=>{}) => {
   ElMessageBox.confirm(
     content,
@@ -66,6 +71,7 @@ const popupMessageBox = (content, title, okCallback ,type = 'warning' , cancelCa
 export {
   locateHeight,
   limitTitle,
+  limitTime,
   commitMessage,
   debounce,
   popupMessageBox,

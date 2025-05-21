@@ -1,19 +1,24 @@
 <template>
-    <div class="reply">
+    <div class="reply" @click="jumpTo(props.records.id,props.records.resourceId)">
       <img class="reply-avatar" :src="props.records.sendUser.avatarUrl">
       <div class="reply-content">
-        <div class="content-header" @click="jumpTo(props.resourceId)">
+        <div class="content-header" >
           <span class="review-name">{{ props.records.sendUser.nickname }}</span>
           <span class="review-font">回复了我的评论</span>
-          <div class="review-reply">{{ props.records.content }}</div>
-          <div class="header-source">{{ props.records.source }}</div>
+          <div class="dot" v-show="props.records.status === 0">●</div>
         </div>
+        <div class="review-reply">{{ props.records.content }}</div>
         <div class="content-footer">
-          <div class="footer-time">{{ props.records.sendTime }}</div>
-          <FooterGoods></FooterGoods>
-          <FooterReply :is-comment="showReply" @reply=changeReplyState></FooterReply>
+          <div class="footer-time">{{ limitTime(props.records.sendTime) }}</div>
+          <div class="footer-delete" @click="deal($event)">
+            <SvgIcon class="delete-icon" name="deletehistory">
+            </SvgIcon>
+            <span>删除该消息</span>
+          </div>
+          <!-- <FooterGoods></FooterGoods>
+          <FooterReply :is-comment="showReply" @reply=changeReplyState></FooterReply> -->
         </div>
-        <div class="footer-input" v-show="showReply">
+        <!-- <div class="footer-input" v-show="showReply">
           <el-input
           v-model="textarea"
           :autosize="{ minRows: 5, maxRows: 5 }"
@@ -24,13 +29,20 @@
           >
           </el-input>
           <el-button class="input-button" type="primary" :disabled="textarea === ''?true:false">回复</el-button>
-        </div> 
+        </div>  -->
       </div>
     </div>
     <div class="divider-line"></div>
 </template>
 
 <style scoped>
+.dot{
+  display: inline-block;
+  color:red;
+  font-size:5px;
+  margin-left:10px;
+}
+
 .divider-line{
   width:calc(100% - 76px);
   height:0px;
@@ -51,6 +63,7 @@ hr{
   display:flex;
   box-sizing: border-box;
   padding:20px 10px;
+  cursor: pointer;
 }
 .reply-avatar{
   width:46px;
@@ -64,9 +77,15 @@ hr{
   height:fit-content;
 }
 
+.delete-icon{
+  width:20px;
+  height:20px;
+}
+
 .content-header{
   width:100%;
-  position:relative;
+  display: flex;
+  align-items: center;
 }
 
 .review-name{
@@ -100,6 +119,7 @@ hr{
 .content-footer{
   margin-top: 10px;
   display:flex;
+  align-items: center;
   gap:10px;
 }
 
@@ -115,6 +135,15 @@ hr{
   height:115px;
   margin-top:5px;
 }
+
+.footer-delete{
+  color:#8a919f;
+  height:20px;
+  display:flex;
+  align-items: center;
+  font-size: 15px;
+}
+
 .el-textarea{
   z-index:0;
   width:calc(100% - 100px);
@@ -133,8 +162,9 @@ hr{
 </style>
 
 <script setup>
-import { addEyes } from '@/utils/preRequest'
-import { defineProps, ref } from 'vue'
+import { limitTime, popupMessageBox } from '@/utils/operate'
+import { addEyes, readedState } from '@/utils/preRequest'
+import { defineProps, defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -161,14 +191,19 @@ const props = defineProps({
   }
 })
 
-const textarea = ref('')
-const showReply = ref(false)
-const changeReplyState = (type) => {
-  showReply.value = type
+const emits = defineEmits(['deleteMessage'])
+const deleteMessage = () => {
+  emits('deleteMessage',props.records.id)
 }
 
-const jumpTo = function (id) {
+const deal = function (event) {
+  event.stopPropagation()
+  popupMessageBox('删除消息通知后不可恢复','删除通知',()=>deleteMessage())
+}
+
+const jumpTo = function (messageId,id) {
   addEyes(id)
+  readedState(messageId)
   let routeData = router.resolve({
     path :`/Poster/${id}`
   })

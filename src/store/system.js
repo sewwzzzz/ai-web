@@ -109,17 +109,17 @@ const useSystemStore = defineStore('system', {
           blockId:6
         },
         {
-          name: '文本匹配',
+          name: '情感分析',
           id: 22,
           blockId:6
         },
         {
-          name: '文本生成',
+          name: '立场检测',
           id: 23,
           blockId:6
         },
         {
-          name: '序列标注',
+          name: '大语言模型',
           id: 24,
           blockId:6
         },
@@ -137,6 +137,9 @@ const useSystemStore = defineStore('system', {
           name: 'Github',
           id:3
         }
+      ],
+      subscribeList: [
+        
       ]
     }
   },

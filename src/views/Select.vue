@@ -49,56 +49,63 @@
 </style>
 
 <script setup>
-import { addEyes, getList } from '@/utils/preRequest'
-import { ref,reactive, provide, watch } from 'vue'
+import { addEyes, getList, getPlatform } from '@/utils/preRequest'
+import { ref, watch, reactive, computed } from 'vue'
 let dataList = ref([])
-import { useRouter } from 'vue-router'
+import { useRouter,useRoute } from 'vue-router'
 import useSystemStore from '@/store/system'
 
+getPlatform()
 const systemStore = useSystemStore()
 const router = useRouter()
-const target = reactive({
-  sourceName: '',
-  searchText: '',
-  type:false
+const route = useRoute()
+const input = ref(route.query.searchText)
+const selectId = computed(() => {
+  if (systemStore.platform.length === 5) {
+    return systemStore.platform.filter((item)=>item.name == route.query.sourceName)[0].id
+  }
+  return null
 })
 
-provide('select', target)
+// 根据信息获取对应数据列表
+const getDataList = (sourceId, searchText, current = 1, size = 30) => {
+  getList(current, size, sourceId, null, searchText).then((data) => {
+    if (data) {
+      paging.pageSize = data.size
+      paging.totalCount = data.total
+      paging.currentPage = data.current
+      dataList.value = data.records
+    }
+    // console.log(dataList)
+  })
+}
 
-watch(target, (x) => {
+watch([()=>route.query.searchText,selectId], (x) => {
   console.log(x)
-  getDataList(systemStore.platform.filter((item)=>item.name == x.sourceName)[0].id,x.searchText)
-})
+  getDataList(x[1],x[0])
+}, {immediate:true})
 // 分页数据
 let paging = reactive({
   currentPage: 1,
-  pageSize: 30,
-  totalCount: 400,
+  pageSize: 10,
+  totalCount: 0,
 })
 
 // 页数据量变化
 const sizeChange = (val) => {
   paging.pageSize = val
-  getDataList(target.sourceId,target.searchText,paging.currentPage,paging.pageSize)
+  paging.currentPage = 1
+  getDataList(selectId.value,input.value,1,paging.pageSize)
 }
 
 // 当前页号变化
 const currentChange = (val) => {
   paging.currentPage = val
-  getDataList(target.sourceId,target.searchText ,paging.currentPage,paging.pageSize)
+  getDataList(selectId.value,input.value ,paging.currentPage,paging.pageSize)
 }
 
 
-// 根据信息获取对应数据列表
-const getDataList = (sourceId, searchText, current = 1, size = 30) => {
-  getList(current, size, sourceId, null, searchText).then((data) => {
-    paging.pageSize = data.size
-    paging.totalCount = data.total
-    paging.currentPage = data.current
-    dataList.value = data.records
-    console.log(dataList)
-  })
-}
+
 
 // 前往具体资讯页面
 const goPoster = (id) => {

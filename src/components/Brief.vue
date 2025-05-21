@@ -4,12 +4,12 @@
       <!-- <img id="header-avatar"/> -->
       {{ keyWord?keyWord.name:'' }}
     </div>
-    <el-button id="content-footer" :type="state" @click="updateState()">
-      <el-icon v-if="state === ''">
+    <el-button id="content-footer" :type="state?'default':'primary'" @click="updateState()">
+      <el-icon v-if="state">
         <i-ep-check></i-ep-check>
       </el-icon>
-      <div :class="[state === '' ? 'footer-text' : '']">
-        {{ state === '' ? '已订阅' : '订阅' }}
+      <div :class="[state? 'footer-text' : '']">
+        {{ state? '已订阅' : '订阅' }}
       </div>
     </el-button>
     
@@ -79,27 +79,48 @@
 </style>
 
 <script setup>
-import { computed, defineProps, ref } from 'vue'
+import { computed, defineProps, ref, watch } from 'vue'
 import useSystemStore from '@/store/system'
-import { updateSubscription } from '@/utils/preRequest';
+import { getSubscriptionList, subscribe, unSubsribe } from '@/utils/preRequest';
+import useInfoStore from '@/store/info'
 
-
-const systemStore = useSystemStore();
+const systemStore = useSystemStore()
+const infoStore = useInfoStore()
 
 const props = defineProps({
   keywordId: {
     type:Number,
   }
 })
-let keyWord = ref(systemStore.menuTitle.filter((x)=> x.id === props.keywordId)[0])
-console.log("keyword",keyWord.value)
-let state = computed(() => {
-  return keyWord.value.status ? '' : 'primary'
+
+let keyWord = computed(() => {
+  return systemStore.menuTitle.filter((x) => x.id === props.keywordId)[0]
+})
+
+// 获取最新订阅状态列表并更新
+const getUpdateList = () => {
+  getSubscriptionList().then(() => {
+    state.value = systemStore.subscribeList.filter((x) => x.keywordId === props.keywordId)[0]
+    // console.log("state", state.value)
+  })
+}
+
+let state = ref(null)
+watch(()=>infoStore.id, (val) => {
+  if (val > 0) {
+    getUpdateList()
+  }
 })
 
 // 更新作者简介的'订阅'状态
-const updateState = function () {
-  keyWord.value.status = !keyWord.value.status
-  updateSubscription(keyWord.value.subscribeId, keyWord.value.status);
+const updateState = async function () {
+  if (state.value) {
+    await unSubsribe(state.value.id)
+    getUpdateList()
+  }
+  else {
+    await subscribe(props.keywordId)
+    getUpdateList()
+  }
 }
 </script>

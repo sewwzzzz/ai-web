@@ -17,22 +17,29 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(function (response) {
   // 2xx会触发该步骤
   const responseData = response.data
+  // console.log("request拦截响应器",response)
   if (responseData.code == 200) {
     return responseData
   }
   else if (responseData.code == 203) {
-    const infoStore = useInfoStore()
-    infoStore.clearInfo()
-    sendInfoMessage()
-    return Promise.reject('您还未登录，请先登录')
+    return null
   }
-  return Promise.reject(responseData.description)
+  else if(responseData.description){
+    // const infoStore = useInfoStore()
+    // infoStore.clearInfo()
+    // sendInfoMessage()
+    return Promise.reject(responseData.description)
+  }
+  else {
+    return Promise.reject(responseData.message)
+  }
+  // return Promise.reject(responseData.message)
 }, function () {
   return Promise.reject('网络错误')
 })
 
 const request = async (config) => {
-  const { url, params, method, data, token } = config
+  const { url, params, method, data, token,type } = config
   const req = {
     url: url,
     method: method,
@@ -49,15 +56,17 @@ const request = async (config) => {
     Object.keys(data).forEach((key) => {
       if(data[key]) formdata.append(key,data[key])
     })
-    req['data']=formdata
+    req['data'] = formdata
+    // console.log(data)
   }
-  if (token) {
+  if (token || type) {
     req['headers'] = {}
-    req.headers['access-token'] = `Bearer ${token}`
+    if (token) req.headers['access-token'] = token
+    if(type) req.headers['content-type'] = type
   }
-  console.log('发送的请求体:',req)
+  // console.log('发送的请求体:',req)
   return instance(req).catch((error)=> {
-    console.log("error的description:",error)
+    // console.log("error的description:",error)
     commitMessage('error', error)
     return null
   })

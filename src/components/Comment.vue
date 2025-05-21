@@ -9,8 +9,8 @@
         {{ props.comment.content }}
       </div>
       <div id="comment-footer">
-        <div id="footer-time">{{ props.comment.commentTime }}</div>
-        <FooterGoods></FooterGoods>
+        <div id="footer-time">{{ limitTime(props.comment.commentTime) }}</div>
+        <!-- <FooterGoods></FooterGoods> -->
         <FooterReply :is-comment="showReply" @reply="updateReplyState"></FooterReply>
         <SvgIcon v-show="props.comment.user.id == infoStore.id" name="deletecomment" class="delete-icon" @click="visible = true">
         </SvgIcon>
@@ -43,10 +43,10 @@
   margin-right:20px;
   border-radius: 50%;
   cursor:pointer;
-  flex-shrink: 0;
 }
 #right-comment{
-  flex:1;
+  /* flex:1; 不行*/
+  width: calc(100% - 60px);
 }
 #comment-name{
   font-size: 14px;
@@ -60,7 +60,7 @@
 #comment-footer{
   width:100%;
   display:flex;
-  margin-top:10px;
+  margin-top:20px;
   position:relative;
 }
 
@@ -130,9 +130,9 @@
 
 <script setup>
 import { ref,defineProps,defineEmits } from 'vue'
-import FooterGoods from './Footer/FooterGoods.vue'
 import FooterReply from './Footer/FooterReply.vue'
 import useInfoStore from '@/store/info'
+import { limitTime } from '@/utils/operate'
 
 const infoStore = useInfoStore()
 let showReply = ref(false)
@@ -164,7 +164,7 @@ const props = defineProps({
 const updateReplyState = function (state) {
   showReply.value = state
   if(state)textarea.value = ''
-  console.log(state)
+  // console.log(state)
 }
 
 // 传递删除消息
@@ -175,7 +175,7 @@ const deleteComment = () => {
 // 发送评论
 const sendResponse = () => {
   showReply.value = false
-  emits('sendResponse', textarea.value, props.comment.id, props.comment.id)
+  emits('sendResponse', textarea.value, props.comment.id,null,null)
   textarea.value = ''
 }
 </script>

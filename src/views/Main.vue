@@ -2,7 +2,7 @@
   <div id="main-login" v-show="showLogin">
     <Enter @exit-login="showLoginCmpt"></Enter>
   </div>
-  <div id="main-reset" v-show="showReset">
+  <!-- <div id="main-reset" v-show="showReset">
     <Dialog title="修改个人信息" @exit="exitReset" @act="updateInfo">
       <template v-slot:dialog-content>
         <div id="dialog-name">
@@ -12,15 +12,34 @@
         <div id="dialog-avatar">
           <el-tag type="primary" size="large">头像</el-tag>
           <img class="dialog-image" :src="imageUrl" alt="">
-          <!-- <input class="dialog_input" type="file"> -->
           <el-button @click="handleImgUpload">上传文件</el-button>
           <input type="file" id="chooseImg" style="display:none;" @change="handleFileChange">
         </div>
       </template>
     </Dialog>
+  </div> -->
+  <div id="main-mask" v-show="showLogin">
   </div>
-  <div id="main-mask" v-show="showLogin || showReset">
-  </div>
+  <el-dialog v-model="showReset" title="修改个人信息" width="500">
+    <div id="dialog-name">
+      <el-tag type="primary" size="large">昵称</el-tag>
+      <el-input class="dialog-input" v-model="nickName" :placeholder="infoStore.nickName" />
+    </div>
+    <div id="dialog-avatar">
+      <el-tag type="primary" size="large">头像</el-tag>
+      <img class="dialog-image" :src="imageUrl" alt="">
+      <el-button @click="handleImgUpload">上传文件</el-button>
+      <input type="file" id="chooseImg" style="display:none;" @change="handleFileChange">
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="exitReset">Cancel</el-button>
+        <el-button type="primary" @click="updateInfo">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
   <aside id="main-aside">
       <div id="aside-sign" @click="stayMain()">
         <svg-icon id="sign-icon" name="aiweb"></svg-icon>
@@ -36,7 +55,7 @@
     <div id="article-header" ref="headerRef">
       <SelectInput ref="inputRef" id="header-input" :platform="systemStore.platform"></SelectInput>
       <div id="header-right">
-        <img v-if="infoStore.id" id="right-avatar" @click="touchAvatar" :src="infoStore.avatarUrl">
+        <img v-if="infoStore.id > 0" id="right-avatar" @click="touchAvatar" :src="infoStore.avatarUrl">
         <div  v-else id="right-avatar" @click="touchLogin">登录</div>
         <ToolIcon v-for="(item,index) in tools" :key="index" :name="item.name" :title="item.title" @click="jumpTools(item)">
         </ToolIcon>
@@ -48,10 +67,12 @@
       </div>
       <div ref="boxContentRef" class="box-content">
         <div class="content-header">
-          <Menu ref="menuRef" :menuTitle="systemStore.menuTitle.filter((x) => x.blockId == item.blockId)" :platform="systemStore.platform" @send-id="setCurrent"></Menu>
-          <el-button class="header-more" @click="goBlock(item.blockId)">
-            查看更多<el-icon><i-ep-arrow-right></i-ep-arrow-right></el-icon>
-          </el-button>
+          <div v-if="systemStore.menuTitle.filter((x) => x.blockId == item.blockId).length">
+            <Menu ref="menuRef" :menuTitle="systemStore.menuTitle.filter((x) => x.blockId == item.blockId)" :platform="systemStore.platform" @send-id="setCurrent"></Menu>
+            <el-button class="header-more" @click="goBlock(item.blockId)">
+              查看更多<el-icon><i-ep-arrow-right></i-ep-arrow-right></el-icon>
+            </el-button>
+          </div>
         </div>
         <div class="content">
           <Bilibili class="content-box" v-for="(x) in dataList[item.blockId]" :key="x.id" :records="x" @click="goPoster(x.id)"></Bilibili>
@@ -290,9 +311,9 @@
 <script setup>
 import SelectInput from '@/components/SelectInput.vue';
 import ToolIcon from '@/components/ToolIcon.vue';
-import { onBeforeUnmount, onMounted, ref} from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import { menu,tools} from '@/datas/config'
-import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform, getUserInfo, addEyes, getSubscriptionList} from '@/utils/preRequest'
+import {uploadFile, updateUserInfo, getBlockList, getKeyWord, getPlatform, getUserInfo, addEyes, getSubscriptionList, updateSubscription} from '@/utils/preRequest'
 import { useRouter } from 'vue-router'
 import useInfoStore from '@/store/info'
 import useSystemStore from '@/store/system'
@@ -308,13 +329,14 @@ const inputRef = ref(null)
 const router = useRouter()                        
 const infoStore = useInfoStore()
 const systemStore = useSystemStore()
-const showLogin = ref(0)
-const showReset = ref(0)   
+const showLogin = ref(false)
+const showReset = ref(false)   
 const imageUrl = ref('')
 const nickName = ref('')
 let imgFile
 let hashmap = ref(new Map())
 const dataList = ref({})
+
 
 Promise.all([getBlockList(), getKeyWord(), getSubscriptionList() ,getPlatform()]).then(() => {
   // 根据不同的blockID记录展示的关键词和平台的内容
@@ -322,16 +344,25 @@ Promise.all([getBlockList(), getKeyWord(), getSubscriptionList() ,getPlatform()]
     const temp = menu[key]
     // console.log(systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0])
     const titleItem = systemStore.menuTitle.filter((item) => item.blockId == temp.blockId)[0]
-    hashmap.value.set(temp.blockId, [titleItem.id, systemStore.platform[0].id])
-    getDataList(temp.blockId, systemStore.platform[0].id, titleItem.id)
+    if (titleItem) {
+      hashmap.value.set(temp.blockId, [titleItem.id, systemStore.platform[0].id])
+      getDataList(temp.blockId, systemStore.platform[0].id, titleItem.id)
+    }
   }
 })
+
+
 
 // 如果token有存储在本地，那么可以认为上次用户并未主动退出，期望下次自动登录
 if (infoStore.token == '' && localStorage.getItem('token')) {
   getUserInfo()
 }
 
+watch(()=>infoStore.id, (val) => {
+  if (val > 0) {
+    getSubscriptionList()
+  }
+})
 // onMounted(() => {
 //   // 这里会出现回到顶部又重新弹回原位置，我推测是由于menuTitle突然重新赋值导致
 //   window.addEventListener('scroll', () => console.log(document.documentElement.scrollTop))
@@ -355,16 +386,25 @@ const getDataList = (blockId, sourceId, keyId, current = 1, size = 5, searchText
   getList(current, size, sourceId, keyId, searchText).then((data) => {
     if (data) {
       dataList.value[blockId] = data.records
-    // console.log(dataList.value)
     }
   })
 }
 
+const getUpdateList = async(id) => {
+  getSubscriptionList().then(() => {
+    // console.log(systemStore.subscribeList.filter((x) => x.keywordId === id).length)
+    return systemStore.subscribeList.filter((x) => x.keywordId === id).length
+    // console.log("state", state.value)
+  })
+}
+
 // 设置当前点击的平台及关键词
-const setCurrent = (firstId, secondId, thirdId) => {
+const setCurrent = async(firstId, secondId, thirdId) => {
   hashmap.value.set(thirdId, [firstId, secondId])
   // console.log("存储的Map:",hashmap)
-  getDataList(thirdId,secondId,firstId)
+  getDataList(thirdId, secondId, firstId)
+  const result = await getUpdateList(firstId)
+  if(result) updateSubscription(firstId,0)
 }
 
 
@@ -385,7 +425,7 @@ const handleFileChange = (event) => {
   imgFile = event.target.files[0]
   event.target.value = ''
   imageUrl.value = URL.createObjectURL(imgFile)
-  console.log(imgFile)
+  // console.log(imgFile)
 }
 
 // 转换文件/图像
@@ -420,33 +460,35 @@ const updateInfo = async () => {
 
 // 点击头像
 const touchAvatar = () => {
-  showReset.value = 1
+  showReset.value = true
   nickName.value = infoStore.nickName
   imageUrl.value = infoStore.avatarUrl
 }
 
 // 退出重置信息界面
 const exitReset = () => {
-  showReset.value = 0
+  showReset.value = false
 }
 
 // 点击登录
 const touchLogin = () => {
-  showLogin.value = 1
+  showLogin.value = true
 }
 
 // 关闭登录界面
 const showLoginCmpt = () => {
-  showLogin.value = 0
+  showLogin.value = false
 }
 
 // 设定每个板块menu和搜索框的宽度
 const updateWidth = debounce(() => {
   inputRef.value.setInputWidth((headerRef.value.offsetWidth+30)*0.3)
   menuWidth = boxContentRef.value[0].offsetWidth * 0.8
-  menuRef.value.forEach((item) => {
-    item.setMenuWidth(menuWidth)
-  })
+  if (menuRef.value) {
+    menuRef.value.forEach((item) => {
+      item.setMenuWidth(menuWidth)
+    })
+  }
 }, 100)
 
 // 获取一下scrollTop高度
@@ -470,6 +512,13 @@ onBeforeUnmount(()=>{
 // 点击 消息/动态/收藏/历史/ 后跳转路由
 const jumpTools = (item) => {
   // router.push(item.path)
+  if (item.title === '注销') {
+    infoStore.clearInfo()
+    localStorage.removeItem('token')
+    localStorage.removeItem('password')
+    sendInfoMessage()
+    return
+  }
   let routeData = router.resolve({
     path: item.path, // 这里填写的是路由配置中定义的路由路径path或者name
   });

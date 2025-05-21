@@ -1,6 +1,6 @@
 <template>
   <div id="badge-content" @click="updateState()">
-    <SvgIcon name="stores" :class="[props.isActive?'content-icon-sure':'content-icon']"></SvgIcon>
+    <SvgIcon name="stores" class='content-icon-sure'></SvgIcon>
   </div>
 </template>
 
@@ -63,17 +63,20 @@
 <script setup>
 import { defineProps,defineEmits } from 'vue'
 import SvgIcon from '../SvgIcon.vue'
+import useInfoStore from '@/store/info'
 
-const props = defineProps({
-  isActive: {
-    type: Boolean,
-    default:false
-  },
-})
+const infoStore= useInfoStore()
+// const props = defineProps({
+//   isActive: {
+//     type: Boolean,
+//     default:false
+//   },
+// })
 
 const emits=defineEmits(['goStore'])
 // 点赞后更新'收藏'徽章状态
 const updateState = function () {
+  if(infoStore.id <= 0) return
   emits('goStore')
 }
 </script>
